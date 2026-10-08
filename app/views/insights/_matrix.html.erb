@@ -1,0 +1,38 @@
+<%# locals: (insights:, title:, noun:, groups:) %>
+<% heading_id = "#{noun}_heading" %>
+<section aria-labelledby="<%= heading_id %>" class="flex min-w-0 flex-col gap-6">
+  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: heading_id, title:,
+        description: "How often each distortion came up with each #{noun}, compared with your overall rate. Numbers are entries with that distortion." %>
+
+  <% if groups.empty? %>
+    <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">No entries in this range recorded a <%= noun %>.</p>
+  <% else %>
+    <div class="-mx-4 overflow-x-auto px-4">
+      <table class="w-full min-w-[32rem] border-separate border-spacing-1 text-center text-base/6 tabular-nums sm:text-sm/6">
+        <thead>
+          <tr>
+            <td></td>
+            <% insights.columns.each do |distortion| %>
+              <th scope="col" class="w-[14%] pb-1 align-bottom text-xs/4 font-medium text-balance <%= distortion == insights.distortion ? "text-teal-800 dark:text-teal-300" : "text-stone-500 dark:text-stone-400" %>"><%= distortion.title %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% groups.each do |group| %>
+            <tr>
+              <th scope="row" title="<%= group.label %>" class="max-w-40 truncate pr-2 text-left font-medium text-stone-900 dark:text-white">
+                <%= group.label %> <span class="font-normal text-stone-500 dark:text-stone-400">(<%= group.entries %>)</span>
+              </th>
+              <% group.cells.each do |distortion, cell| %>
+                <% heading = "#{group.label} · #{distortion.title}" %>
+                <% detail = "#{cell.matches} of #{pluralize cell.entries, "entry"} · #{lift_label(cell.lift)}" %>
+                <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset dark:hover:ring-white/40 <%= lift_class(cell.lift) %>" data-tooltip="<%= heading %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= heading %>: <%= detail %></span><span aria-hidden="true"><%= cell.matches if cell.lift %></span></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <%= render "insights/lift_legend" %>
+  <% end %>
+</section>

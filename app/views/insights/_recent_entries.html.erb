@@ -1,0 +1,24 @@
+<%# locals: (insights:) %>
+<% entries = insights.recent_entries %>
+<section aria-labelledby="recent_heading" class="flex min-w-0 flex-col gap-6">
+  <%= render "insights/section_heading", level: 3, id: "recent_heading", title: "Recent entries",
+        description: "The latest entries where you noticed #{insights.distortion.title.downcase}." %>
+
+  <ul role="list" class="divide-y divide-stone-950/5 dark:divide-white/10">
+    <% entries.each do |situation| %>
+      <li>
+        <%= link_to situation, data: { turbo_frame: "_top" }, class: "group -mx-2 flex items-center justify-between gap-6 rounded-lg px-2 py-3 hover:bg-stone-950/[0.03] dark:hover:bg-white/[0.03]" do %>
+          <div class="min-w-0">
+            <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
+              <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time><% if situation.location.present? %> · <%= situation.location %><% end %>
+            </p>
+            <p class="truncate font-display text-lg font-medium text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300"><%= situation.title %></p>
+          </div>
+          <% if situation.emotion_level %>
+            <div class="shrink-0"><%= render "shared/emotion_level", level: situation.emotion_level %></div>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</section>

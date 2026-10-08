@@ -1,0 +1,33 @@
+<%# locals: (insights:) %>
+<% focus = insights.distortion %>
+<% pairs = insights.pairs %>
+<% max = pairs.map(&:count).max.to_i %>
+<section aria-labelledby="pairs_heading" class="flex min-w-0 flex-col gap-6">
+  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "pairs_heading", title: (focus ? "Often with" : "Together"),
+        description: focus ? "Other distortions logged in the same entry as #{focus.title.downcase}, and how often." : "Distortions that most often show up in the same entry." %>
+
+  <% if pairs.empty? %>
+    <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
+      <%= focus ? "#{focus.title} hasn't been logged alongside another distortion in this range." : "No entry in this range has more than one distortion." %>
+    </p>
+  <% else %>
+    <ul role="list" class="flex flex-col gap-3">
+      <% pairs.each do |pair| %>
+        <% label = focus ? pair.distortions.last.title : pair.distortions.map(&:title).join(" + ") %>
+        <% detail = focus ? "In #{pluralize pair.count, "entry"}, #{percent(pair.share)} of #{focus.title.downcase} entries" : "Together in #{pluralize pair.count, "entry"}, #{percent(pair.share)} of all entries" %>
+        <li class="grid grid-cols-1 gap-1.5" data-tooltip="<%= label %>" data-tooltip-detail="<%= detail %>">
+          <p class="truncate text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white"><%= label %></p>
+          <div class="flex items-center gap-3">
+            <div class="h-2 flex-1 rounded-full bg-stone-950/5 dark:bg-white/10" aria-hidden="true">
+              <div class="h-full rounded-full bg-teal-600 dark:bg-teal-400" style="width: <%= (pair.count.fdiv(max) * 100).round(2) %>%"></div>
+            </div>
+            <p class="relative w-24 shrink-0 text-right text-base/6 text-stone-600 tabular-nums sm:text-sm/6 dark:text-stone-400">
+              <span class="sr-only"><%= detail %></span>
+              <span aria-hidden="true"><%= focus ? percent(pair.share) : pluralize(pair.count, "entry") %></span>
+            </p>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

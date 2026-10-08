@@ -1,0 +1,26 @@
+<%# locals: (insights:, column:, title:, noun:) %>
+<% distortion = insights.distortion %>
+<% groups = insights.ranked_groups(column) %>
+<% heading_id = "#{noun}_heading" %>
+<section aria-labelledby="<%= heading_id %>" class="flex min-w-0 flex-col gap-6">
+  <%= render "insights/section_heading", level: 3, id: heading_id, title:,
+        description: "Each #{noun}, ordered by how often #{distortion.title.downcase} came up there compared with your overall rate." %>
+
+  <% if groups.empty? %>
+    <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">No entries in this range recorded a <%= noun %>.</p>
+  <% else %>
+    <ul role="list" class="flex flex-col gap-1">
+      <% groups.each do |group| %>
+        <% cell = group.cells[distortion] %>
+        <% detail = "#{cell.matches} of #{pluralize cell.entries, "entry"} · #{lift_label(cell.lift)}" %>
+        <li class="relative -mx-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg px-2 py-1.5 hover:bg-stone-950/[0.03] dark:hover:bg-white/[0.03]" data-tooltip="<%= group.label %>" data-tooltip-detail="<%= detail %>">
+          <p class="min-w-0 text-base/6 sm:text-sm/6">
+            <span class="block truncate font-medium text-stone-900 dark:text-white"><%= group.label %></span>
+            <span class="text-stone-500 tabular-nums dark:text-stone-400"><%= cell.matches %> of <%= pluralize cell.entries, "entry" %></span>
+          </p>
+          <span class="rounded-full px-2.5 py-0.5 text-sm/6 font-medium whitespace-nowrap tabular-nums sm:text-xs/5 <%= lift_class(cell.lift) %>"><%= lift_short(cell.lift) %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</section>

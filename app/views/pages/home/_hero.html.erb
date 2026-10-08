@@ -1,0 +1,15 @@
+<section aria-labelledby="hero_heading" class="mx-auto grid max-w-7xl items-center gap-12 px-4 pt-10 pb-20 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-8 lg:pt-16 lg:pb-28">
+  <div class="flex flex-col gap-8 lg:col-span-7">
+    <h1 id="hero_heading" class="max-w-[16ch] font-display text-5xl/[1.05] font-medium tracking-tight text-balance text-stone-900 sm:text-6xl/[1.05] dark:text-white">Notice the thought. Name the pattern.</h1>
+    <p class="max-w-[46ch] text-lg/8 text-pretty text-stone-600 sm:text-xl/8 dark:text-stone-300">A private journal for spotting thinking traps, like catastrophizing or mind reading, and weighing them against the evidence.</p>
+    <div class="flex flex-wrap items-center gap-3">
+      <%= link_to "Start your journal", new_registration_path, class: "btn btn-primary px-5 py-2.5 text-base/6 active:translate-y-px" %>
+      <%= link_to "Sign in", new_session_path, class: "btn btn-ghost px-5 py-2.5 text-base/6" %>
+    </div>
+  </div>
+  <div class="lg:col-span-5">
+    <%= image_tag "landing/hero.webp", alt: "An open journal and pen on a wooden table in soft morning light, beside a sage green mug.",
+          width: 960, height: 1200, fetchpriority: "high", decoding: "async",
+          class: "aspect-[4/5] w-full rounded-3xl object-cover ring-1 ring-stone-950/5 max-lg:max-h-[28rem] dark:ring-white/10" %>
+  </div>
+</section>

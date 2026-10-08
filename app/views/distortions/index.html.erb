@@ -1,0 +1,25 @@
+<% content_for :title, "Distortions" %>
+
+<div class="page">
+  <div class="flex flex-col gap-8">
+    <%= render "shared/flash" %>
+
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Cognitive distortions</h1>
+        <p class="mt-3 max-w-[48ch] text-lg/7 text-pretty text-stone-600 dark:text-stone-400">Common thinking patterns that can make a situation feel heavier than it is. Naming them is the first step to loosening their grip.</p>
+      </div>
+      <% if Current.user.admin? %>
+        <%= link_to "New distortion", new_distortion_path, class: "btn btn-primary shrink-0 self-start sm:self-auto" %>
+      <% end %>
+    </div>
+
+    <% if @distortions.any? %>
+      <ul id="distortions" role="list" class="grid lg:grid-cols-2 lg:gap-x-16">
+        <%= render @distortions %>
+      </ul>
+    <% else %>
+      <p class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center text-base/7 text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">No distortions have been added yet.</p>
+    <% end %>
+  </div>
+</div>

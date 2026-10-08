@@ -1,0 +1,28 @@
+<section aria-labelledby="is_isnt_heading" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <div class="rounded-3xl bg-stone-950/[0.025] px-6 py-12 ring-1 ring-stone-950/5 sm:px-10 lg:px-14 lg:py-16 dark:bg-white/[0.03] dark:ring-white/10">
+    <h2 id="is_isnt_heading" class="max-w-[24ch] font-display text-3xl font-medium tracking-tight text-balance text-stone-900 sm:text-4xl dark:text-white">What beckit is, and what it isn't</h2>
+
+    <div class="mt-10 grid gap-10 md:grid-cols-2 md:gap-16">
+      <div>
+        <h3 class="text-base/6 font-semibold text-stone-900 dark:text-white">It is</h3>
+        <ul role="list" class="mt-4 flex flex-col gap-3 text-base/7 text-stone-700 dark:text-stone-300">
+          <% [ "A private journal. Only your account can see your entries.", "A structured way to write down a hard moment.", "A way to notice which patterns come up over time." ].each do |item| %>
+            <li class="flex gap-3"><%= icon :check, "mt-1.5 text-teal-700 dark:text-teal-400" %><span><%= item %></span></li>
+          <% end %>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-base/6 font-semibold text-stone-900 dark:text-white">It isn't</h3>
+        <ul role="list" class="mt-4 flex flex-col gap-3 text-base/7 text-stone-700 dark:text-stone-300">
+          <% [ "Therapy, or a substitute for it.", "A diagnosis of any kind.", "Medical or mental health advice.", "A replacement for talking to a professional." ].each do |item| %>
+            <li class="flex gap-3"><%= icon :x_mark, "mt-1.5 text-stone-400 dark:text-stone-500" %><span><%= item %></span></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <p class="mt-10 border-t border-stone-950/5 pt-6 text-base/7 text-pretty text-stone-600 dark:border-white/10 dark:text-stone-400">
+      If you're in crisis, call or text <%= link_to "988", "tel:988", class: "font-semibold text-stone-900 underline decoration-stone-950/20 underline-offset-2 dark:text-white dark:decoration-white/30" %> in the US, or contact your local emergency number.
+    </p>
+  </div>
+</section>

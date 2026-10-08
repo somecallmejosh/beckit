@@ -1,0 +1,26 @@
+<%# locals: (insights:) %>
+<% rows = insights.strongest %>
+<section aria-labelledby="strongest_heading" class="flex min-w-0 flex-col gap-6">
+  <%= render "insights/section_heading", id: "strongest_heading", title: "Strongest feelings",
+        description: "Distortions with the highest average intensity, among those with at least #{DistortionInsights::MIN_ENTRIES} entries." %>
+
+  <% if rows.empty? %>
+    <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">No distortion has enough entries with an intensity in this range yet.</p>
+  <% else %>
+    <ol role="list" class="flex flex-col gap-4">
+      <% rows.each do |row| %>
+        <li class="flex items-center justify-between gap-4">
+          <%= link_to row.distortion.title, insights_path(range: insights.range, distortion_id: row.distortion.id), class: "min-w-0 truncate text-base/6 font-medium text-stone-900 hover:text-teal-800 sm:text-sm/6 dark:text-white dark:hover:text-teal-300" %>
+          <div class="flex shrink-0 items-center gap-2.5">
+            <div class="flex gap-0.5" aria-hidden="true">
+              <% 10.times do |i| %>
+                <span class="h-1.5 w-2 rounded-full <%= i < row.avg_emotion.round ? "bg-teal-600 dark:bg-teal-400" : "bg-stone-950/10 dark:bg-white/10" %>"></span>
+              <% end %>
+            </div>
+            <p class="w-12 text-right text-base/6 text-stone-600 tabular-nums sm:text-sm/6 dark:text-stone-400"><span class="sr-only">Average intensity </span><%= number_with_precision(row.avg_emotion, precision: 1) %></p>
+          </div>
+        </li>
+      <% end %>
+    </ol>
+  <% end %>
+</section>

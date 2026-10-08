@@ -1,0 +1,142 @@
+<%= form_with(model: situation, class: "flex flex-col gap-12") do |form| %>
+  <%= render "shared/form_errors", record: situation %>
+
+  <fieldset class="form-section">
+    <legend class="contents">
+      <span class="flex flex-col gap-1">
+        <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 1</span>
+        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">What happened</span>
+      </span>
+    </legend>
+
+    <div class="flex max-w-4xl min-w-0 flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <%= form.label :title, "Give this entry a short name", class: "field-label" %>
+        <%= form.text_field :title, required: true, placeholder: "e.g. Presentation at work", class: "field" %>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <%= form.label :date, "When did this occur?", class: "field-label" %>
+          <%= form.datetime_field :date, required: true, class: "field" %>
+        </div>
+        <div class="flex flex-col gap-2">
+          <%= form.label :location, "Where were you when it happened?", class: "field-label" %>
+          <%= form.text_field :location, placeholder: "Optional", list: "location_options", autocomplete: "off", class: "field" %>
+          <%= render "suggestions", id: "location_options", options: @location_options %>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <%= form.label :who_was_involved, "Who was involved?", class: "field-label" %>
+        <%= form.text_field :who_was_involved, placeholder: "Optional", list: "who_options", autocomplete: "off", class: "field" %>
+        <%= render "suggestions", id: "who_options", options: @who_options %>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+    <legend class="contents">
+      <span class="flex flex-col gap-1">
+        <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 2</span>
+        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Thoughts and feelings</span>
+      </span>
+    </legend>
+
+    <div class="flex max-w-4xl min-w-0 flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <div>
+          <%= form.label :thought_imagery, "What went through your mind?", class: "field-label" %>
+          <p id="thought_imagery_hint" class="field-hint">Words, images, or memories that came up in the moment.</p>
+        </div>
+        <%= form.text_area :thought_imagery, class: "field", aria: { describedby: "thought_imagery_hint" } %>
+      </div>
+
+      <fieldset aria-describedby="emotion_level_hint" class="flex flex-col gap-2">
+        <legend class="field-label">How strong was the feeling?</legend>
+        <p id="emotion_level_hint" class="field-hint">0 is barely noticeable, 10 is the most intense you can imagine.</p>
+        <div class="grid grid-cols-6 gap-2 sm:flex sm:flex-wrap">
+          <% (0..10).each do |level| %>
+            <label class="relative flex h-11 cursor-pointer items-center justify-center rounded-full text-base/6 font-medium text-stone-700 tabular-nums ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-teal-700 has-checked:text-white has-checked:ring-teal-700 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 sm:size-10 sm:text-sm/6 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-teal-600 dark:has-checked:ring-teal-600">
+              <%= form.radio_button :emotion_level, level, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
+              <%= level %>
+            </label>
+          <% end %>
+          <label class="relative flex h-11 cursor-pointer items-center justify-center rounded-full px-4 text-base/6 font-medium text-stone-500 ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-stone-950/5 has-checked:text-stone-900 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 max-sm:col-span-1 sm:h-10 sm:text-sm/6 dark:text-stone-400 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-white/10 dark:has-checked:text-white">
+            <%= form.radio_button :emotion_level, "", checked: situation.emotion_level.nil?, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
+            Skip
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="flex flex-col gap-2">
+        <legend class="field-label">Which distortions might be at play?</legend>
+        <p class="field-hint">Choose any that fit. It's okay to leave these blank.</p>
+        <%= hidden_field_tag "situation[distortion_ids][]", "", id: nil %>
+        <div class="grid gap-x-6 gap-y-4 pt-2 sm:grid-cols-2 xl:grid-cols-3">
+          <% @distortions.each do |distortion| %>
+            <% checkbox_id = "situation_distortion_ids_#{distortion.id}" %>
+            <div class="flex gap-3">
+              <div class="flex h-lh items-center text-base/6 sm:text-sm/6">
+                <span class="group inline-grid size-5 grid-cols-1 sm:size-4">
+                  <%= check_box_tag "situation[distortion_ids][]", distortion.id, situation.distortion_ids.include?(distortion.id), id: checkbox_id, aria: { describedby: "#{checkbox_id}_description" }, class: "col-start-1 row-start-1 appearance-none rounded-sm border border-stone-300 bg-white checked:border-teal-700 checked:bg-teal-700 indeterminate:border-teal-700 indeterminate:bg-teal-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:border-stone-300 disabled:bg-stone-100 disabled:checked:bg-stone-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-teal-600 dark:checked:bg-teal-600 dark:indeterminate:border-teal-600 dark:indeterminate:bg-teal-600 dark:focus-visible:outline-teal-600 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" %>
+                  <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-7/8 self-center justify-self-center stroke-white group-has-disabled:stroke-stone-950/25 dark:group-has-disabled:stroke-white/25">
+                    <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-not-has-checked:opacity-0" />
+                    <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-not-has-indeterminate:opacity-0" />
+                  </svg>
+                </span>
+              </div>
+              <div class="min-w-0 text-base/6 sm:text-sm/6">
+                <label for="<%= checkbox_id %>" class="cursor-pointer font-medium text-stone-900 dark:text-white"><%= distortion.title %></label>
+                <p id="<%= checkbox_id %>_description" class="text-pretty text-stone-500 dark:text-stone-400"><%= distortion.description %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </fieldset>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+    <legend class="contents">
+      <span class="flex flex-col gap-1">
+        <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 3</span>
+        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Weigh it up</span>
+      </span>
+    </legend>
+
+    <div class="flex max-w-4xl min-w-0 flex-col gap-6">
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div class="flex flex-col gap-2">
+          <div>
+            <%= form.label :evidence_for, "Evidence that validates the thought", class: "field-label" %>
+            <p class="field-hint">What makes you think the thought is true?</p>
+          </div>
+          <%= form.textarea :evidence_for, rows: 5, class: "field" %>
+        </div>
+        <div class="flex flex-col gap-2">
+          <div>
+            <%= form.label :evidence_against, "Evidence that doesn't validate it", class: "field-label" %>
+            <p class="field-hint">What are some signs that the thought might not be true?</p>
+          </div>
+          <%= form.textarea :evidence_against, rows: 5, class: "field" %>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <div>
+          <%= form.label :balanced_thought, "A more balanced thought", class: "field-label" %>
+          <p id="balanced_thought_hint" class="field-hint">What might you say to a friend who was in the same situation?</p>
+        </div>
+        <%= form.textarea :balanced_thought, rows: 4, class: "field", aria: { describedby: "balanced_thought_hint" } %>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-section border-t border-stone-950/5 pt-8 dark:border-white/10">
+    <div class="flex max-w-4xl flex-col-reverse gap-3 sm:flex-row sm:justify-end lg:col-start-2">
+      <%= link_to "Cancel", (situation.persisted? ? situation : situations_path), class: "btn btn-ghost" %>
+      <%= form.submit "Save entry", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

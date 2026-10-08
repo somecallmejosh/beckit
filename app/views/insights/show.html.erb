@@ -1,0 +1,46 @@
+<% content_for :title, "Insights" %>
+<%# Frame navigation with "advance" can cache a later state under an earlier URL, so back/forward
+    re-fetch instead of restoring snapshots. %>
+<% turbo_exempts_page_from_cache %>
+
+<div class="page">
+  <div class="flex flex-col gap-10">
+    <div>
+      <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Insights</h1>
+      <p class="mt-3 max-w-[52ch] text-lg/7 text-pretty text-stone-600 dark:text-stone-400">Patterns in your thinking: which distortions come up, and when, where, and with whom.</p>
+    </div>
+
+    <%# Rail, range and panel links swap only this frame and push the URL, so back/forward still work. %>
+    <%= turbo_frame_tag "insights_body", data: { turbo_action: "advance" }, class: "group/frame flex flex-col gap-8" do %>
+      <div class="flex flex-col gap-3 border-b border-stone-950/5 pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+        <nav aria-label="Time range" class="flex flex-wrap gap-1">
+          <% InsightsHelper::RANGE_LABELS.each do |range, label| %>
+            <%= nav_link_to label, insights_path(insights_link_params(@insights, range:)), active: @insights.range == range, class: "px-3 py-1.5" %>
+          <% end %>
+        </nav>
+        <p class="text-base/6 text-stone-500 tabular-nums sm:text-sm/6 dark:text-stone-400"><%= pluralize @insights.total, "entry" %> <%= range_phrase(@insights.range) %></p>
+      </div>
+
+      <% if @insights.empty? %>
+        <div class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center dark:border-white/10">
+          <h2 class="font-display text-xl font-medium text-balance text-stone-900 dark:text-white">Nothing to show yet</h2>
+          <p class="mx-auto mt-2 max-w-[48ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">There are no journal entries in this time range. Try a longer range, or come back after a few more entries.</p>
+          <div class="mt-6">
+            <%= link_to "Write an entry", new_situation_path, class: "btn btn-secondary", data: { turbo_frame: "_top" } %>
+          </div>
+        </div>
+      <% else %>
+        <div class="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12">
+          <%= render "insights/rail", insights: @insights %>
+
+          <div id="insights_panel" class="relative min-w-0 transition-opacity duration-200 group-aria-busy/frame:opacity-50 motion-reduce:transition-none"
+               data-controller="tooltip" data-action="pointerover->tooltip#show pointerout->tooltip#hide scroll@window->tooltip#dismiss">
+            <%= render(@insights.distortion ? "insights/profile" : "insights/overview", insights: @insights) %>
+
+            <%= render "insights/tooltip" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+require "test_helper"
+
+class InsightsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    sign_in_as users(:one)
+  end
+
+  test "requires authentication" do
+    sign_out
+    get insights_url
+    assert_redirected_to new_session_url
+  end
+
+  test "shows every distortion for each range" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      DistortionInsights::RANGES.each_key do |range|
+        get insights_url(range:)
+        assert_response :success
+        assert_select "nav[aria-label=Distortions] a", count: Distortion.count + 1
+      end
+    end
+  end
+
+  test "focuses on a distortion" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url(distortion_id: distortions(:mind_reading).id)
+      assert_response :success
+      assert_select "#profile_heading", text: "Mind reading"
+      assert_select "nav[aria-label=Distortions] a[aria-current=page]", text: /Mind reading/
+      assert_select "#standouts_heading + ul li", text: /Came up in 1 of your 1 entry/
+      assert_select "#place_heading"
+      assert_select "#strongest_heading", count: 0
+    end
+  end
+
+  test "shows the empty state when there are no entries in range" do
+    sign_in_as users(:admin)
+    get insights_url
+    assert_response :success
+    assert_match "Nothing to show yet", response.body
+  end
+
+  test "marks carry tooltip text and the tooltip is wired up" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url(distortion_id: distortions(:mind_reading).id)
+      assert_select "[data-controller=tooltip] [data-tooltip-target=tip][hidden]"
+      assert_select "td[data-tooltip][data-tooltip-detail]", minimum: 35
+      assert_select "[title]:not(th)", count: 0
+    end
+  end
+
+  test "shows distortions logged together" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url
+      assert_select "#pairs_heading", text: "Together"
+      assert_match "Catastrophizing + Mind reading", response.body
+    end
+  end
+
+  test "overview marks All distortions as current and shows overview sections" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url
+      assert_select "nav[aria-label=Distortions] a[aria-current=page]", text: /All distortions/
+      assert_select "#strongest_heading"
+      assert_select "#profile_heading", count: 0
+    end
+  end
+
+  test "rail, range and panel links swap only the insights frame" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url
+      assert_select "turbo-frame#insights_body[data-turbo-action=advance] nav[aria-label=Distortions]"
+      assert_select "turbo-frame#insights_body nav[aria-label='Time range']"
+      assert_select "meta[name=turbo-cache-control][content=no-cache]", 1, "back/forward must re-fetch, not restore stale frame snapshots"
+
+      get insights_url(distortion_id: distortions(:mind_reading).id), headers: { "Turbo-Frame" => "insights_body" }
+      assert_response :success
+      assert_select "turbo-frame#insights_body #profile_heading", text: "Mind reading"
+      assert_select "nav[aria-label=Main]", count: 0
+    end
+  end
+
+  test "profile for a distortion with no entries in range" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      sign_in_as users(:two)
+      get insights_url(distortion_id: distortions(:catastrophizing).id, range: "30")
+      assert_select "#profile_heading", text: "Catastrophizing"
+      assert_select "p", text: /No entries with catastrophizing in the last 30 days/
+    end
+  end
+end

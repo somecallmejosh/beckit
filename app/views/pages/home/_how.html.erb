@@ -1,0 +1,53 @@
+<section aria-labelledby="how_heading" class="mx-auto grid max-w-7xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-8 lg:py-32">
+  <div class="flex flex-col gap-10 lg:col-span-5">
+    <h2 id="how_heading" class="font-display text-3xl font-medium tracking-tight text-balance text-stone-900 sm:text-4xl dark:text-white">How an entry works</h2>
+    <dl class="flex flex-col gap-8">
+      <% [
+        [ "Write it down", "What happened, where you were, and who was there. A few words is enough." ],
+        [ "Name the pattern", "Pick any thinking traps that seem to fit. It's fine to leave them blank." ],
+        [ "Weigh the evidence", "Note what supports the thought and what doesn't, then try writing a more balanced one." ]
+      ].each do |title, body| %>
+        <div class="border-l-2 border-teal-600 pl-5 dark:border-teal-400">
+          <dt class="text-lg/7 font-semibold text-stone-900 dark:text-white"><%= title %></dt>
+          <dd class="mt-1 max-w-[42ch] text-base/7 text-pretty text-stone-600 dark:text-stone-400"><%= body %></dd>
+        </div>
+      <% end %>
+    </dl>
+  </div>
+
+  <figure class="lg:col-span-7">
+    <div class="rounded-3xl bg-white p-6 shadow-[0_24px_60px_-24px_rgb(28_25_23/0.18)] ring-1 ring-stone-950/5 sm:p-8 dark:bg-stone-900 dark:shadow-none dark:ring-white/10">
+      <p class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Tuesday at 9:40 PM</p>
+      <p class="mt-1 font-display text-2xl font-medium text-stone-900 dark:text-white">Presentation at work</p>
+
+      <div class="mt-6 flex flex-col gap-5">
+        <div>
+          <p class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">What went through your mind</p>
+          <p class="mt-1 text-base/7 text-stone-700 dark:text-stone-300">Everyone could tell I was nervous.</p>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <ul role="list" class="flex flex-wrap gap-1.5">
+            <li class="badge">Mind reading</li>
+            <li class="badge">Mental filter</li>
+          </ul>
+          <%= render "shared/emotion_level", level: 7 %>
+        </div>
+        <div class="grid gap-5 border-t border-stone-950/5 pt-5 sm:grid-cols-2 dark:border-white/10">
+          <div>
+            <p class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">Evidence for</p>
+            <p class="mt-1 text-base/7 text-stone-600 sm:text-sm/6 dark:text-stone-400">My voice shook during the first slide.</p>
+          </div>
+          <div>
+            <p class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">Evidence against</p>
+            <p class="mt-1 text-base/7 text-stone-600 sm:text-sm/6 dark:text-stone-400">Two people said it was clear and asked follow-up questions.</p>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-teal-50/70 p-5 ring-1 ring-teal-700/10 dark:bg-white/5 dark:ring-white/10">
+          <p class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300">A more balanced thought</p>
+          <p class="mt-2 font-display text-lg/7 text-pretty text-stone-800 italic dark:text-stone-100">I was nervous, and the presentation still landed. Nerves are not the same as failure.</p>
+        </div>
+      </div>
+    </div>
+    <figcaption class="mt-3 text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">Example entry</figcaption>
+  </figure>
+</section>

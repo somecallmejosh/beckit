@@ -1,0 +1,8 @@
+<%# locals: (user:, size: "size-8", variant: :thumb, text: "text-xs") %>
+<% if user.avatar.attached? && user.avatar.blob.persisted? %>
+  <%= image_tag user.avatar.variant(variant), alt: user.name, class: [ size, "shrink-0 rounded-full object-cover ring-1 ring-stone-950/10 dark:ring-white/10" ] %>
+<% else %>
+  <span class="<%= size %> inline-flex shrink-0 items-center justify-center rounded-full bg-teal-100 font-semibold text-teal-800 ring-1 ring-teal-700/10 dark:bg-teal-400/15 dark:text-teal-200 dark:ring-teal-400/20 <%= text %>">
+    <span aria-hidden="true"><%= user.initials %></span><span class="sr-only"><%= user.name %></span>
+  </span>
+<% end %>

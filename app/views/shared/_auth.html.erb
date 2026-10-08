@@ -1,0 +1,19 @@
+<%# locals: (title:, subtitle: nil) %>
+<% content_for :bare_layout, "true" %>
+<div class="px-4 py-16 sm:px-6 sm:py-24">
+  <div class="mx-auto flex w-full max-w-xs flex-col gap-8">
+    <div class="flex flex-col gap-6">
+      <a href="/" aria-label="Homepage" class="self-start"><%= logo_tag("h-8 w-auto") %></a>
+      <div>
+        <h1 class="font-display text-3xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= title %></h1>
+        <% if subtitle %>
+          <p class="mt-2 text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= subtitle %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <%= render "shared/flash" %>
+
+    <%= yield %>
+  </div>
+</div>

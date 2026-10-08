@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "InterVariable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans--font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  --font-display: "Lora", ui-serif, Georgia, serif;
+}
+
+/* Page container shared by every signed-in page; header and footer use the same edges. */
+@utility page {
+  @apply mx-auto w-full max-w-7xl px-4 pt-8 pb-16 sm:px-6 sm:pt-14 lg:px-8;
+}
+
+/* Form row: heading and hint on the left at lg, fields on the right. */
+@utility form-section {
+  @apply grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12;
+}
+
+/* Text inputs, textareas, and selects. Rails marks invalid fields with aria-invalid (see config/initializers/field_error_proc.rb). */
+@utility field {
+  @apply w-full rounded-xl bg-white px-3.5 py-2.5 text-base/6 text-stone-900 shadow-xs ring-1 ring-stone-950/10 placeholder:text-stone-400 focus:outline-2 focus:-outline-offset-1 focus:outline-teal-600 aria-invalid:ring-red-600/40 aria-invalid:focus:outline-red-600 sm:py-2 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:shadow-none dark:ring-white/10 dark:placeholder:text-stone-500 dark:focus:outline-teal-500 dark:aria-invalid:ring-red-500/50;
+}
+
+@utility field-label {
+  @apply text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white;
+}
+
+@utility field-hint {
+  @apply text-base/6 text-pretty text-stone-500 sm:text-sm/6 dark:text-stone-400;
+}
+
+/* Button sizes: btn (36px) and btn-sm (28px). Pair with one of the color utilities below. */
+@utility btn {
+  @apply inline-flex cursor-pointer items-center justify-center gap-x-1.5 rounded-full px-4 py-2 text-sm/5 font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:focus-visible:outline-teal-500;
+}
+
+@utility btn-sm {
+  @apply inline-flex cursor-pointer items-center justify-center gap-x-1 rounded-full px-3 py-1 text-sm/5 font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:focus-visible:outline-teal-500;
+}
+
+@utility btn-primary {
+  @apply bg-teal-700 text-white shadow-xs hover:bg-teal-600 dark:bg-teal-600 dark:shadow-none dark:hover:bg-teal-500;
+}
+
+@utility btn-secondary {
+  @apply bg-white text-stone-800 shadow-xs ring-1 ring-stone-950/10 hover:bg-stone-50 dark:bg-white/5 dark:text-stone-100 dark:shadow-none dark:ring-white/10 dark:hover:bg-white/10;
+}
+
+@utility btn-ghost {
+  @apply text-stone-600 hover:bg-stone-950/5 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-white/5 dark:hover:text-white;
+}
+
+@utility btn-danger {
+  @apply bg-white text-red-700 shadow-xs ring-1 ring-stone-950/10 hover:bg-red-50 dark:bg-white/5 dark:text-red-400 dark:shadow-none dark:ring-white/10 dark:hover:bg-red-500/10;
+}
+
+@utility badge {
+  @apply inline-flex items-center rounded-full bg-teal-50 px-2.5 py-0.5 text-sm/6 font-medium text-teal-800 ring-1 ring-teal-700/10 ring-inset sm:text-xs/5 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/20;
+}

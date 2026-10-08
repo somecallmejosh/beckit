@@ -1,0 +1,6 @@
+<%# locals: (id:, options:) %>
+<datalist id="<%= id %>">
+  <% options.each do |option| %>
+    <option value="<%= option %>"></option>
+  <% end %>
+</datalist>

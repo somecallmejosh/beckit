@@ -1,0 +1,9 @@
+<%# locals: (level:) %>
+<div class="flex items-center gap-2.5">
+  <div class="flex gap-0.5" aria-hidden="true">
+    <% 10.times do |i| %>
+      <span class="h-1.5 w-2 rounded-full <%= i < level ? "bg-teal-600 dark:bg-teal-400" : "bg-stone-950/10 dark:bg-white/10" %>"></span>
+    <% end %>
+  </div>
+  <p class="text-base/6 text-stone-600 tabular-nums sm:text-sm/6 dark:text-stone-400"><span class="sr-only">Emotion level </span><%= level %>/10</p>
+</div>

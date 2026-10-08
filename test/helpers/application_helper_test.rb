@@ -1,0 +1,23 @@
+require "test_helper"
+
+class ApplicationHelperTest < ActionView::TestCase
+  setup do
+    @user = User.new(name: "Joshua Briley", preferred_name: "Josh", date_of_birth: Date.new(1985, 6, 1))
+  end
+
+  test "greeting follows the time of day" do
+    {
+      9 => "Good morning, Josh",
+      14 => "Good afternoon, Josh",
+      19 => "Good evening, Josh",
+      23 => "Hello, Josh",
+      3 => "Hello, Josh"
+    }.each do |hour, greeting|
+      assert_equal greeting, greeting_for(@user, Time.zone.local(2026, 10, 7, hour))
+    end
+  end
+
+  test "greeting wishes a happy birthday" do
+    assert_equal "Happy birthday, Josh", greeting_for(@user, Time.zone.local(2026, 6, 1, 9))
+  end
+end

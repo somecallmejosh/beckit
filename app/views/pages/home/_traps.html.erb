@@ -1,0 +1,31 @@
+<%# locals: (distortions:) %>
+<% featured_titles = [ "Catastrophizing", "Mind reading", "All-or-nothing thinking" ] %>
+<% featured = distortions.select { it.title.in?(featured_titles) }.sort_by { featured_titles.index(it.title) } %>
+<% featured = distortions.first(3) if featured.empty? %>
+<% rest = distortions - featured %>
+<section aria-labelledby="traps_heading" class="border-y border-stone-950/5 bg-stone-950/[0.02] dark:border-white/10 dark:bg-white/[0.02]">
+  <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+    <h2 id="traps_heading" class="max-w-[22ch] font-display text-3xl font-medium tracking-tight text-balance text-stone-900 sm:text-4xl dark:text-white">Thinking traps you might recognize</h2>
+    <p class="mt-4 max-w-[60ch] text-lg/8 text-pretty text-stone-600 dark:text-stone-400">These are common patterns described in cognitive behavioral approaches. Everyone falls into them sometimes. Naming one can make a thought easier to look at.</p>
+
+    <dl class="mt-14 flex flex-col">
+      <% featured.each do |distortion| %>
+        <div class="grid gap-2 border-t border-stone-950/10 py-8 md:grid-cols-12 md:gap-12 dark:border-white/15">
+          <dt class="font-display text-2xl font-medium text-stone-900 md:col-span-4 dark:text-white"><%= distortion.title %></dt>
+          <dd class="max-w-[60ch] text-lg/8 text-pretty text-stone-600 md:col-span-8 dark:text-stone-400"><%= distortion.description %></dd>
+        </div>
+      <% end %>
+    </dl>
+
+    <% if rest.any? %>
+      <div class="mt-6 border-t border-stone-950/10 pt-8 dark:border-white/15">
+        <h3 class="text-base/6 font-semibold text-stone-900 dark:text-white">And <%= rest.size %> more</h3>
+        <ul role="list" class="mt-4 flex flex-wrap gap-2">
+          <% rest.each do |distortion| %>
+            <li class="rounded-full bg-white px-3.5 py-1.5 text-base/6 text-stone-700 ring-1 ring-stone-950/10 sm:text-sm/6 dark:bg-white/5 dark:text-stone-300 dark:ring-white/10" title="<%= distortion.description %>"><%= distortion.title %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  </div>
+</section>

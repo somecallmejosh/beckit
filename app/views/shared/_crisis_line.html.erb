@@ -1,0 +1,10 @@
+<%# locals: (user:) %>
+<% link_class = "font-medium text-stone-700 underline decoration-stone-950/20 underline-offset-2 hover:decoration-stone-950/50 dark:text-stone-200 dark:decoration-white/30 dark:hover:decoration-white/60" %>
+<p class="border-t border-stone-950/5 py-10 text-base/6 text-pretty text-stone-500 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">
+  Be gentle with yourself. If you are in crisis,
+  <% if user&.crisis_contact_name %>
+    contact <%= user.crisis_contact_name %> at <%= link_to user.crisis_contact_phone, "tel:#{user.crisis_contact_phone.gsub(/[^\d+]/, "")}", class: link_class %>, or your local emergency number.
+  <% else %>
+    call or text <%= link_to "988", "tel:988", class: link_class %> in the US, or contact your local emergency number.
+  <% end %>
+</p>

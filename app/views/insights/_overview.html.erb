@@ -1,0 +1,18 @@
+<%# locals: (insights:) %>
+<% top = insights.frequency.select { it.count.positive? }.first(3).map { it.distortion.title } %>
+<div class="flex flex-col gap-12">
+  <p class="max-w-[60ch] text-lg/8 text-pretty text-stone-700 dark:text-stone-300">
+    <%= pluralize insights.total, "entry" %> <%= range_phrase(insights.range) %>.
+    <% if top.any? %><%= top.to_sentence %> came up most.<% end %>
+    Pick a distortion to see when, where and with whom it shows up.
+  </p>
+
+  <div class="grid gap-12 xl:grid-cols-2 xl:gap-x-12">
+    <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/weekly", insights: %></div>
+    <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/strongest", insights: %></div>
+    <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/heatmap", insights: %></div>
+    <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/pairs", insights: %></div>
+    <div class="min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10"><%= render "insights/matrix", insights:, title: "Where", noun: "place", groups: insights.by_location %></div>
+    <div class="min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10"><%= render "insights/matrix", insights:, title: "Who was involved", noun: "person", groups: insights.by_person %></div>
+  </div>
+</div>

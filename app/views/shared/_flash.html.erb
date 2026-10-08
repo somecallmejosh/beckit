@@ -1,0 +1,6 @@
+<% if notice.present? %>
+  <p id="notice" role="status" class="rounded-2xl bg-teal-50 px-4 py-3 text-base/6 text-pretty text-teal-900 ring-1 ring-teal-700/10 sm:text-sm/6 dark:bg-white/5 dark:text-teal-200 dark:ring-white/10"><%= notice %></p>
+<% end %>
+<% if alert.present? %>
+  <p id="alert" role="alert" class="rounded-2xl bg-red-50 px-4 py-3 text-base/6 text-pretty text-red-800 ring-1 ring-red-700/10 sm:text-sm/6 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-400/20"><%= alert %></p>
+<% end %>

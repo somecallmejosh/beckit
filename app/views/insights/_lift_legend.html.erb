@@ -1,0 +1,6 @@
+<%# locals: () %>
+<ul role="list" class="flex flex-wrap gap-x-4 gap-y-1.5 text-base/6 text-stone-600 sm:text-xs/5 dark:text-stone-400">
+  <% [ [ 0.4, "Much less often" ], [ 0.6, "Less often" ], [ 1, "About usual" ], [ 1.5, "More often" ], [ 2.5, "Much more often" ], [ nil, "Too few entries" ] ].each do |lift, label| %>
+    <li class="flex items-center gap-1.5"><span aria-hidden="true" class="size-3 rounded-sm ring-1 ring-stone-950/10 ring-inset dark:ring-white/10 <%= lift_class(lift) %>"></span><%= label %></li>
+  <% end %>
+</ul>

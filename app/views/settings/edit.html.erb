@@ -1,0 +1,126 @@
+<% content_for :title, "Settings" %>
+
+<div class="page">
+  <div class="flex flex-col gap-10">
+    <div class="flex flex-col gap-6">
+      <%= render "shared/flash" %>
+      <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Settings</h1>
+    </div>
+
+    <%= form_with(model: @user, url: settings_path, method: :patch, multipart: true, class: "flex flex-col gap-12") do |form| %>
+      <%= render "shared/form_errors", record: @user %>
+
+      <div class="form-section">
+        <div class="flex flex-col gap-1">
+          <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Profile</h2>
+          <p class="field-hint">How the app greets you and shows you.</p>
+        </div>
+
+        <div class="flex max-w-xl min-w-0 flex-col gap-8">
+          <div class="flex flex-col gap-4" data-controller="avatar-crop">
+            <span class="field-label">Photo</span>
+            <div class="flex items-center gap-5">
+              <div data-avatar-crop-target="current">
+                <%= render "shared/avatar", user: @user, size: "size-20", variant: :profile, text: "text-2xl" %>
+              </div>
+              <img data-avatar-crop-target="preview" hidden alt="Your new photo" class="size-20 shrink-0 rounded-full object-cover ring-1 ring-stone-950/10 dark:ring-white/10">
+              <div class="flex flex-col gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <label class="btn-sm btn-secondary has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600">
+                    Choose photo
+                    <%= form.file_field :avatar, accept: User::AVATAR_TYPES.join(","), class: "sr-only", data: { avatar_crop_target: "input", action: "change->avatar-crop#load" } %>
+                  </label>
+                  <% if @user.avatar.attached? && @user.avatar.blob.persisted? %>
+                    <label class="inline-flex cursor-pointer items-center gap-2 text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
+                      <%= form.check_box :remove_avatar, { class: "size-4 rounded-sm accent-teal-700", data: { avatar_crop_target: "remove" } }, "1", "0" %>
+                      Remove photo
+                    </label>
+                  <% end %>
+                </div>
+                <p class="field-hint">PNG, JPEG or WebP, up to 5 MB.</p>
+              </div>
+            </div>
+
+            <div data-avatar-crop-target="stage" hidden class="flex w-full max-w-sm flex-col gap-4 rounded-3xl bg-stone-950/[0.025] p-5 ring-1 ring-stone-950/5 dark:bg-white/[0.03] dark:ring-white/10">
+              <p class="field-hint">Drag to position your photo. Arrow keys work too.</p>
+              <div data-avatar-crop-target="viewport" tabindex="0" aria-label="Photo position. Drag or use arrow keys to move it."
+                   data-action="pointerdown->avatar-crop#startDrag pointermove->avatar-crop#drag pointerup->avatar-crop#endDrag pointercancel->avatar-crop#endDrag keydown->avatar-crop#nudge"
+                   class="relative aspect-square w-full max-w-64 cursor-grab touch-none overflow-hidden rounded-2xl bg-stone-200 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 active:cursor-grabbing dark:bg-stone-800">
+                <img data-avatar-crop-target="image" alt="" draggable="false" class="pointer-events-none absolute top-0 left-0 max-w-none origin-top-left">
+                <div aria-hidden="true" class="pointer-events-none absolute inset-0 rounded-full shadow-[0_0_0_9999px_rgb(28_25_23/0.55)] ring-2 ring-white/70"></div>
+              </div>
+              <label class="flex items-center gap-3 text-base/6 text-stone-700 sm:text-sm/6 dark:text-stone-300">
+                Zoom
+                <input type="range" min="1" max="3" step="0.01" value="1" class="flex-1 accent-teal-700" data-avatar-crop-target="zoom" data-action="input->avatar-crop#zoom">
+              </label>
+              <div class="flex gap-2">
+                <button type="button" class="btn-sm btn-primary" data-action="avatar-crop#apply">Use photo</button>
+                <button type="button" class="btn-sm btn-ghost" data-action="avatar-crop#cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <%= form.label :name, "Full name", class: "field-label" %>
+            <%= form.text_field :name, required: true, autocomplete: "name", class: "field" %>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div>
+              <%= form.label :preferred_name, "What should we call you?", class: "field-label" %>
+              <p id="preferred_name_hint" class="field-hint">Used in greetings. Leave blank to use your first name.</p>
+            </div>
+            <%= form.text_field :preferred_name, autocomplete: "nickname", placeholder: @user.name.to_s.split.first, class: "field", aria: { describedby: "preferred_name_hint" } %>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div>
+              <%= form.label :date_of_birth, "Date of birth", class: "field-label" %>
+              <p id="date_of_birth_hint" class="field-hint">Optional. Only used to wish you a happy birthday.</p>
+            </div>
+            <%= form.date_field :date_of_birth, max: Date.current, min: "1900-01-01", autocomplete: "bday", class: "field sm:max-w-56", aria: { describedby: "date_of_birth_hint" } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+        <div class="flex flex-col gap-1">
+          <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Time</h2>
+          <p class="field-hint">Entry times and the insights dashboard use your time zone.</p>
+        </div>
+
+        <div class="flex max-w-xl min-w-0 flex-col gap-2">
+          <div>
+            <%= form.label :time_zone, class: "field-label" %>
+            <p id="time_zone_hint" class="field-hint">It's <%= l Time.current, format: "%-l:%M %P" %> here now.</p>
+          </div>
+          <%= form.select :time_zone, time_zone_options(@user.time_zone), {}, class: "field", aria: { describedby: "time_zone_hint" } %>
+        </div>
+      </div>
+
+      <div class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+        <div class="flex flex-col gap-1">
+          <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Support</h2>
+          <p class="field-hint">Shown at the bottom of every page. Leave blank to show the US 988 Lifeline.</p>
+        </div>
+
+        <div class="grid max-w-xl min-w-0 gap-6 sm:grid-cols-2">
+          <div class="flex flex-col gap-2">
+            <%= form.label :crisis_contact_name, "Crisis line or person", class: "field-label" %>
+            <%= form.text_field :crisis_contact_name, placeholder: "e.g. Samaritans", class: "field" %>
+          </div>
+          <div class="flex flex-col gap-2">
+            <%= form.label :crisis_contact_phone, "Phone number", class: "field-label" %>
+            <%= form.telephone_field :crisis_contact_phone, placeholder: "e.g. 116 123", autocomplete: "off", class: "field" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section border-t border-stone-950/5 pt-8 dark:border-white/10">
+        <div class="flex max-w-xl flex-col-reverse gap-3 sm:flex-row sm:justify-end lg:col-start-2">
+          <%= form.submit "Save settings", class: "btn btn-primary" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

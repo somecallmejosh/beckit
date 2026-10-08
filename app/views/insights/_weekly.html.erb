@@ -1,0 +1,39 @@
+<%# locals: (insights:) %>
+<% totals = insights.weekly_totals %>
+<% focus = insights.weekly_focus %>
+<% max = [ totals.max.to_i, 1 ].max %>
+<section aria-labelledby="weekly_heading" class="flex min-w-0 flex-col gap-6">
+  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "weekly_heading", title: "Over time",
+        description: focus ? "Entries per week, with #{insights.distortion.title.downcase} highlighted." : "Entries per week." %>
+
+  <% if focus %>
+    <ul role="list" class="flex flex-wrap gap-x-5 gap-y-1 text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
+      <li class="flex items-center gap-2"><span aria-hidden="true" class="size-2.5 rounded-sm bg-teal-700 dark:bg-teal-400"></span><%= insights.distortion.title %></li>
+      <li class="flex items-center gap-2"><span aria-hidden="true" class="size-2.5 rounded-sm bg-teal-200 dark:bg-teal-900"></span>All entries</li>
+    </ul>
+  <% end %>
+
+  <div>
+    <div class="flex items-end gap-0.5 border-b border-stone-950/10 sm:gap-1 dark:border-white/15" style="height: 10rem" role="img" aria-label="Entries per week: <%= insights.weeks.zip(totals).map { |week, total| "week of #{l week, format: :short}: #{total}" }.join(", ") %>">
+      <% insights.weeks.each_with_index do |week, i| %>
+        <% total = totals[i] %>
+        <% detail = pluralize(total, "entry") %>
+        <% detail += ", #{focus[i]} with #{insights.distortion.title.downcase}" if focus %>
+        <div class="group flex h-full min-w-0 flex-1 flex-col justify-end" data-tooltip="Week of <%= l week, format: :long %>" data-tooltip-detail="<%= detail %>">
+          <% if total.positive? %>
+            <div class="flex flex-col justify-end overflow-hidden rounded-t-sm <%= focus ? "bg-teal-200 dark:bg-teal-900" : "bg-teal-600 dark:bg-teal-400" %> group-hover:opacity-80" style="height: <%= (total.fdiv(max) * 100).round(2) %>%">
+              <% if focus && focus[i].positive? %>
+                <div class="border-t-2 border-white bg-teal-700 dark:border-stone-950 dark:bg-teal-400" style="height: <%= (focus[i].fdiv(total) * 100).round(2) %>%"></div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div class="mt-2 flex justify-between text-base/6 text-stone-500 tabular-nums sm:text-xs/5 dark:text-stone-400">
+      <span><%= l insights.weeks.first, format: :short %></span>
+      <span>Busiest week: <%= pluralize totals.max, "entry" %></span>
+      <span>This week</span>
+    </div>
+  </div>
+</section>

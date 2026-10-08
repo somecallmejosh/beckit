@@ -1,0 +1,33 @@
+<% content_for :title, "Sign up" %>
+
+<%= render layout: "shared/auth", locals: { title: "Create your account", subtitle: "A private space to notice your thoughts and practice seeing them more kindly." } do %>
+  <%= form_with model: @user, url: registration_path, class: "flex flex-col gap-6" do |form| %>
+    <%= render "shared/form_errors", record: @user %>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :name, class: "field-label" %>
+      <%= form.text_field :name, required: true, autofocus: true, autocomplete: "name", class: "field" %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :email_address, "Email address", class: "field-label" %>
+      <%= form.email_field :email_address, required: true, autocomplete: "username", class: "field" %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :password, class: "field-label" %>
+      <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "field" %>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <%= form.label :password_confirmation, "Confirm password", class: "field-label" %>
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "field" %>
+    </div>
+
+    <%= form.submit "Create account", class: "btn btn-primary w-full" %>
+  <% end %>
+
+  <p class="text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
+    Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>
+  </p>
+<% end %>

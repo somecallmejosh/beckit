@@ -1,0 +1,17 @@
+one:
+  title: Missed deadline
+  date: 2026-10-01 09:00:00
+  location: Office
+  who_was_involved: Manager
+  thought_imagery: I'm going to be fired.
+  emotion_level: 8
+  evidence_for: The report was late.
+  evidence_against: My reviews have been good.
+  balanced_thought: One late report is unlikely to cost me my job.
+  user: one
+
+two:
+  title: Friend didn't reply
+  date: 2026-10-02 18:30:00
+  emotion_level: 5
+  user: two

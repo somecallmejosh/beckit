@@ -1,0 +1,11 @@
+one_catastrophizing:
+  situation: one
+  distortion: catastrophizing
+
+one_mind_reading:
+  situation: one
+  distortion: mind_reading
+
+two_mind_reading:
+  situation: two
+  distortion: mind_reading

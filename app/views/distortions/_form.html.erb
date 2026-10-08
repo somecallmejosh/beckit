@@ -1,0 +1,32 @@
+<%= form_with(model: distortion, class: "flex flex-col gap-12") do |form| %>
+  <%= render "shared/form_errors", record: distortion %>
+
+  <div class="form-section">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Details</h2>
+      <p class="field-hint">Everyone sees these when choosing distortions for an entry.</p>
+    </div>
+
+    <div class="flex max-w-3xl min-w-0 flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <%= form.label :title, class: "field-label" %>
+        <%= form.text_field :title, required: true, class: "field" %>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <div>
+          <%= form.label :description, class: "field-label" %>
+          <p id="description_hint" class="field-hint">A short, plain-language explanation people will see when choosing distortions.</p>
+        </div>
+        <%= form.textarea :description, rows: 4, required: true, class: "field", aria: { describedby: "description_hint" } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section border-t border-stone-950/5 pt-8 dark:border-white/10">
+    <div class="flex max-w-3xl flex-col-reverse gap-3 sm:flex-row sm:justify-end lg:col-start-2">
+      <%= link_to "Cancel", (distortion.persisted? ? distortion : distortions_path), class: "btn btn-ghost" %>
+      <%= form.submit "Save distortion", class: "btn btn-primary" %>
+    </div>
+  </div>
+<% end %>

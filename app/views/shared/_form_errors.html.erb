@@ -1,0 +1,10 @@
+<% if record.errors.any? %>
+  <div id="error_explanation" role="alert" class="rounded-2xl bg-red-50 p-4 ring-1 ring-red-700/10 dark:bg-red-500/10 dark:ring-red-400/20">
+    <h2 class="text-base/6 font-medium text-red-800 sm:text-sm/6 dark:text-red-300">A few things need another look</h2>
+    <ul class="mt-2 list-disc pl-5 text-base/6 text-red-700 sm:text-sm/6 dark:text-red-300/90">
+      <% record.errors.each do |error| %>
+        <li><%= error.full_message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

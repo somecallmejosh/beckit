@@ -1,0 +1,16 @@
+<% content_for :title, "Forgot password" %>
+
+<%= render layout: "shared/auth", locals: { title: "Forgot your password?", subtitle: "Enter your email and we'll send you a link to reset it." } do %>
+  <%= form_with url: passwords_path, class: "flex flex-col gap-6" do |form| %>
+    <div class="flex flex-col gap-2">
+      <%= form.label :email_address, "Email address", class: "field-label" %>
+      <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "field" %>
+    </div>
+
+    <%= form.submit "Email reset instructions", class: "btn btn-primary w-full" %>
+  <% end %>
+
+  <p class="text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
+    Remembered it? <%= link_to "Back to sign in", new_session_path, class: "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>
+  </p>
+<% end %>

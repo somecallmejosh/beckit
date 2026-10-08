@@ -1,0 +1,29 @@
+<%# locals: (insights:) %>
+<% distortion = insights.distortion %>
+<% row = insights.focus_row %>
+<% standout = insights.standout_cell %>
+<% places = insights.standout_groups(:location) %>
+<% people = insights.standout_groups(:who_was_involved) %>
+<% companion = insights.pairs.first if insights.pairs.first&.count.to_i >= 2 %>
+<section aria-labelledby="standouts_heading" class="flex flex-col gap-4">
+  <h3 id="standouts_heading" class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">What stands out</h3>
+  <ul role="list" class="flex max-w-[65ch] flex-col gap-3 border-l-2 border-teal-600 pl-5 text-lg/7 text-pretty text-stone-700 dark:border-teal-400 dark:text-stone-300">
+    <li>Came up in <%= row.count %> of your <%= pluralize insights.total, "entry" %> <%= range_phrase(insights.range) %>.</li>
+    <% if standout %>
+      <% (wday, part), cell = standout %>
+      <li>Most often on <%= when_phrase(wday, part) %>: <%= cell.matches %> of <%= pluralize cell.entries, "entry" %> then.</li>
+    <% end %>
+    <% if places.any? %>
+      <li>More often than usual in these places: <%= places.to_sentence %>.</li>
+    <% end %>
+    <% if people.any? %>
+      <li>More often than usual with: <%= people.to_sentence %>.</li>
+    <% end %>
+    <% if companion %>
+      <li>Often alongside <%= companion.distortions.last.title.downcase %>, in <%= companion.count %> of these <%= row.count %> entries.</li>
+    <% end %>
+    <% unless standout || places.any? || people.any? %>
+      <li class="text-stone-500 dark:text-stone-400">Not enough entries yet to see when or where <%= distortion.title.downcase %> tends to show up.</li>
+    <% end %>
+  </ul>
+</section>
