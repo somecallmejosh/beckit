@@ -1,3 +1,5 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>path{fill:#009689}@media (prefers-color-scheme:dark){path{fill:#00bba7}}</style>
+  <path d="M11 2h8L11 22H3l8-20Z"/>
+  <path d="M21 10h8l-8 20h-8l8-20Z"/>
 </svg>
