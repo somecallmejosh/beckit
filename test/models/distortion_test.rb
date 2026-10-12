@@ -45,6 +45,21 @@ class DistortionTest < ActiveSupport::TestCase
     assert_not distortion.reload.og_image.attached?
   end
 
+  test "attaches the starter photo, updates an older one, and keeps an uploaded one" do
+    distortion = distortions(:catastrophizing)
+    starter = Distortion::STARTER_PHOTOS.join("catastrophizing.webp")
+
+    distortion.refresh_starter_photo
+    assert_equal Digest::MD5.file(starter).base64digest, distortion.reload.image.checksum
+
+    distortion.update!(image: photo.merge(filename: "catastrophizing.webp"))
+    distortion.refresh_starter_photo
+    assert_equal Digest::MD5.file(starter).base64digest, distortion.reload.image.checksum
+
+    distortion.update!(image: photo)
+    assert_no_changes(-> { distortion.reload.image.blob_id }) { distortion.refresh_starter_photo }
+  end
+
   private
     def photo = { io: file_fixture("trap.webp").open, filename: "trap.webp", content_type: "image/webp" }
 end

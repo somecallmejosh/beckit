@@ -25,14 +25,8 @@
   Distortion.find_or_create_by!(title: title) { |d| d.description = description }
 end
 
-# Starter photos for each trap (db/seeds/traps/<slug>.webp). Only attached when a trap has none, so a photo
-# uploaded through the admin form is never replaced. Attaching one also builds the trap's social card.
-Distortion.find_each do |distortion|
-  path = Rails.root.join("db/seeds/traps/#{distortion.slug}.webp")
-  next if distortion.image.attached? || !path.exist?
-
-  distortion.image.attach(io: path.open, filename: path.basename.to_s, content_type: "image/webp")
-end
+# Starter photos for each trap. Attaching one also builds the trap's social card.
+Distortion.find_each(&:refresh_starter_photo)
 
 # Sample journal entries for local development. Skipped once they exist, so
 # re-running db:seed does not add duplicates.

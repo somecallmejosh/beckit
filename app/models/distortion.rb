@@ -11,6 +11,7 @@ class Distortion < ApplicationRecord
   has_rich_text :details
 
   IMAGE_TYPES = %w[ image/png image/jpeg image/webp ].freeze
+  STARTER_PHOTOS = Rails.root.join("db/seeds/traps")
 
   validates :title, presence: true, uniqueness: { case_sensitive: false }
   validates :description, presence: true
@@ -22,6 +23,16 @@ class Distortion < ApplicationRecord
   after_commit :refresh_og_image_later, on: %i[ create update ], if: -> { @card_outdated }
 
   def slug = title.parameterize
+
+  # Attaches the trap's starter photo (db/seeds/traps/<slug>.webp) when it has none, or swaps in a newer
+  # version when it still shows an older starter photo. A photo uploaded through the admin form is kept.
+  def refresh_starter_photo
+    path = STARTER_PHOTOS.join("#{slug}.webp")
+    return unless path.exist?
+    return if image.attached? && (image.filename != path.basename.to_s || image.checksum == Digest::MD5.file(path).base64digest)
+
+    image.attach(io: path.open, filename: path.basename.to_s, content_type: "image/webp")
+  end
 
   def refresh_og_image
     if image.attached?
