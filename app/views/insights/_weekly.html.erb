@@ -30,10 +30,19 @@
         </div>
       <% end %>
     </div>
-    <div class="mt-2 flex justify-between text-base/6 text-stone-500 tabular-nums sm:text-xs/5 dark:text-stone-400">
-      <span><%= l insights.weeks.first, format: :short %></span>
-      <span>Busiest week: <%= pluralize totals.max, "entry" %></span>
-      <span>This week</span>
+    <%# Up to five dates (three on phones), each centered under its bar, so the chart reads without hovering. The ends hug the edges so they never clip. %>
+    <% last = insights.weeks.size - 1 %>
+    <div class="relative mt-2 h-6 text-base/6 whitespace-nowrap text-stone-500 tabular-nums sm:h-5 sm:text-xs/5 dark:text-stone-400" aria-hidden="true">
+      <% (0..4).map { (it * last / 4.0).round }.uniq.each_with_index do |i, n| %>
+        <% if i.zero? %>
+          <span class="absolute left-0"><%= l insights.weeks[i], format: :short %></span>
+        <% elsif i == last %>
+          <span class="absolute right-0">This week</span>
+        <% else %>
+          <span class="absolute -translate-x-1/2 <%= "max-sm:hidden" if n.odd? %>" style="left: <%= ((i + 0.5) / (last + 1) * 100).round(2) %>%"><%= l insights.weeks[i], format: :short %></span>
+        <% end %>
+      <% end %>
     </div>
+    <p class="mt-1 text-base/6 text-stone-500 tabular-nums sm:text-xs/5 dark:text-stone-400">Busiest week: <%= pluralize totals.max, "entry" %></p>
   </div>
 </section>

@@ -1,4 +1,4 @@
-<% content_for :title, "Journal" %>
+<% content_for :title, @distortion ? "#{@distortion.title} entries" : "Journal" %>
 
 <div class="page">
   <div class="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-16">
@@ -23,7 +23,25 @@
       <%= render "shared/flash" %>
 
       <% if @any_entries %>
-        <% filters = { q: @query.presence, distortion_id: @distortion&.id }.compact %>
+        <% filters = { q: @query.presence, distortion_id: @distortion&.id, insights_range: @insights_range }.compact %>
+        <%# A filtered journal says so up top, and links back to Insights when that's where the filter came from. %>
+        <% if @match_count %>
+          <section aria-labelledby="filter_heading" class="flex flex-col gap-4 rounded-3xl panel-teal p-6">
+            <% if @insights_range %>
+              <%= link_to insights_path(distortion_id: @distortion.id, range: @insights_range), class: "btn-sm btn-ghost -ml-3 -mt-2 self-start" do %>
+                <%= icon :arrow_left %> <%= @distortion.title %> insights
+              <% end %>
+            <% end %>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div class="min-w-0">
+                <h2 id="filter_heading" class="font-display text-2xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= @distortion ? @distortion.title : "Search results" %></h2>
+                <p role="status" class="mt-1 text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-300"><%= filter_summary @match_count, distortion: @distortion, query: @query %></p>
+              </div>
+              <%= link_to "Show all entries", situations_path, class: "btn-sm btn-secondary self-start sm:self-auto" %>
+            </div>
+          </section>
+        <% end %>
+
         <%= form_with url: situations_path, method: :get, role: "search", class: "flex flex-col gap-3 sm:flex-row" do |form| %>
           <%= form.label :q, "Search your entries", class: "sr-only" %>
           <%= form.search_field :q, value: @query, placeholder: "Search your entries", class: "field min-w-0 sm:flex-1" %>
@@ -31,13 +49,6 @@
           <%= form.select :distortion_id, options_from_collection_for_select(Distortion.order(:title), :id, :title, @distortion&.id),
                 { include_blank: "All thinking traps" }, class: "field sm:w-56" %>
           <%= form.submit "Search", name: nil, class: "btn btn-secondary" %>
-        <% end %>
-
-        <% if @match_count %>
-          <p class="-mt-4 flex flex-wrap items-baseline gap-x-3 text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
-            <span role="status"><%= pluralize @match_count, "entry" %> <%= @match_count == 1 ? "matches" : "match" %></span>
-            <%= link_to "Clear search", situations_path, class: "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>
-          </p>
         <% end %>
 
         <div id="situations" class="flex flex-col gap-10">

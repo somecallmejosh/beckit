@@ -30,7 +30,7 @@
               <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 dark:hover:ring-white/40 <%= lift_class(cell.lift) %>" data-tooltip="<%= where %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.matches if cell.entries.positive? %></span></td>
             <% else %>
               <% detail = pluralize(cell.entries, "entry") %>
-              <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 dark:hover:ring-white/40 <%= heat_class(cell.entries, max) %>" data-tooltip="<%= where %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.entries if cell.entries.positive? %></span></td>
+              <td class="relative h-10 rounded-md focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 <%= heat_class(cell.entries, max) %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.entries if cell.entries.positive? %></span></td>
             <% end %>
           <% end %>
         </tr>

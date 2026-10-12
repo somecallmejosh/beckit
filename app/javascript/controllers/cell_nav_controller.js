@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Makes a table of [data-tooltip] cells one tab stop; arrow keys, Home and End move between cells.
-// Focus shows the shared tooltip (the tooltip controller listens for focusin/focusout).
+// Makes a table's body cells one tab stop; arrow keys, Home and End move between cells.
+// Cells with [data-tooltip] show the shared tooltip on focus (the tooltip controller listens for focusin/focusout).
 export default class extends Controller {
   connect() {
     this.cells.forEach((cell, i) => cell.tabIndex = i === 0 ? 0 : -1)
@@ -33,10 +33,10 @@ export default class extends Controller {
   }
 
   get cells() {
-    return [ ...this.element.querySelectorAll("td[data-tooltip]") ]
+    return [ ...this.element.querySelectorAll("tbody td") ]
   }
 
   get grid() {
-    return [ ...this.element.tBodies[0].rows ].map(row => [ ...row.querySelectorAll("td[data-tooltip]") ])
+    return [ ...this.element.tBodies[0].rows ].map(row => [ ...row.querySelectorAll("td") ])
   }
 }

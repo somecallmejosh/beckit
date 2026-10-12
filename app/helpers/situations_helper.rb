@@ -1,4 +1,13 @@
 module SituationsHelper
+  # The sentence under a filtered journal's heading, e.g. "7 entries with this thinking trap, across your whole journal."
+  def filter_summary(count, distortion:, query:)
+    entries = pluralize(count, "entry")
+    if distortion && query.present? then "#{entries} with #{distortion.title.downcase} #{count == 1 ? "matches" : "match"} “#{query}”."
+    elsif distortion then "#{entries} with this thinking trap, across your whole journal."
+    else "#{entries} #{count == 1 ? "matches" : "match"} “#{query}”."
+    end
+  end
+
   # Placeholder for an empty field on an entry, muted so recorded answers stand out.
   def not_recorded(text = "Not recorded")
     tag.span(text, class: "font-normal text-stone-500 dark:text-stone-400")

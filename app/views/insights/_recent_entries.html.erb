@@ -21,6 +21,6 @@
       </li>
     <% end %>
   </ul>
-  <%= link_to "See every #{insights.distortion.title.downcase} entry in your journal", situations_path(distortion_id: insights.distortion.id),
+  <%= link_to "See every #{insights.distortion.title.downcase} entry in your journal", situations_path(distortion_id: insights.distortion.id, insights_range: insights.range),
         class: "self-start text-base/6 font-medium text-teal-700 hover:text-teal-600 sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300", data: { turbo_frame: "_top" } %>
 </section>

@@ -15,15 +15,15 @@
       <% pairs.each do |pair| %>
         <% label = focus ? pair.distortions.last.title : pair.distortions.map(&:title).join(" + ") %>
         <% detail = focus ? "In #{pluralize pair.count, "entry"}, #{percent(pair.share)} of #{focus.title.downcase} entries" : "Together in #{pluralize pair.count, "entry"}, #{percent(pair.share)} of all entries" %>
-        <li class="grid grid-cols-1 gap-1.5" data-tooltip="<%= label %>" data-tooltip-detail="<%= detail %>">
+        <li class="grid grid-cols-1 gap-1.5">
           <p class="truncate text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white"><%= label %></p>
           <div class="flex items-center gap-3">
             <div class="h-2 flex-1 rounded-full bg-stone-950/5 dark:bg-white/10" aria-hidden="true">
               <div class="h-full rounded-full bg-teal-600 dark:bg-teal-400" style="width: <%= (pair.count.fdiv(max) * 100).round(2) %>%"></div>
             </div>
-            <p class="relative w-24 shrink-0 text-right text-base/6 text-stone-600 tabular-nums sm:text-sm/6 dark:text-stone-400">
+            <p class="shrink-0 text-right text-base/6 whitespace-nowrap text-stone-600 tabular-nums sm:text-sm/6 dark:text-stone-400">
               <span class="sr-only"><%= detail %></span>
-              <span aria-hidden="true"><%= focus ? percent(pair.share) : pluralize(pair.count, "entry") %></span>
+              <span aria-hidden="true"><%= pluralize(pair.count, "entry") %> <span class="text-stone-500 dark:text-stone-400">(<%= percent(pair.share) %>)</span></span>
             </p>
           </div>
         </li>

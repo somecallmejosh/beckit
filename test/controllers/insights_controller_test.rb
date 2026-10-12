@@ -49,6 +49,20 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "tooltips only where they add detail the page doesn't show" do
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url(range: "all")
+      assert_select "section[aria-labelledby=heatmap_heading] table td", minimum: 35
+      assert_select "section[aria-labelledby=heatmap_heading] table [data-tooltip]", count: 0
+      assert_select "section[aria-labelledby=pairs_heading] ul [data-tooltip]", count: 0
+      assert_select "section[aria-labelledby=pairs_heading] ul li", text: /1 entry \(\d+%\)/
+      assert_select "section[aria-labelledby=weekly_heading] div [data-tooltip]", minimum: 1
+
+      get insights_url(range: "all", distortion_id: distortions(:catastrophizing).id)
+      assert_select "section[aria-labelledby=place_heading] ul [data-tooltip]", count: 0
+    end
+  end
+
   test "shows distortions logged together" do
     travel_to Time.zone.local(2026, 10, 7, 12) do
       get insights_url
@@ -108,6 +122,6 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
 
   test "profile links to the journal filtered by that thinking trap" do
     get insights_url(range: "all", distortion_id: distortions(:catastrophizing).id)
-    assert_select "a[href=?][data-turbo-frame=_top]", situations_path(distortion_id: distortions(:catastrophizing).id)
+    assert_select "a[href=?][data-turbo-frame=_top]", situations_path(distortion_id: distortions(:catastrophizing).id, insights_range: "all")
   end
 end

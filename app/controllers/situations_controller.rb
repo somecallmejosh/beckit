@@ -6,7 +6,7 @@ class SituationsController < ApplicationController
   before_action :set_distortions, :set_suggestions, only: %i[ new edit create update ]
 
   # GET /situations
-  # GET /situations?q=&distortion_id=&page= ; GET /situations.csv exports every entry (linked from Settings).
+  # GET /situations?q=&distortion_id=&insights_range=&page= ; GET /situations.csv exports every entry (linked from Settings).
   def index
     situations = Current.user.situations.includes(:distortions).order(date: :desc)
 
@@ -66,6 +66,8 @@ class SituationsController < ApplicationController
     def filter_and_paginate(situations)
       @query = params[:q].to_s.squish
       @distortion = Distortion.find_by(id: params[:distortion_id]) if params[:distortion_id].present?
+      # Set when a thinking trap's Insights page linked here, so the journal can link back to the same view.
+      @insights_range = params[:insights_range] if @distortion && DistortionInsights::RANGES.key?(params[:insights_range])
       situations = situations.search(@query) if @query.present?
       situations = situations.tagged_with(@distortion) if @distortion
       @match_count = situations.count if @query.present? || @distortion

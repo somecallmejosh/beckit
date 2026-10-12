@@ -198,13 +198,14 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "#notice", "Entry saved."
     assert_select "li.badge-neutral", "Anxious"
-    assert_select "dd p", "Down 3 from 8"
+    assert_select "section[aria-labelledby=feeling_heading] p", "Down 3 from 8"
   end
 
   test "index searches and filters by thinking trap" do
     get situations_url(q: "fired")
     assert_select "#situations h3", text: "Missed deadline"
-    assert_select "[role=status]", "1 entry matches"
+    assert_select "#filter_heading", "Search results"
+    assert_select "[role=status]", "1 entry matches “fired”."
 
     get situations_url(q: "nothing like this")
     assert_select "#situations h3", count: 0
@@ -214,6 +215,20 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     get situations_url(distortion_id: distortions(:catastrophizing).id)
     assert_select "#situations h3", count: 1
     assert_select "select[name=distortion_id] option[selected]", "Catastrophizing"
+    assert_select "#filter_heading", "Catastrophizing"
+    assert_select "section[aria-labelledby=filter_heading] a[href=?]", situations_path, "Show all entries"
+    assert_select "a[href^='/insights']", { text: /Catastrophizing insights/, count: 0 }
+  end
+
+  test "a journal filtered from Insights links back to the same Insights view" do
+    catastrophizing = distortions(:catastrophizing)
+    get situations_url(distortion_id: catastrophizing.id, insights_range: "365")
+    assert_select "title", /Catastrophizing entries/
+    assert_select "section[aria-labelledby=filter_heading] a[href=?]", insights_path(distortion_id: catastrophizing.id, range: "365"), text: /Catastrophizing insights/
+    assert_select "[role=status]", /across your whole journal/
+
+    get situations_url(distortion_id: catastrophizing.id, insights_range: "bogus")
+    assert_select "a", { text: /Catastrophizing insights/, count: 0 }
   end
 
   test "index pages 20 at a time under month headings" do
