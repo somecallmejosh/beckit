@@ -1,0 +1,18 @@
+<%# locals: (form:, attribute:, legend:, hint:) %>
+<% hint_id = "#{attribute}_hint" %>
+<fieldset aria-describedby="<%= hint_id %>" class="flex flex-col gap-2">
+  <legend class="field-label"><%= legend %></legend>
+  <p id="<%= hint_id %>" class="field-hint"><%= hint %></p>
+  <div class="grid grid-cols-6 gap-2 sm:flex sm:flex-wrap">
+    <% (0..10).each do |level| %>
+      <label class="relative flex h-11 cursor-pointer items-center justify-center rounded-full text-base/6 font-medium text-stone-700 tabular-nums ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-teal-700 has-checked:text-white has-checked:ring-teal-700 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 sm:size-10 sm:text-sm/6 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-teal-600 dark:has-checked:ring-teal-600">
+        <%= form.radio_button attribute, level, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
+        <%= level %>
+      </label>
+    <% end %>
+    <label class="relative flex h-11 cursor-pointer items-center justify-center rounded-full px-4 text-base/6 font-medium text-stone-500 ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-stone-950/5 has-checked:text-stone-900 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 max-sm:col-span-1 sm:h-10 sm:text-sm/6 dark:text-stone-400 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-white/10 dark:has-checked:text-white">
+      <%= form.radio_button attribute, "", checked: form.object.public_send(attribute).nil?, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
+      Skip
+    </label>
+  </div>
+</fieldset>

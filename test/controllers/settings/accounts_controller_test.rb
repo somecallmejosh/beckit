@@ -19,6 +19,14 @@ class Settings::AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#notice", /account and all of your entries have been deleted/
   end
 
+  test "deleting the account also removes recently deleted entries" do
+    trashed = situations(:one)
+    trashed.trash!
+
+    delete settings_account_url, params: { password: "password" }
+    assert_not Situation.exists?(trashed.id)
+  end
+
   test "keeps everything with the wrong password" do
     assert_no_difference -> { User.count } do
       delete settings_account_url, params: { password: "wrong" }

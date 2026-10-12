@@ -45,4 +45,44 @@ class SituationTest < ActiveSupport::TestCase
     assert_equal "Home office", situation.location
     assert_nil situation.who_was_involved
   end
+
+  test "title defaults to the start of the thought, then the date" do
+    situation = users(:one).situations.create!(date: Time.zone.local(2026, 10, 3, 9), thought_imagery: "Everyone in the room could tell I had no idea what I was saying")
+    assert_equal "Everyone in the room could tell...", situation.title
+
+    situation = users(:one).situations.create!(date: Time.zone.local(2026, 10, 3, 9))
+    assert_equal "Entry on Oct 3, 2026", situation.title
+  end
+
+  test "emotions are cleaned up and limited to the known list" do
+    situation = users(:one).situations.build(date: Time.current, emotions: [ "Sad", "", "Sad", "Anxious" ])
+    assert situation.valid?
+    assert_equal %w[ Sad Anxious ], situation.emotions
+
+    situation.emotions = [ "Bored" ]
+    assert_not situation.valid?
+    assert_includes situation.errors.full_messages, "Feelings include one we don't recognize"
+  end
+
+  test "feeling now is 0 to 10" do
+    situation = situations(:one)
+    situation.emotion_level_after = 11
+    assert_not situation.valid?
+  end
+
+  test "search covers the written fields, case-insensitively, and treats wildcards literally" do
+    assert_equal [ situations(:one) ], Situation.search("FIRED").to_a
+    assert_equal [ situations(:one) ], Situation.search("reviews have").to_a
+    assert_empty Situation.search("%")
+  end
+
+  test "trash and restore" do
+    situation = situations(:one)
+    situation.trash!
+    assert_not_includes users(:one).situations, situation
+    assert_includes users(:one).all_situations, situation
+
+    situation.restore!
+    assert_includes users(:one).situations, situation
+  end
 end

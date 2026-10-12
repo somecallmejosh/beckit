@@ -43,4 +43,17 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_not User.find_by(email_address: "sneaky@example.com").admin?
   end
+
+  test "create keeps a supported browser time zone and ignores others" do
+    post registration_url, params: { user: { name: "Lee", email_address: "lee@example.com", password: "password", password_confirmation: "password", time_zone: "Europe/London" } }
+    assert_equal "Europe/London", User.find_by(email_address: "lee@example.com").time_zone
+
+    post registration_url, params: { user: { name: "Sam", email_address: "sam@example.com", password: "password", password_confirmation: "password", time_zone: "Mars/Olympus" } }
+    assert_equal "America/New_York", User.find_by(email_address: "sam@example.com").time_zone
+  end
+
+  test "new fills the time zone from the browser" do
+    get new_registration_url
+    assert_select "input[type=hidden][name=?][data-controller=time-zone]", "user[time_zone]"
+  end
 end

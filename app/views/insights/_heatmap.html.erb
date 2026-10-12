@@ -5,7 +5,8 @@
   <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "heatmap_heading", title: "When",
         description: focus ? "How often #{focus.title.downcase} came up at each time, compared with your overall rate. Numbers are entries with it." : "Entries by day of the week and time of day. Entries after midnight count toward the night before. Pick a distortion to see when it tends to show up." %>
 
-  <table class="w-full table-fixed border-separate border-spacing-0.5 text-center text-base/6 tabular-nums sm:border-spacing-1 sm:text-sm/6">
+  <table data-controller="cell-nav" data-action="keydown->cell-nav#move" class="w-full table-fixed border-separate border-spacing-0.5 text-center text-base/6 tabular-nums sm:border-spacing-1 sm:text-sm/6">
+    <caption class="sr-only">Use the arrow keys to move between cells.</caption>
     <thead>
       <tr>
         <td class="w-11"></td>
@@ -26,10 +27,10 @@
             <% where = "#{Date::DAYNAMES[wday]} #{part}" %>
             <% if focus %>
               <% detail = "#{cell.matches} of #{pluralize cell.entries, "entry"} · #{lift_label(cell.lift)}" %>
-              <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset dark:hover:ring-white/40 <%= lift_class(cell.lift) %>" data-tooltip="<%= where %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.matches if cell.entries.positive? %></span></td>
+              <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 dark:hover:ring-white/40 <%= lift_class(cell.lift) %>" data-tooltip="<%= where %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.matches if cell.entries.positive? %></span></td>
             <% else %>
               <% detail = pluralize(cell.entries, "entry") %>
-              <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset dark:hover:ring-white/40 <%= heat_class(cell.entries, max) %>" data-tooltip="<%= where %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.entries if cell.entries.positive? %></span></td>
+              <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 dark:hover:ring-white/40 <%= heat_class(cell.entries, max) %>" data-tooltip="<%= where %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= where %>: <%= detail %></span><span aria-hidden="true"><%= cell.entries if cell.entries.positive? %></span></td>
             <% end %>
           <% end %>
         </tr>

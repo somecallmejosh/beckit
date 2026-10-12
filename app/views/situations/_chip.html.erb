@@ -1,0 +1,7 @@
+<%# locals: (name:, value:, label:, checked:, id:, describedby: nil) %>
+<%# A checkbox styled as a pill; the whole pill is the hit area and a check mark shows the state without relying on color. %>
+<label class="group relative inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-base/6 font-medium text-stone-700 ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-teal-700 has-checked:text-white has-checked:ring-teal-700 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 sm:text-sm/6 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-teal-600 dark:has-checked:text-white dark:has-checked:ring-teal-600">
+  <%= check_box_tag name, value, checked, id:, aria: { describedby: }, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
+  <%= icon :check, "hidden group-has-checked:block" %>
+  <%= label %>
+</label>

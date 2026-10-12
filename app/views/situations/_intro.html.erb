@@ -1,0 +1,36 @@
+<%# locals: (user:) %>
+<%# Shown until the first entry: how an entry works, plus the two settings that are easy to get wrong. %>
+<% link_class = "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>
+<section aria-labelledby="intro_heading" class="flex flex-col gap-8 rounded-3xl bg-stone-950/[0.025] p-6 ring-1 ring-stone-950/5 sm:p-10 dark:bg-white/[0.03] dark:ring-white/10">
+  <div>
+    <h2 id="intro_heading" class="font-display text-2xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">A quiet place to begin</h2>
+    <p class="mt-2 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">Each entry is a short thought record. Take it at your own pace; every part except the date is optional.</p>
+  </div>
+
+  <ol role="list" class="flex flex-col gap-6">
+    <% [
+      [ "Write down a moment", "Pick one moment that felt heavy. A sentence about what went through your mind is enough." ],
+      [ "Name the pattern", capture { concat "Tag any thinking traps that seem to fit. "; concat link_to("Browse the thinking traps", distortions_path, class: link_class) } ],
+      [ "Weigh it up", "Note the evidence for and against the thought, then try a kinder, more balanced one." ]
+    ].each.with_index(1) do |(title, body), step| %>
+      <li class="flex gap-4">
+        <span aria-hidden="true" class="flex size-7 shrink-0 items-center justify-center rounded-full bg-teal-100 text-sm/5 font-semibold text-teal-800 dark:bg-teal-400/15 dark:text-teal-200"><%= step %></span>
+        <div>
+          <h3 class="text-base/7 font-semibold text-stone-900 dark:text-white"><%= title %></h3>
+          <p class="max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= body %></p>
+        </div>
+      </li>
+    <% end %>
+  </ol>
+
+  <div>
+    <%= link_to "Write your first entry", new_situation_path, class: "btn btn-primary" %>
+  </div>
+
+  <ul role="list" class="flex flex-col gap-2 border-t border-stone-950/5 pt-6 text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">
+    <li id="intro_time_zone">Your time zone is set to <%= user.time_zone_name %>. <%= link_to "Change it", edit_settings_path, class: link_class %></li>
+    <% unless user.us_time_zone? || user.crisis_contact_name %>
+      <li id="intro_crisis_line">The footer shows the US 988 Lifeline. <%= link_to "Add a crisis line for where you live", edit_settings_path, class: link_class %></li>
+    <% end %>
+  </ul>
+</section>

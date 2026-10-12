@@ -3,6 +3,7 @@
 <%= render layout: "shared/auth", locals: { title: "Create your account", subtitle: "A private space to notice your thoughts and practice seeing them more kindly." } do %>
   <%= form_with model: @user, url: registration_path, class: "flex flex-col gap-6" do |form| %>
     <%= render "shared/form_errors", record: @user %>
+    <%= form.hidden_field :time_zone, value: (@user.time_zone if @user.time_zone_changed?), data: { controller: "time-zone" } %>
 
     <div class="flex flex-col gap-2">
       <%= form.label :name, class: "field-label" %>

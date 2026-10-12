@@ -11,7 +11,7 @@ module InsightsHelper
 
   # Sequential teal ramp for counts, empty first.
   HEAT_CLASSES = [
-    "bg-stone-950/[0.03] text-stone-400 dark:bg-white/[0.03] dark:text-stone-500",
+    "bg-stone-950/[0.03] text-stone-500 dark:bg-white/[0.03] dark:text-stone-400",
     "bg-teal-100 text-stone-900 dark:bg-teal-950 dark:text-teal-100",
     "bg-teal-200 text-stone-900 dark:bg-teal-900 dark:text-teal-50",
     "bg-teal-400 text-stone-950 dark:bg-teal-700 dark:text-white",
@@ -20,7 +20,7 @@ module InsightsHelper
 
   # Diverging scale for lift: sky = less often than usual, amber = more often, gray = about usual.
   LIFT_CLASSES = {
-    unknown: "bg-stone-950/[0.03] text-stone-400 dark:bg-white/[0.03] dark:text-stone-500",
+    unknown: "bg-stone-950/[0.03] text-stone-500 dark:bg-white/[0.03] dark:text-stone-400",
     much_less: "bg-sky-200 text-stone-900 dark:bg-sky-800 dark:text-white",
     less: "bg-sky-50 text-stone-900 dark:bg-sky-950 dark:text-sky-100",
     usual: "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-200",
@@ -42,7 +42,7 @@ module InsightsHelper
       if active
         "bg-teal-50 font-semibold text-teal-900 ring-teal-700/20 lg:before:absolute lg:before:inset-y-2 lg:before:left-0 lg:before:w-0.5 lg:before:rounded-full lg:before:bg-teal-600 dark:bg-teal-400/10 dark:text-teal-100 dark:ring-teal-400/30 dark:lg:before:bg-teal-400"
       elsif count.zero?
-        "text-stone-400 ring-stone-950/10 hover:bg-stone-950/5 hover:text-stone-600 dark:text-stone-500 dark:ring-white/10 dark:hover:bg-white/5"
+        "text-stone-500 ring-stone-950/10 hover:bg-stone-950/5 hover:text-stone-700 dark:text-stone-400 dark:ring-white/10 dark:hover:bg-white/5"
       else
         "font-medium text-stone-700 ring-stone-950/10 hover:bg-stone-950/5 hover:text-stone-900 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:hover:text-white"
       end
@@ -50,12 +50,21 @@ module InsightsHelper
     link_to url, class: classes, aria: { current: (active ? "page" : nil) } do
       safe_join([
         tag.span(label, class: "truncate"),
-        tag.span(count, class: [ "tabular-nums", active ? "text-teal-700 dark:text-teal-300" : "text-stone-400 dark:text-stone-500" ])
+        tag.span(count, class: [ "tabular-nums", active ? "text-teal-700 dark:text-teal-300" : "text-stone-500 dark:text-stone-400" ])
       ])
     end
   end
 
   def range_phrase(range) = RANGE_PHRASES.fetch(range)
+
+  # "In the 4 entries you re-rated, the feeling dropped by 2.5 points on average."
+  def feeling_shift_sentence(shift)
+    rated = "In the #{pluralize shift.entries, "entry"} you re-rated"
+    change = number_with_precision(shift.average.abs, precision: 1, strip_insignificant_zeros: true)
+    if shift.average.abs < 0.05 then "#{rated}, the feeling stayed about the same on average."
+    else "#{rated}, the feeling #{shift.average.negative? ? "dropped" : "rose"} by #{change} #{"point".pluralize(shift.average.abs == 1 ? 1 : 2)} on average."
+    end
+  end
 
   # "Monday afternoons", or "around midday on Mondays".
   def when_phrase(wday, part)

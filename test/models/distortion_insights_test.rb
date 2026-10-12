@@ -201,4 +201,33 @@ class DistortionInsightsTest < ActiveSupport::TestCase
 
     assert_equal [ @mind_reading ], DistortionInsights.new(@user).strongest.map(&:distortion)
   end
+
+  test "feeling shift averages re-rated entries only" do
+    @user.situations.create!(date: 1.day.ago, emotion_level: 8, emotion_level_after: 4)
+    @user.situations.create!(date: 2.days.ago, emotion_level: 6, emotion_level_after: 5)
+    @user.situations.create!(date: 3.days.ago, emotion_level: 9)
+
+    shift = DistortionInsights.new(@user).feeling_shift
+    assert_equal 2, shift.entries
+    assert_in_delta(-2.5, shift.average)
+    assert_nil DistortionInsights.new(users(:two)).feeling_shift
+  end
+
+  test "busiest slot and top place need at least two entries" do
+    log(Time.zone.local(2026, 10, 5, 19), location: "Office")
+    insights = DistortionInsights.new(@user)
+    assert_nil insights.busiest_slot
+    assert_nil insights.top_place
+
+    log(Time.zone.local(2026, 9, 28, 20), location: "Office")
+    insights = DistortionInsights.new(@user)
+    assert_equal [ 1, :evening ], insights.busiest_slot
+    assert_equal "Office", insights.top_place
+  end
+
+  test "deleted entries are left out" do
+    log(1.day.ago).trash!
+    log(2.days.ago)
+    assert_equal 1, DistortionInsights.new(@user).total
+  end
 end

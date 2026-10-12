@@ -8,7 +8,8 @@
     <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">No entries in this range recorded a <%= noun %>.</p>
   <% else %>
     <div class="-mx-4 overflow-x-auto px-4">
-      <table class="w-full min-w-[32rem] border-separate border-spacing-1 text-center text-base/6 tabular-nums sm:text-sm/6">
+      <table data-controller="cell-nav" data-action="keydown->cell-nav#move" class="w-full min-w-[32rem] border-separate border-spacing-1 text-center text-base/6 tabular-nums sm:text-sm/6">
+        <caption class="sr-only">Use the arrow keys to move between cells.</caption>
         <thead>
           <tr>
             <td></td>
@@ -26,7 +27,7 @@
               <% group.cells.each do |distortion, cell| %>
                 <% heading = "#{group.label} · #{distortion.title}" %>
                 <% detail = "#{cell.matches} of #{pluralize cell.entries, "entry"} · #{lift_label(cell.lift)}" %>
-                <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset dark:hover:ring-white/40 <%= lift_class(cell.lift) %>" data-tooltip="<%= heading %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= heading %>: <%= detail %></span><span aria-hidden="true"><%= cell.matches if cell.lift %></span></td>
+                <td class="relative h-10 rounded-md hover:ring-2 hover:ring-stone-950/25 hover:ring-inset focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-teal-600 dark:hover:ring-white/40 <%= lift_class(cell.lift) %>" data-tooltip="<%= heading %>" data-tooltip-detail="<%= detail %>"><span class="sr-only"><%= heading %>: <%= detail %></span><span aria-hidden="true"><%= cell.matches if cell.lift %></span></td>
               <% end %>
             </tr>
           <% end %>

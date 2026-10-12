@@ -21,18 +21,53 @@
     <div class="flex min-w-0 flex-col gap-8">
       <%= render "shared/flash" %>
 
-      <% if @situations.any? %>
-        <ul id="situations" role="list" class="divide-y divide-stone-950/5 dark:divide-white/10 max-lg:border-t max-lg:border-stone-950/5 max-lg:dark:border-white/10">
-          <%= render @situations %>
-        </ul>
-      <% else %>
-        <div class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center dark:border-white/10">
-          <h2 class="font-display text-xl font-medium text-balance text-stone-900 dark:text-white">A quiet place to begin</h2>
-          <p class="mx-auto mt-2 max-w-[48ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">When a moment feels heavy, write down what happened and what went through your mind. You can work through it at your own pace.</p>
-          <div class="mt-6">
-            <%= link_to "Write your first entry", new_situation_path, class: "btn btn-secondary" %>
-          </div>
+      <% if @any_entries %>
+        <% filters = { q: @query.presence, distortion_id: @distortion&.id }.compact %>
+        <%= form_with url: situations_path, method: :get, role: "search", class: "flex flex-col gap-3 sm:flex-row" do |form| %>
+          <%= form.label :q, "Search your entries", class: "sr-only" %>
+          <%= form.search_field :q, value: @query, placeholder: "Search your entries", class: "field min-w-0 sm:flex-1" %>
+          <%= form.label :distortion_id, "Thinking trap", class: "sr-only" %>
+          <%= form.select :distortion_id, options_from_collection_for_select(Distortion.order(:title), :id, :title, @distortion&.id),
+                { include_blank: "All thinking traps" }, class: "field sm:w-56" %>
+          <%= form.submit "Search", name: nil, class: "btn btn-secondary" %>
+        <% end %>
+
+        <% if @match_count %>
+          <p class="-mt-4 flex flex-wrap items-baseline gap-x-3 text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
+            <span role="status"><%= pluralize @match_count, "entry" %> <%= @match_count == 1 ? "matches" : "match" %></span>
+            <%= link_to "Clear search", situations_path, class: "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>
+          </p>
+        <% end %>
+
+        <div id="situations" class="flex flex-col gap-10">
+          <% @situations.group_by { it.date.beginning_of_month }.each do |month, situations| %>
+            <section aria-labelledby="month_<%= month.strftime("%Y_%m") %>">
+              <h2 id="month_<%= month.strftime("%Y_%m") %>" class="border-b border-stone-950/5 pb-2 text-base/6 font-medium text-stone-500 sm:text-sm/6 dark:border-white/10 dark:text-stone-400"><%= l month, format: "%B %Y" %></h2>
+              <ul role="list" class="divide-y divide-stone-950/5 dark:divide-white/10">
+                <%= render situations %>
+              </ul>
+            </section>
+          <% end %>
         </div>
+
+        <% if @situations.empty? %>
+          <p class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">No entries match. Try other words, or a different thinking trap.</p>
+        <% end %>
+
+        <% if @page > 1 || @older_page %>
+          <nav aria-label="Pages" class="flex items-center justify-between gap-4 border-t border-stone-950/5 pt-6 dark:border-white/10">
+            <% if @page > 1 %>
+              <%= link_to situations_path(filters.merge(page: (@page - 1 if @page > 2)).compact), class: "btn btn-secondary" do %><%= icon :arrow_left %> Newer entries<% end %>
+            <% else %>
+              <span></span>
+            <% end %>
+            <% if @older_page %>
+              <%= link_to "Older entries", situations_path(filters.merge(page: @page + 1)), class: "btn btn-secondary" %>
+            <% end %>
+          </nav>
+        <% end %>
+      <% else %>
+        <%= render "intro", user: Current.user %>
       <% end %>
     </div>
   </div>

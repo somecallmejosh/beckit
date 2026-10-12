@@ -5,7 +5,9 @@ class User < ApplicationRecord
 
   has_secure_password
   has_many :sessions, dependent: :destroy
-  has_many :situations, dependent: :destroy
+  # Deleted entries stay restorable for a while (see Situation::RESTORE_WINDOW); `situations` hides them.
+  has_many :all_situations, class_name: "Situation", dependent: :destroy
+  has_many :situations, -> { kept }
   has_one_attached :avatar do |attachable|
     attachable.variant :thumb, resize_to_fill: [ 64, 64 ]
     attachable.variant :profile, resize_to_fill: [ 256, 256 ]
@@ -30,6 +32,15 @@ class User < ApplicationRecord
 
   def first_name
     preferred_name.presence || name.to_s.split.first
+  end
+
+  # Every Rails name for the zone, e.g. "Edinburgh, London" for Europe/London.
+  def time_zone_name
+    ActiveSupport::TimeZone.all.select { it.tzinfo.name == time_zone }.map(&:name).join(", ").presence || time_zone
+  end
+
+  def us_time_zone?
+    ActiveSupport::TimeZone.us_zones.any? { it.tzinfo.name == time_zone }
   end
 
   def initials

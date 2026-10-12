@@ -1,4 +1,9 @@
-<% if notice.present? %>
+<% if notice.present? && flash[:undo_situation_id] %>
+  <div id="notice" role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-teal-50 px-4 py-3 text-base/6 text-pretty text-teal-900 ring-1 ring-teal-700/10 sm:text-sm/6 dark:bg-white/5 dark:text-teal-200 dark:ring-white/10">
+    <p><%= notice %></p>
+    <%= button_to "Undo", situation_restoration_path(flash[:undo_situation_id]), class: "btn-sm btn-secondary" %>
+  </div>
+<% elsif notice.present? %>
   <p id="notice" role="status" class="rounded-2xl bg-teal-50 px-4 py-3 text-base/6 text-pretty text-teal-900 ring-1 ring-teal-700/10 sm:text-sm/6 dark:bg-white/5 dark:text-teal-200 dark:ring-white/10"><%= notice %></p>
 <% end %>
 <% if alert.present? %>

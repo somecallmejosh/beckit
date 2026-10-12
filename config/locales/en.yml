@@ -37,3 +37,6 @@ en:
     attributes:
       user:
         password_challenge: "Current password"
+      situation:
+        emotions: "Feelings"
+        emotion_level_after: "Feeling now"

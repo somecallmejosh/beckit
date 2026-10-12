@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_234725) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_165250) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -82,9 +82,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_234725) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.string "emotions", default: [], null: false, array: true
+    t.integer "emotion_level_after"
+    t.index ["deleted_at"], name: "index_situations_on_deleted_at", where: "(deleted_at IS NOT NULL)"
     t.index ["user_id", "date"], name: "index_situations_on_user_id_and_date"
     t.index ["user_id"], name: "index_situations_on_user_id"
     t.check_constraint "emotion_level >= 0 AND emotion_level <= 10", name: "emotion_level_range"
+    t.check_constraint "emotion_level_after >= 0 AND emotion_level_after <= 10", name: "emotion_level_after_range"
   end
 
   create_table "users", force: :cascade do |t|

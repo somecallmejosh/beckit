@@ -43,7 +43,7 @@
         <% end %>
       </article>
 
-      <aside class="flex flex-col gap-6 lg:sticky lg:top-20 lg:col-span-4 lg:self-start">
+      <aside class="flex flex-col gap-6 lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
         <dl class="flex flex-col divide-y divide-stone-950/5 rounded-3xl bg-stone-950/[0.025] px-6 py-2 ring-1 ring-stone-950/5 dark:divide-white/10 dark:bg-white/[0.03] dark:ring-white/10">
           <% [ [ "Where", @situation.location ], [ "Who was involved", @situation.who_was_involved ] ].each do |label, value| %>
             <div class="flex flex-col gap-1 py-4">
@@ -53,8 +53,23 @@
           <% end %>
 
           <div class="flex flex-col gap-2 py-4">
-            <dt class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">How strongly you felt</dt>
+            <dt class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">What you felt</dt>
             <dd>
+              <% if @situation.emotions.any? %>
+                <ul role="list" class="flex flex-wrap gap-1.5">
+                  <% @situation.emotions.each do |emotion| %>
+                    <li class="badge"><%= emotion %></li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <p class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">Not recorded</p>
+              <% end %>
+            </dd>
+          </div>
+
+          <div class="flex flex-col gap-2 py-4">
+            <dt class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">How strongly you felt</dt>
+            <dd class="flex flex-col gap-2">
               <% if @situation.emotion_level %>
                 <%= render "shared/emotion_level", level: @situation.emotion_level %>
               <% else %>
@@ -62,6 +77,18 @@
               <% end %>
             </dd>
           </div>
+
+          <% if @situation.emotion_level_after %>
+            <div class="flex flex-col gap-2 py-4">
+              <dt class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">After weighing it up</dt>
+              <dd class="flex flex-col gap-2">
+                <%= render "shared/emotion_level", level: @situation.emotion_level_after %>
+                <% if (shift = feeling_shift(@situation)) %>
+                  <p class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300"><%= shift %></p>
+                <% end %>
+              </dd>
+            </div>
+          <% end %>
 
           <div class="flex flex-col gap-2 py-4">
             <dt class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">Distortions</dt>
@@ -81,7 +108,7 @@
 
         <div class="flex items-center gap-2">
           <%= link_to "Edit", edit_situation_path(@situation), class: "btn btn-secondary" %>
-          <%= button_to "Delete", @situation, method: :delete, class: "btn btn-danger", data: { turbo_confirm: "Delete this entry? This can't be undone." } %>
+          <%= button_to "Delete", @situation, method: :delete, class: "btn btn-danger" %>
         </div>
       </aside>
     </div>

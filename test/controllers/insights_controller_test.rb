@@ -88,4 +88,26 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
       assert_select "p", text: /No entries with catastrophizing in the last 30 days/
     end
   end
+
+  test "overview leads with a plain summary and tucks the where/who tables away" do
+    situations(:one).update!(emotion_level_after: 4)
+    get insights_url(range: "all")
+    assert_select "#in_short_heading", "In short"
+    assert_select "ul li", /In the 1 entry you re-rated, the feeling dropped by 4 points on average/
+    assert_select "details summary", /Where and who, in detail/
+    assert_select "details #place_heading"
+  end
+
+  test "small screens pick a thinking trap from a select; tables are keyboard navigable" do
+    get insights_url(range: "all")
+    assert_select "form[data-controller=autosubmit] select[name=distortion_id] option", Distortion.count + 1
+    assert_select "nav[aria-label=Distortions].max-lg\\:hidden"
+    assert_select "table[data-controller=cell-nav] caption", /arrow keys/
+    assert_select "[data-action*='focusin->tooltip#show']"
+  end
+
+  test "profile links to the journal filtered by that thinking trap" do
+    get insights_url(range: "all", distortion_id: distortions(:catastrophizing).id)
+    assert_select "a[href=?][data-turbo-frame=_top]", situations_path(distortion_id: distortions(:catastrophizing).id)
+  end
 end

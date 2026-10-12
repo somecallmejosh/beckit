@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
-  resources :situations
+  resources :situations do
+    resource :restoration, only: :create, module: :situations
+  end
   resources :distortions
   resource :insights, only: :show
   resource :settings, only: %i[ edit update ]

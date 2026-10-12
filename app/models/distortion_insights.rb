@@ -17,6 +17,7 @@ class DistortionInsights
   Cell = Data.define(:entries, :matches, :lift)
   Group = Data.define(:label, :entries, :cells)
   Pair = Data.define(:distortions, :count, :share)
+  Shift = Data.define(:entries, :average)
 
   attr_reader :range, :distortion
 
@@ -94,6 +95,23 @@ class DistortionInsights
   def overall_avg_emotion
     levels = situations.filter_map(&:emotion_level)
     levels.sum.fdiv(levels.size) if levels.any?
+  end
+
+  # The weekday and part of the day with the most entries, if any slot has at least two.
+  def busiest_slot
+    key, cell = heatmap.max_by { |_, cell| cell.entries }
+    key if cell && cell.entries >= 2
+  end
+
+  # The most common named place (not "Other"), if it has at least two entries.
+  def top_place
+    by_location.find { it.label != "Other" && it.entries >= 2 }&.label
+  end
+
+  # How the feeling changed between the first rating and the re-rating, for entries that have both.
+  def feeling_shift
+    rated = situations.select { it.emotion_level && it.emotion_level_after }
+    Shift.new(entries: rated.size, average: rated.sum { it.emotion_level_after - it.emotion_level }.fdiv(rated.size)) if rated.any?
   end
 
   def focus_row

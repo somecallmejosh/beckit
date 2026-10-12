@@ -23,6 +23,7 @@
           <li>For each sign-in: the IP address and browser it came from, so a session can be recognized and ended.</li>
         </ul>
         <p>While you write an entry, unsaved text is kept in your browser tab so a reload doesn't lose it. It is removed when you save, cancel or close the tab.</p>
+        <p>When you delete an entry it is hidden straight away, so a mistake can be undone, and permanently removed after <%= Situation::RESTORE_WINDOW.inspect %>.</p>
       </div>
     </section>
 
@@ -49,7 +50,7 @@
         <ul role="list">
           <li>Download all of your entries as a CSV file.</li>
           <li>Change your password, which signs out your other devices.</li>
-          <li>Delete your account. This removes your account, entries, photo and sign-ins from the app straight away.</li>
+          <li>Delete your account. This removes your account, every entry (including recently deleted ones), photo and sign-ins from the app straight away.</li>
         </ul>
       </div>
     </section>

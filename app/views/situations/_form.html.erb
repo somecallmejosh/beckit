@@ -9,24 +9,53 @@
 
   <%= render "shared/form_errors", record: situation %>
 
+  <%# Thought and feeling come first: they are what's pressing when someone opens this form. %>
   <fieldset class="form-section">
     <legend class="contents">
       <span class="flex flex-col gap-1">
         <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 1</span>
-        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">What happened</span>
+        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">What's on your mind</span>
       </span>
     </legend>
 
     <div class="flex max-w-4xl min-w-0 flex-col gap-6">
       <div class="flex flex-col gap-2">
-        <%= form.label :title, "Give this entry a short name", class: "field-label" %>
-        <%= form.text_field :title, required: true, placeholder: "e.g. Presentation at work", class: "field" %>
+        <div>
+          <%= form.label :thought_imagery, "What went through your mind?", class: "field-label" %>
+          <p id="thought_imagery_hint" class="field-hint">Words, images, or memories that came up in the moment.</p>
+        </div>
+        <%= form.textarea :thought_imagery, rows: 4, class: "field", aria: { describedby: "thought_imagery_hint" } %>
       </div>
 
+      <fieldset aria-describedby="emotions_hint" class="flex flex-col gap-2">
+        <legend class="field-label">What did you feel?</legend>
+        <p id="emotions_hint" class="field-hint">Pick any that fit, or none.</p>
+        <%= hidden_field_tag "situation[emotions][]", "", id: nil %>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <% Situation::EMOTIONS.each do |emotion| %>
+            <%= render "chip", name: "situation[emotions][]", value: emotion, label: emotion, checked: situation.emotions.include?(emotion), id: "situation_emotions_#{emotion.downcase}" %>
+          <% end %>
+        </div>
+      </fieldset>
+
+      <%= render "intensity", form:, attribute: :emotion_level, legend: "How strong was the feeling?",
+            hint: "0 is barely noticeable, 10 is the most intense you can imagine." %>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+    <legend class="contents">
+      <span class="flex flex-col gap-1">
+        <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 2</span>
+        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">What happened</span>
+      </span>
+    </legend>
+
+    <div class="flex max-w-4xl min-w-0 flex-col gap-6">
       <div class="grid gap-6 sm:grid-cols-2">
         <div class="flex flex-col gap-2">
           <%= form.label :date, "When did this occur?", class: "field-label" %>
-          <%= form.datetime_field :date, required: true, class: "field" %>
+          <%= form.datetime_field :date, required: true, step: 60, value: situation.date&.strftime("%Y-%m-%dT%H:%M"), class: "field" %>
         </div>
         <div class="flex flex-col gap-2">
           <%= form.label :location, "Where were you when it happened?", class: "field-label" %>
@@ -40,68 +69,14 @@
         <%= form.text_field :who_was_involved, placeholder: "Optional", list: "who_options", autocomplete: "off", class: "field" %>
         <%= render "suggestions", id: "who_options", options: @who_options %>
       </div>
-    </div>
-  </fieldset>
 
-  <fieldset class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
-    <legend class="contents">
-      <span class="flex flex-col gap-1">
-        <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 2</span>
-        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Thoughts and feelings</span>
-      </span>
-    </legend>
-
-    <div class="flex max-w-4xl min-w-0 flex-col gap-6">
       <div class="flex flex-col gap-2">
         <div>
-          <%= form.label :thought_imagery, "What went through your mind?", class: "field-label" %>
-          <p id="thought_imagery_hint" class="field-hint">Words, images, or memories that came up in the moment.</p>
+          <%= form.label :title, "Give this entry a short name", class: "field-label" %>
+          <p id="title_hint" class="field-hint">Optional. Leave it blank to use the start of your thought.</p>
         </div>
-        <%= form.text_area :thought_imagery, class: "field", aria: { describedby: "thought_imagery_hint" } %>
+        <%= form.text_field :title, placeholder: "e.g. Presentation at work", class: "field", aria: { describedby: "title_hint" } %>
       </div>
-
-      <fieldset aria-describedby="emotion_level_hint" class="flex flex-col gap-2">
-        <legend class="field-label">How strong was the feeling?</legend>
-        <p id="emotion_level_hint" class="field-hint">0 is barely noticeable, 10 is the most intense you can imagine.</p>
-        <div class="grid grid-cols-6 gap-2 sm:flex sm:flex-wrap">
-          <% (0..10).each do |level| %>
-            <label class="relative flex h-11 cursor-pointer items-center justify-center rounded-full text-base/6 font-medium text-stone-700 tabular-nums ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-teal-700 has-checked:text-white has-checked:ring-teal-700 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 sm:size-10 sm:text-sm/6 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-teal-600 dark:has-checked:ring-teal-600">
-              <%= form.radio_button :emotion_level, level, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
-              <%= level %>
-            </label>
-          <% end %>
-          <label class="relative flex h-11 cursor-pointer items-center justify-center rounded-full px-4 text-base/6 font-medium text-stone-500 ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-stone-950/5 has-checked:text-stone-900 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 max-sm:col-span-1 sm:h-10 sm:text-sm/6 dark:text-stone-400 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-white/10 dark:has-checked:text-white">
-            <%= form.radio_button :emotion_level, "", checked: situation.emotion_level.nil?, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
-            Skip
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset class="flex flex-col gap-2">
-        <legend class="field-label">Which distortions might be at play?</legend>
-        <p class="field-hint">Choose any that fit. It's okay to leave these blank.</p>
-        <%= hidden_field_tag "situation[distortion_ids][]", "", id: nil %>
-        <div class="grid gap-x-6 gap-y-4 pt-2 sm:grid-cols-2 xl:grid-cols-3">
-          <% @distortions.each do |distortion| %>
-            <% checkbox_id = "situation_distortion_ids_#{distortion.id}" %>
-            <div class="flex gap-3">
-              <div class="flex h-lh items-center text-base/6 sm:text-sm/6">
-                <span class="group inline-grid size-5 grid-cols-1 sm:size-4">
-                  <%= check_box_tag "situation[distortion_ids][]", distortion.id, situation.distortion_ids.include?(distortion.id), id: checkbox_id, aria: { describedby: "#{checkbox_id}_description" }, class: "col-start-1 row-start-1 appearance-none rounded-sm border border-stone-300 bg-white checked:border-teal-700 checked:bg-teal-700 indeterminate:border-teal-700 indeterminate:bg-teal-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700 disabled:border-stone-300 disabled:bg-stone-100 disabled:checked:bg-stone-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-teal-600 dark:checked:bg-teal-600 dark:indeterminate:border-teal-600 dark:indeterminate:bg-teal-600 dark:focus-visible:outline-teal-600 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" %>
-                  <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-7/8 self-center justify-self-center stroke-white group-has-disabled:stroke-stone-950/25 dark:group-has-disabled:stroke-white/25">
-                    <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-not-has-checked:opacity-0" />
-                    <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-not-has-indeterminate:opacity-0" />
-                  </svg>
-                </span>
-              </div>
-              <div class="min-w-0 text-base/6 sm:text-sm/6">
-                <label for="<%= checkbox_id %>" class="cursor-pointer font-medium text-stone-900 dark:text-white"><%= distortion.title %></label>
-                <p id="<%= checkbox_id %>_description" class="text-pretty text-stone-500 dark:text-stone-400"><%= distortion.description %></p>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </fieldset>
     </div>
   </fieldset>
 
@@ -109,6 +84,44 @@
     <legend class="contents">
       <span class="flex flex-col gap-1">
         <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 3</span>
+        <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Name the pattern</span>
+      </span>
+    </legend>
+
+    <div class="flex max-w-4xl min-w-0 flex-col gap-4">
+      <fieldset aria-describedby="distortions_hint" class="flex flex-col gap-2">
+        <legend class="field-label">Which thinking traps might be at play?</legend>
+        <p id="distortions_hint" class="field-hint">Choose any that fit. It's okay to leave these blank.<% if @distortions_used %> The ones you use most are first.<% end %></p>
+        <%= hidden_field_tag "situation[distortion_ids][]", "", id: nil %>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <% @distortions.each do |distortion| %>
+            <% checkbox_id = "situation_distortion_ids_#{distortion.id}" %>
+            <%= render "chip", name: "situation[distortion_ids][]", value: distortion.id, label: distortion.title,
+                  checked: situation.distortion_ids.include?(distortion.id), id: checkbox_id, describedby: "#{checkbox_id}_description" %>
+          <% end %>
+        </div>
+      </fieldset>
+
+      <details class="group/meanings">
+        <summary class="inline-flex cursor-pointer list-none items-center gap-1 text-base/6 font-medium text-teal-700 hover:text-teal-600 sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300 [&::-webkit-details-marker]:hidden">
+          <span class="group-open/meanings:hidden">What do these mean?</span><span class="group-not-open/meanings:hidden">Hide descriptions</span>
+        </summary>
+        <dl class="mt-4 grid gap-x-8 gap-y-4 text-base/6 sm:grid-cols-2 sm:text-sm/6">
+          <% @distortions.each do |distortion| %>
+            <div>
+              <dt class="font-medium text-stone-900 dark:text-white"><%= distortion.title %></dt>
+              <dd id="situation_distortion_ids_<%= distortion.id %>_description" class="mt-0.5 text-pretty text-stone-500 dark:text-stone-400"><%= distortion.description %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </details>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+    <legend class="contents">
+      <span class="flex flex-col gap-1">
+        <span class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">Step 4</span>
         <span class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Weigh it up</span>
       </span>
     </legend>
@@ -138,6 +151,9 @@
         </div>
         <%= form.textarea :balanced_thought, rows: 4, class: "field", aria: { describedby: "balanced_thought_hint" } %>
       </div>
+
+      <%= render "intensity", form:, attribute: :emotion_level_after, legend: "How strong is the feeling now?",
+            hint: "Optional. Rate it again after writing the balanced thought, on the same 0 to 10 scale." %>
     </div>
   </fieldset>
 

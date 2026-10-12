@@ -1,18 +1,45 @@
 <%# locals: (insights:) %>
 <% top = insights.frequency.select { it.count.positive? }.first(3).map { it.distortion.title } %>
+<% slot = insights.busiest_slot %>
+<% place = insights.top_place %>
+<% shift = insights.feeling_shift %>
 <div class="flex flex-col gap-12">
-  <p class="max-w-[60ch] text-lg/8 text-pretty text-stone-700 dark:text-stone-300">
-    <%= pluralize insights.total, "entry" %> <%= range_phrase(insights.range) %>.
-    <% if top.any? %><%= top.to_sentence %> came up most.<% end %>
-    Pick a distortion to see when, where and with whom it shows up.
-  </p>
+  <%# Plain-language findings first; the charts below back them up. %>
+  <section aria-labelledby="in_short_heading" class="flex flex-col gap-4">
+    <h2 id="in_short_heading" class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">In short</h2>
+    <ul role="list" class="flex max-w-[65ch] flex-col gap-3 border-l-2 border-teal-600 pl-5 text-lg/7 text-pretty text-stone-700 dark:border-teal-400 dark:text-stone-300">
+      <li><%= pluralize insights.total, "entry" %> <%= range_phrase(insights.range) %>.<% if top.any? %> <%= top.to_sentence %> came up most.<% end %></li>
+      <%# Place names are free text, so they go after a colon rather than into the sentence. %>
+      <% if slot %>
+        <li>You wrote most often on <%= when_phrase(*slot) %>.</li>
+      <% end %>
+      <% if place %>
+        <li>Most common place: <%= place %>.</li>
+      <% end %>
+      <% if shift %>
+        <li><%= feeling_shift_sentence(shift) %></li>
+      <% end %>
+    </ul>
+    <p class="text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">Pick a thinking trap to see when, where and with whom it shows up.</p>
+  </section>
 
   <div class="grid gap-12 xl:grid-cols-2 xl:gap-x-12">
     <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/weekly", insights: %></div>
     <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/strongest", insights: %></div>
     <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/heatmap", insights: %></div>
     <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/pairs", insights: %></div>
-    <div class="min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10"><%= render "insights/matrix", insights:, title: "Where", noun: "place", groups: insights.by_location %></div>
-    <div class="min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10"><%= render "insights/matrix", insights:, title: "Who was involved", noun: "person", groups: insights.by_person %></div>
+    <details class="group/detail min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10">
+      <summary class="flex cursor-pointer list-none flex-col gap-1 [&::-webkit-details-marker]:hidden">
+        <span class="inline-flex items-center gap-2 font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">
+          Where and who, in detail
+          <%= icon :plus, "size-5 text-teal-700 transition-transform group-open/detail:rotate-45 motion-reduce:transition-none dark:text-teal-400" %>
+        </span>
+        <span class="max-w-[60ch] text-base/6 text-pretty text-stone-500 sm:text-sm/6 dark:text-stone-400">Tables comparing each thinking trap across places and people.</span>
+      </summary>
+      <div class="mt-10 flex flex-col gap-12">
+        <%= render "insights/matrix", insights:, title: "Where", noun: "place", groups: insights.by_location %>
+        <%= render "insights/matrix", insights:, title: "Who was involved", noun: "person", groups: insights.by_person %>
+      </div>
+    </details>
   </div>
 </div>

@@ -33,8 +33,20 @@
         <div class="grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-12">
           <%= render "insights/rail", insights: @insights %>
 
+          <%# Small screens: a select instead of the rail, so every thinking trap is visible at once. %>
+          <%= form_with url: insights_path, method: :get, class: "flex items-end gap-2 lg:hidden", data: { controller: "autosubmit" } do |form| %>
+            <%= hidden_field_tag :range, @insights.range, id: nil %>
+            <div class="flex min-w-0 flex-1 flex-col gap-2">
+              <%= form.label :distortion_id, "Thinking trap", class: "field-label" %>
+              <%= form.select :distortion_id,
+                    options_for_select(@insights.frequency.map { [ "#{it.distortion.title} (#{it.count})", it.distortion.id ] }, @insights.distortion&.id),
+                    { include_blank: "All thinking traps (#{@insights.total})" }, class: "field", data: { action: "autosubmit#submit" } %>
+            </div>
+            <%= form.submit "Show", name: nil, class: "btn btn-secondary", data: { autosubmit_target: "button" } %>
+          <% end %>
+
           <div id="insights_panel" class="relative min-w-0 transition-opacity duration-200 group-aria-busy/frame:opacity-50 motion-reduce:transition-none"
-               data-controller="tooltip" data-action="pointerover->tooltip#show pointerout->tooltip#hide scroll@window->tooltip#dismiss">
+               data-controller="tooltip" data-action="pointerover->tooltip#show pointerout->tooltip#hide focusin->tooltip#show focusout->tooltip#hide scroll@window->tooltip#dismiss">
             <%= render(@insights.distortion ? "insights/profile" : "insights/overview", insights: @insights) %>
 
             <%= render "insights/tooltip" %>

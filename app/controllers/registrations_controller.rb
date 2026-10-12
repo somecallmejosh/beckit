@@ -18,7 +18,10 @@ class RegistrationsController < ApplicationController
   end
 
   private
+    # The browser's time zone, when it's one we support; otherwise the column default.
     def user_params
-      params.expect(user: [ :name, :email_address, :password, :password_confirmation ])
+      params.expect(user: [ :name, :email_address, :password, :password_confirmation, :time_zone ]).tap do |permitted|
+        permitted.delete(:time_zone) unless permitted[:time_zone].in?(ActiveSupport::TimeZone.all.map { it.tzinfo.name })
+      end
     end
 end

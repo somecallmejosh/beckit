@@ -33,7 +33,7 @@ class DistortionsController < ApplicationController
     @distortion = Distortion.new(distortion_params)
 
     if @distortion.save
-      redirect_to @distortion, notice: "Distortion was successfully created."
+      redirect_to @distortion, notice: "Thinking trap added."
     else
       render :new, status: :unprocessable_content
     end
@@ -42,7 +42,7 @@ class DistortionsController < ApplicationController
   # PATCH/PUT /distortions/1
   def update
     if @distortion.update(distortion_params)
-      redirect_to @distortion, notice: "Distortion was successfully updated.", status: :see_other
+      redirect_to @distortion, notice: "Thinking trap updated.", status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -51,7 +51,7 @@ class DistortionsController < ApplicationController
   # DELETE /distortions/1
   def destroy
     @distortion.destroy!
-    redirect_to distortions_path, notice: "Distortion was successfully destroyed.", status: :see_other
+    redirect_to distortions_path, notice: "Thinking trap deleted.", status: :see_other
   end
 
   private

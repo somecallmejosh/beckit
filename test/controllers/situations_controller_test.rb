@@ -64,12 +64,40 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Updated", @situation.reload.title
   end
 
-  test "should destroy situation" do
-    assert_difference("Situation.count", -1) do
+  test "delete hides the entry and offers undo" do
+    assert_difference -> { @user.situations.count } => -1, -> { Situation.count } => 0 do
       delete situation_url(@situation)
     end
-
     assert_redirected_to situations_url
+
+    follow_redirect!
+    assert_select "#notice", /Entry deleted/
+    assert_select "#notice form[action=?] button", situation_restoration_path(@situation), "Undo"
+    assert_no_match @situation.title, response.body
+
+    get situation_url(@situation)
+    assert_response :not_found
+  end
+
+  test "undo restores a deleted entry, only for its owner" do
+    @situation.trash!
+
+    sign_in_as users(:two)
+    post situation_restoration_url(@situation)
+    assert_response :not_found
+
+    sign_in_as @user
+    post situation_restoration_url(@situation)
+    assert_redirected_to situation_url(@situation)
+    assert_nil @situation.reload.deleted_at
+  end
+
+  test "purge job removes entries deleted more than 30 days ago" do
+    @situation.update!(deleted_at: 31.days.ago)
+    situations(:two).update!(deleted_at: 2.days.ago)
+
+    assert_difference("Situation.count", -1) { PurgeDeletedSituationsJob.perform_now }
+    assert Situation.exists?(situations(:two).id)
   end
   test "should clear distortions when none are checked" do
     patch situation_url(@situation), params: { situation: { distortion_ids: [ "" ] } }
@@ -124,8 +152,8 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Situation::CSV_HEADERS, rows.first
     assert_equal 2, rows.size
     assert_equal [ "2026-10-01 02:00", "Missed deadline" ], rows.second.first(2)
-    assert_equal "Catastrophizing; Mind reading", rows.second[6]
-    assert_equal "'=HYPERLINK(1)", rows.second[7]
+    assert_equal "Catastrophizing; Mind reading", rows.second[7]
+    assert_equal "'=HYPERLINK(1)", rows.second[8]
   end
 
   test "form saves drafts per user and per entry" do
@@ -139,6 +167,80 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
 
   test "entry aside sticks below the header" do
     get situation_url(@situation)
-    assert_select "aside.lg\\:top-20"
+    assert_select "aside.lg\\:top-24"
+  end
+
+  test "form leads with the thought and feelings, and the title is optional" do
+    get new_situation_url
+    fields = css_select("form[data-controller=draft] textarea, form[data-controller=draft] input[type=text]").map { it["name"] }
+    assert_operator fields.index("situation[thought_imagery]"), :<, fields.index("situation[title]")
+    assert_select "input[name=?]:not([required])", "situation[title]"
+    assert_select "input[type=checkbox][name=?]", "situation[emotions][]", count: Situation::EMOTIONS.size
+    assert_select "input[type=radio][name=?]", "situation[emotion_level_after]", count: 12
+    assert_select "input[type=datetime-local][step='60']" do |field|
+      assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}\z/, field.first["value"])
+    end
+  end
+
+  test "form puts the user's most-used thinking traps first, with descriptions in a disclosure" do
+    get new_situation_url
+    chips = css_select("input[name='situation[distortion_ids][]']").map { it["value"] }.compact_blank
+    assert_equal [ distortions(:catastrophizing), distortions(:mind_reading) ].map { it.id.to_s }, chips.first(2)
+    assert_select "details summary", /What do these mean/
+    assert_select "details dd[id=?]", "situation_distortion_ids_#{distortions(:catastrophizing).id}_description"
+  end
+
+  test "creates an entry with feelings, a re-rating and no title" do
+    post situations_url, params: { situation: { date: "2026-10-05T08:30", thought_imagery: "They are all judging me", emotions: [ "", "Anxious", "Ashamed" ], emotion_level: 8, emotion_level_after: 5 } }
+    situation = @user.situations.order(:created_at).last
+    assert_equal [ "They are all judging me", %w[ Anxious Ashamed ], 5 ], [ situation.title, situation.emotions, situation.emotion_level_after ]
+
+    follow_redirect!
+    assert_select "#notice", "Entry saved."
+    assert_select "li.badge", "Anxious"
+    assert_select "dd p", "Down 3 from 8"
+  end
+
+  test "index searches and filters by thinking trap" do
+    get situations_url(q: "fired")
+    assert_select "#situations h3", text: "Missed deadline"
+    assert_select "[role=status]", "1 entry matches"
+
+    get situations_url(q: "nothing like this")
+    assert_select "#situations h3", count: 0
+    assert_select "p", /No entries match/
+
+    @user.situations.create!(title: "Untagged", date: 1.day.ago)
+    get situations_url(distortion_id: distortions(:catastrophizing).id)
+    assert_select "#situations h3", count: 1
+    assert_select "select[name=distortion_id] option[selected]", "Catastrophizing"
+  end
+
+  test "index pages 20 at a time under month headings" do
+    21.times { |i| @user.situations.create!(title: "Entry #{i}", date: Time.zone.local(2026, 9, 1, 9) + i.days) }
+
+    get situations_url
+    assert_select "#situations section > ul > li", 20
+    assert_select "#situations h2", "September 2026"
+    assert_select "nav[aria-label=Pages] a", "Older entries"
+
+    get situations_url(page: 2)
+    assert_select "#situations section > ul > li", 2
+    assert_select "#situations h2", "September 2026"
+    assert_select "nav[aria-label=Pages] a[href=?]", situations_path, /Newer entries/
+  end
+
+  test "an empty journal shows the intro with time zone and crisis line prompts" do
+    admin = users(:admin)
+    sign_in_as admin
+    get situations_url
+    assert_select "#intro_heading", "A quiet place to begin"
+    assert_select "#intro_time_zone", /Eastern Time/
+    assert_select "#intro_crisis_line", count: 0
+    assert_select "form[role=search]", count: 0
+
+    admin.update!(time_zone: "Europe/London")
+    get situations_url
+    assert_select "#intro_crisis_line", /Add a crisis line/
   end
 end
