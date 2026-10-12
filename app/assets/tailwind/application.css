@@ -1,9 +1,9 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --font-sans: "InterVariable", ui-sans-serif, system-ui, sans-serif;
-  --font-sans--font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  --font-display: "Lora", ui-serif, Georgia, serif;
+  --font-sans: 'InterVariable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans--font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  --font-display: 'Lora', ui-serif, Georgia, serif;
 }
 
 /* Page container shared by every signed-in page; header and footer use the same edges. */
@@ -18,7 +18,23 @@
 
 /* Text inputs, textareas, and selects. Rails marks invalid fields with aria-invalid (see config/initializers/field_error_proc.rb). */
 @utility field {
-  @apply w-full rounded-xl bg-white px-3.5 py-2.5 text-base/6 text-stone-900 shadow-xs ring-1 ring-stone-950/10 placeholder:text-stone-400 focus:outline-2 focus:-outline-offset-1 focus:outline-teal-600 aria-invalid:ring-red-600/40 aria-invalid:focus:outline-red-600 sm:py-2 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:shadow-none dark:ring-white/10 dark:placeholder:text-stone-500 dark:focus:outline-teal-500 dark:aria-invalid:ring-red-500/50;
+  @apply w-full max-w-full rounded-xl bg-white px-3.5 py-2.5 text-base/6 text-stone-900 shadow-xs ring-1 ring-stone-950/10 placeholder:text-stone-400 focus:outline-2 focus:-outline-offset-1 focus:outline-teal-600 aria-invalid:ring-red-600/40 aria-invalid:focus:outline-red-600 sm:py-2 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:shadow-none dark:ring-white/10 dark:placeholder:text-stone-500 dark:focus:outline-teal-500 dark:aria-invalid:ring-red-500/50;
+
+  /* iOS Safari draws date/time inputs natively: it drops the ring, centers the value, and sizes the control wider than its container. */
+  &:is(
+    [type='date'],
+    [type='datetime-local'],
+    [type='time'],
+    [type='month'],
+    [type='week']
+  ) {
+    @apply min-w-0 appearance-none;
+  }
+
+  &::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: start;
+  }
 }
 
 @utility field-label {
