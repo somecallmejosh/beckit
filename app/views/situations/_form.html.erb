@@ -2,7 +2,7 @@
 <%= form_with(model: situation, class: "flex flex-col gap-12", data: {
       controller: "draft", draft_key_value: [ "draft", Current.user.id, situation.persisted? ? situation.id : "new" ].join(":"),
       action: "input->draft#save change->draft#save turbo:submit-end->draft#submitted" }) do |form| %>
-  <div data-draft-target="notice" hidden role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-teal-50 px-4 py-3 text-base/6 text-teal-900 ring-1 ring-teal-700/10 sm:text-sm/6 dark:bg-white/5 dark:text-teal-200 dark:ring-white/10">
+  <div data-draft-target="notice" hidden role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl panel-teal px-4 py-3 text-base/6 text-teal-900 sm:text-sm/6 dark:text-teal-200">
     <p>We restored the text you hadn't saved yet.</p>
     <button type="button" class="btn-sm btn-ghost" data-action="draft#discard">Discard draft</button>
   </div>
@@ -27,7 +27,7 @@
         <%= form.textarea :thought_imagery, rows: 4, class: "field", aria: { describedby: "thought_imagery_hint" } %>
       </div>
 
-      <fieldset aria-describedby="emotions_hint" class="flex flex-col gap-2">
+      <fieldset id="situation_emotions" aria-describedby="emotions_hint" class="flex flex-col gap-2">
         <legend class="field-label">What did you feel?</legend>
         <p id="emotions_hint" class="field-hint">Pick any that fit, or none.</p>
         <%= hidden_field_tag "situation[emotions][]", "", id: nil %>

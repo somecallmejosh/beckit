@@ -16,7 +16,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
       DistortionInsights::RANGES.each_key do |range|
         get insights_url(range:)
         assert_response :success
-        assert_select "nav[aria-label=Distortions] a", count: Distortion.count + 1
+        assert_select "nav[aria-label='Thinking traps'] a", count: Distortion.count + 1
       end
     end
   end
@@ -26,7 +26,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
       get insights_url(distortion_id: distortions(:mind_reading).id)
       assert_response :success
       assert_select "#profile_heading", text: "Mind reading"
-      assert_select "nav[aria-label=Distortions] a[aria-current=page]", text: /Mind reading/
+      assert_select "nav[aria-label='Thinking traps'] a[aria-current=page]", text: /Mind reading/
       assert_select "#standouts_heading + ul li", text: /Came up in 1 of your 1 entry/
       assert_select "#place_heading"
       assert_select "#strongest_heading", count: 0
@@ -57,10 +57,10 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "overview marks All distortions as current and shows overview sections" do
+  test "overview marks All thinking traps as current and shows overview sections" do
     travel_to Time.zone.local(2026, 10, 7, 12) do
       get insights_url
-      assert_select "nav[aria-label=Distortions] a[aria-current=page]", text: /All distortions/
+      assert_select "nav[aria-label='Thinking traps'] a[aria-current=page]", text: /All thinking traps/
       assert_select "#strongest_heading"
       assert_select "#profile_heading", count: 0
     end
@@ -69,7 +69,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   test "rail, range and panel links swap only the insights frame" do
     travel_to Time.zone.local(2026, 10, 7, 12) do
       get insights_url
-      assert_select "turbo-frame#insights_body[data-turbo-action=advance] nav[aria-label=Distortions]"
+      assert_select "turbo-frame#insights_body[data-turbo-action=advance] nav[aria-label='Thinking traps']"
       assert_select "turbo-frame#insights_body nav[aria-label='Time range']"
       assert_select "meta[name=turbo-cache-control][content=no-cache]", 1, "back/forward must re-fetch, not restore stale frame snapshots"
 
@@ -101,7 +101,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   test "small screens pick a thinking trap from a select; tables are keyboard navigable" do
     get insights_url(range: "all")
     assert_select "form[data-controller=autosubmit] select[name=distortion_id] option", Distortion.count + 1
-    assert_select "nav[aria-label=Distortions].max-lg\\:hidden"
+    assert_select "nav[aria-label='Thinking traps'].max-lg\\:hidden"
     assert_select "table[data-controller=cell-nav] caption", /arrow keys/
     assert_select "[data-action*='focusin->tooltip#show']"
   end

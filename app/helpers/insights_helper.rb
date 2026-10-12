@@ -34,13 +34,14 @@ module InsightsHelper
 
   RANGE_PHRASES = { "30" => "in the last 30 days", "90" => "in the last 90 days", "365" => "in the last year", "all" => "so far" }.freeze
 
-  # One item in the distortion rail: a chip on small screens, a full-width row from lg up.
+  # One item in the thinking-trap rail: a chip on small screens, a full-width row from lg up.
+  # The selected state matches nav_link_to so the rail and the range tabs read as one control style.
   def rail_link(label, count, url, active:)
     classes = [
       "relative flex shrink-0 snap-start items-center justify-between gap-4 rounded-full px-3.5 py-1.5 text-base/6 ring-1 sm:text-sm/6",
-      "lg:w-full lg:rounded-lg lg:px-3 lg:py-2 lg:ring-0",
+      "lg:w-full lg:px-3 lg:py-2 lg:ring-0",
       if active
-        "bg-teal-50 font-semibold text-teal-900 ring-teal-700/20 lg:before:absolute lg:before:inset-y-2 lg:before:left-0 lg:before:w-0.5 lg:before:rounded-full lg:before:bg-teal-600 dark:bg-teal-400/10 dark:text-teal-100 dark:ring-teal-400/30 dark:lg:before:bg-teal-400"
+        "bg-stone-950/5 font-medium text-stone-900 ring-transparent dark:bg-white/10 dark:text-white"
       elsif count.zero?
         "text-stone-500 ring-stone-950/10 hover:bg-stone-950/5 hover:text-stone-700 dark:text-stone-400 dark:ring-white/10 dark:hover:bg-white/5"
       else
@@ -50,7 +51,7 @@ module InsightsHelper
     link_to url, class: classes, aria: { current: (active ? "page" : nil) } do
       safe_join([
         tag.span(label, class: "truncate"),
-        tag.span(count, class: [ "tabular-nums", active ? "text-teal-700 dark:text-teal-300" : "text-stone-500 dark:text-stone-400" ])
+        tag.span(count, class: [ "tabular-nums", active ? "text-stone-700 dark:text-stone-200" : "text-stone-500 dark:text-stone-400" ])
       ])
     end
   end

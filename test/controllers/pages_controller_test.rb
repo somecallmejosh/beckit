@@ -17,12 +17,20 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='tel:988']", minimum: 1
   end
 
-  test "shows the insights features with labeled example data" do
+  test "explains the benefits, with privacy claims that match the privacy page" do
     get root_url
-    %w[ standouts_heading weekly_heading heatmap_heading place_heading pairs_heading ].each { |id| assert_select "##{id}" }
+    assert_select "#benefits_heading", "Why write it down"
+    assert_select "#benefits_heading ~ div h3", count: 4
+    assert_select "#benefits_heading ~ div li", text: "Only you can read your entries."
+    assert_select "#benefits_heading ~ div a[href=?]", privacy_path
+  end
+
+  test "shows a slice of the insights with labeled example data" do
+    get root_url
+    %w[ standouts_heading weekly_heading ].each { |id| assert_select "##{id}" }
     assert_select "[data-controller=tooltip] [data-tooltip-target=tip]"
-    assert_select "td[data-tooltip]", minimum: 35
-    assert_select "p", text: "Example data. Your insights come from your own entries."
+    assert_select "[data-tooltip]", minimum: 10
+    assert_select "figcaption", text: "Example data. Your insights come from your own entries."
   end
 
   test "lists every distortion" do
@@ -68,5 +76,24 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get root_url
     assert_select "footer nav a[href=?]", distortions_path, "Thinking traps"
     assert_select "footer nav a[href=?]", privacy_path, "Privacy"
+  end
+
+  test "landing shows the sample insights right after how an entry works" do
+    get root_url
+    headings = css_select("section h2[id]").map { it["id"] }
+    assert_equal headings.index("how_heading") + 1, headings.index("patterns_heading")
+  end
+
+  test "the app is installable, with no service worker" do
+    get root_url
+    assert_select "link[rel=manifest][href=?]", pwa_manifest_path(format: :json)
+    assert_select "meta[name=theme-color]", 2
+
+    get pwa_manifest_url(format: :json)
+    assert_response :success
+    manifest = JSON.parse(response.body)
+    assert_equal [ "192x192", "512x512", "512x512" ], manifest["icons"].map { it["sizes"] }
+    assert_equal "/situations", manifest["start_url"]
+    assert_raises(ActionController::RoutingError, ActionController::UrlGenerationError, NameError) { pwa_service_worker_path }
   end
 end

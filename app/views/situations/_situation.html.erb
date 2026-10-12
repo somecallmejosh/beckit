@@ -1,5 +1,5 @@
 <li id="<%= dom_id situation %>">
-  <%= link_to situation, class: "group -mx-4 flex flex-col gap-3 rounded-2xl px-4 py-6 hover:bg-stone-950/2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-8 dark:hover:bg-white/2.5" do %>
+  <%= link_to situation, class: "group -mx-4 flex flex-col gap-3 rounded-2xl px-4 py-6 hover:bg-stone-950/[0.03] sm:flex-row sm:items-start sm:justify-between sm:gap-8 dark:hover:bg-white/[0.03]" do %>
     <div class="min-w-0 flex-1">
       <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
         <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time>

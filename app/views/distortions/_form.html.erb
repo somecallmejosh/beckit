@@ -3,8 +3,8 @@
 
   <div class="form-section">
     <div class="flex flex-col gap-1">
-      <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Details</h2>
-      <p class="field-hint">Everyone sees these when choosing distortions for an entry.</p>
+      <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Summary</h2>
+      <p class="field-hint">Everyone sees these when choosing thinking traps for an entry.</p>
     </div>
 
     <div class="flex max-w-3xl min-w-0 flex-col gap-6">
@@ -16,17 +16,48 @@
       <div class="flex flex-col gap-2">
         <div>
           <%= form.label :description, class: "field-label" %>
-          <p id="description_hint" class="field-hint">A short, plain-language explanation people will see when choosing distortions.</p>
+          <p id="description_hint" class="field-hint">A short, plain-language explanation people will see when choosing thinking traps.</p>
         </div>
         <%= form.textarea :description, rows: 4, required: true, class: "field", aria: { describedby: "description_hint" } %>
       </div>
     </div>
   </div>
 
+  <div class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Photo</h2>
+      <p class="field-hint">Shown on this trap's page, and used for its social card when the page is shared.</p>
+    </div>
+
+    <div class="flex max-w-3xl min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
+      <% if distortion.image.attached? && distortion.image.blob.persisted? %>
+        <%= image_tag distortion.image.variant(:page), alt: "Current photo", class: "aspect-[4/5] w-32 shrink-0 rounded-2xl object-cover ring-1 ring-stone-950/5 dark:ring-white/10" %>
+      <% end %>
+      <div class="flex flex-col gap-2">
+        <%= form.label :image, (distortion.image.attached? ? "Replace photo" : "Photo"), class: "field-label" %>
+        <p id="image_hint" class="field-hint">PNG, JPEG or WebP, up to 10 MB. A portrait photo works best; it is cropped to 4:5.</p>
+        <%= form.file_field :image, accept: Distortion::IMAGE_TYPES.join(","), aria: { describedby: "image_hint" },
+              class: "text-base/6 text-stone-600 file:mr-3 file:btn-sm file:btn-secondary sm:text-sm/6 dark:text-stone-400" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+    <div class="flex flex-col gap-1">
+      <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">More details</h2>
+      <p class="field-hint">Optional. A longer explanation shown on this trap's page, such as examples or questions to ask yourself.</p>
+    </div>
+
+    <div class="flex max-w-3xl min-w-0 flex-col gap-2">
+      <%= form.label :details, "Details", class: "field-label" %>
+      <%= form.rich_textarea :details, class: "field rich-text min-h-48" %>
+    </div>
+  </div>
+
   <div class="form-section border-t border-stone-950/5 pt-8 dark:border-white/10">
     <div class="flex max-w-3xl flex-col-reverse gap-3 sm:flex-row sm:justify-end lg:col-start-2">
       <%= link_to "Cancel", (distortion.persisted? ? distortion : distortions_path), class: "btn btn-ghost" %>
-      <%= form.submit "Save distortion", class: "btn btn-primary" %>
+      <%= form.submit "Save thinking trap", class: "btn btn-primary" %>
     </div>
   </div>
 <% end %>

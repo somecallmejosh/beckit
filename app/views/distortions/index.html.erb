@@ -10,16 +10,16 @@
         <p class="mt-3 max-w-[48ch] text-lg/7 text-pretty text-stone-600 dark:text-stone-400">Common thinking patterns, also called cognitive distortions, that can make a situation feel heavier than it is. Naming them is the first step to loosening their grip.</p>
       </div>
       <% if Current.user&.admin? %>
-        <%= link_to "New distortion", new_distortion_path, class: "btn btn-primary shrink-0 self-start sm:self-auto" %>
+        <%= link_to "New thinking trap", new_distortion_path, class: "btn btn-primary shrink-0 self-start sm:self-auto" %>
       <% end %>
     </div>
 
     <% if @distortions.any? %>
-      <ul id="distortions" role="list" class="grid lg:grid-cols-2 lg:gap-x-16">
+      <ul id="distortions" role="list" class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <%= render @distortions %>
       </ul>
     <% else %>
-      <p class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center text-base/7 text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">No distortions have been added yet.</p>
+      <p class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center text-base/7 text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">No thinking traps have been added yet.</p>
     <% end %>
   </div>
 </div>

@@ -56,4 +56,15 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     get new_registration_url
     assert_select "input[type=hidden][name=?][data-controller=time-zone]", "user[time_zone]"
   end
+
+  test "errors show under each field and the summary links to them" do
+    post registration_url, params: { user: { name: "", email_address: "new@example.com", password: "short", password_confirmation: "short" } }
+
+    assert_select "input#user_name[aria-invalid=true][aria-describedby=user_name_error]"
+    assert_select "p#user_name_error.field-error", "Name can't be blank"
+    assert_select "input#user_password[aria-describedby=?]", "password_hint user_password_error"
+    assert_select "p#user_password_error", /too short/
+    assert_select "#error_explanation a[href=?]", "#user_name", "Name can't be blank"
+    assert_select "input#user_email_address[aria-invalid]", count: 0
+  end
 end

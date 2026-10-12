@@ -1,11 +1,21 @@
-<li id="<%= dom_id distortion %>" class="flex flex-col gap-3 border-t border-stone-950/5 py-6 sm:flex-row sm:items-start sm:justify-between sm:gap-8 dark:border-white/10">
-  <div class="min-w-0">
-    <h2 class="font-display text-xl font-medium text-balance text-stone-900 dark:text-white">
-      <%= link_to distortion.title, distortion, class: "hover:text-teal-800 dark:hover:text-teal-300" %>
-    </h2>
-    <p class="mt-1.5 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= distortion.description %></p>
-  </div>
+<%# Same 4:5 crop as the trap page: the photos put their subject at different heights, so a wider crop loses some.
+    The whole card links to the trap (the title link stretches over it); the admin Edit button sits above that layer. %>
+<li id="<%= dom_id distortion %>" class="group relative flex flex-col">
+  <% if distortion.image.attached? %>
+    <%= image_tag distortion.image.variant(:page), alt: "", width: 720, height: 900, loading: "lazy", decoding: "async",
+          class: "aspect-[4/5] w-full rounded-3xl object-cover ring-1 ring-stone-950/5 transition-opacity group-hover:opacity-90 motion-reduce:transition-none dark:ring-white/10" %>
+  <% else %>
+    <%# No photo yet: a teal tile with the name, so the grid never shows an empty frame. %>
+    <div aria-hidden="true" class="panel-teal flex aspect-[4/5] w-full items-end rounded-3xl p-6">
+      <span class="font-display text-2xl font-medium tracking-tight text-balance text-teal-900 dark:text-teal-100"><%= distortion.title %></span>
+    </div>
+  <% end %>
+
+  <h2 class="mt-5 font-display text-xl font-medium text-balance text-stone-900 dark:text-white">
+    <%= link_to distortion.title, distortion, class: "after:absolute after:inset-0 after:rounded-3xl group-hover:text-teal-800 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-teal-600 dark:group-hover:text-teal-300" %>
+  </h2>
+  <p class="mt-1.5 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= distortion.description %></p>
   <% if Current.user&.admin? %>
-    <%= link_to "Edit", edit_distortion_path(distortion), class: "btn-sm btn-secondary shrink-0 self-start", aria: { label: "Edit #{distortion.title}" } %>
+    <%= link_to "Edit", edit_distortion_path(distortion), class: "btn-sm btn-secondary relative mt-4 self-start", aria: { label: "Edit #{distortion.title}" } %>
   <% end %>
 </li>

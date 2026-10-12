@@ -34,10 +34,11 @@ module ApplicationHelper
   end
 
   # Self-hosted wordmark (no third-party request), with a light-on-dark variant.
+  # Decorative: every caller wraps it in a link labelled "beckit home".
   def logo_tag(css = "h-7 w-auto")
     safe_join([
-      image_tag("logo.svg", alt: "beckit", class: [ css, "dark:hidden" ]),
-      image_tag("logo-dark.svg", alt: "beckit", class: [ css, "not-dark:hidden" ])
+      image_tag("logo.svg", alt: "", class: [ css, "dark:hidden" ]),
+      image_tag("logo-dark.svg", alt: "", class: [ css, "not-dark:hidden" ])
     ])
   end
 end

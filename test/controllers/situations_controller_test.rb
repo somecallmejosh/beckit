@@ -197,7 +197,7 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_select "#notice", "Entry saved."
-    assert_select "li.badge", "Anxious"
+    assert_select "li.badge-neutral", "Anxious"
     assert_select "dd p", "Down 3 from 8"
   end
 
@@ -242,5 +242,20 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     admin.update!(time_zone: "Europe/London")
     get situations_url
     assert_select "#intro_crisis_line", /Add a crisis line/
+  end
+
+  test "invalid feelings link to the feelings group, not an inline message" do
+    post situations_url, params: { situation: { date: "2026-10-05T08:30", emotions: [ "Bored" ] } }
+    assert_response :unprocessable_content
+    assert_select "#error_explanation a[href='#situation_emotions']"
+    assert_select "fieldset#situation_emotions"
+    assert_select ".field-error", count: 0
+  end
+
+  test "on small screens the 30-day summary follows the entries" do
+    get situations_url
+    assert_select "aside section.max-lg\\:hidden #summary_heading"
+    assert_select "#situations ~ section.lg\\:hidden #summary_mobile_heading", "Last 30 days"
+    assert_select "a", "See 30-day insights"
   end
 end

@@ -7,7 +7,7 @@
   <ul role="list" class="divide-y divide-stone-950/5 dark:divide-white/10">
     <% entries.each do |situation| %>
       <li>
-        <%= link_to situation, data: { turbo_frame: "_top" }, class: "group -mx-2 flex items-center justify-between gap-6 rounded-lg px-2 py-3 hover:bg-stone-950/[0.03] dark:hover:bg-white/[0.03]" do %>
+        <%= link_to situation, data: { turbo_frame: "_top" }, class: "group row-link flex items-center justify-between gap-6 py-3" do %>
           <div class="min-w-0">
             <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
               <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time><% if situation.location.present? %> · <%= situation.location %><% end %>

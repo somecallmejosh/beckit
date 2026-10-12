@@ -2,7 +2,7 @@
 <% heading_id = "#{noun}_heading" %>
 <section aria-labelledby="<%= heading_id %>" class="flex min-w-0 flex-col gap-6">
   <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: heading_id, title:,
-        description: "How often each distortion came up with each #{noun}, compared with your overall rate. Numbers are entries with that distortion." %>
+        description: "How often each thinking trap came up with each #{noun}, compared with your overall rate. Numbers are entries with that thinking trap." %>
 
   <% if groups.empty? %>
     <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">No entries in this range recorded a <%= noun %>.</p>

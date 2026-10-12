@@ -1,6 +1,6 @@
 <%# locals: (form:, attribute:, legend:, hint:) %>
 <% hint_id = "#{attribute}_hint" %>
-<fieldset aria-describedby="<%= hint_id %>" class="flex flex-col gap-2">
+<fieldset id="situation_<%= attribute %>" aria-describedby="<%= hint_id %>" class="flex flex-col gap-2">
   <legend class="field-label"><%= legend %></legend>
   <p id="<%= hint_id %>" class="field-hint"><%= hint %></p>
   <div class="grid grid-cols-6 gap-2 sm:flex sm:flex-wrap">

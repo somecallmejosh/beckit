@@ -66,6 +66,49 @@ class DistortionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show uses the trap's photo, social card and details" do
+    perform_enqueued_jobs do
+      @distortion.update!(image: fixture_file_upload("trap.webp", "image/webp"), details: "<h1>Examples</h1><ul><li>One mistake ruins the day.</li></ul>")
+    end
+    get distortion_url(@distortion)
+    assert_select "main img[src*='/rails/active_storage/']"
+    assert_select "meta[property='og:image'][content*='/rails/active_storage/blobs/']"
+    assert_select "meta[property='og:description'][content=?]", @distortion.description
+    assert_select ".rich-text h1", "Examples"
+    assert_select ".rich-text li", "One mistake ruins the day."
+  end
+
+  test "index shows each trap's photo, or a named tile when it has none" do
+    @distortion.update!(image: fixture_file_upload("trap.webp", "image/webp"))
+    get distortions_url
+    assert_select "##{dom_id @distortion} img[src*='/rails/active_storage/']"
+    assert_select "##{dom_id distortions(:mind_reading)} img", count: 0
+    assert_select "##{dom_id distortions(:mind_reading)} [aria-hidden=true]", "Mind reading"
+    assert_select "##{dom_id @distortion} a[href=?]", distortion_url(@distortion).delete_prefix("http://www.example.com")
+  end
+
+  test "show falls back to the site social card when a trap has no photo" do
+    get distortion_url(@distortion)
+    assert_select "main img[src*='/rails/active_storage/']", count: 0
+    assert_select "meta[property='og:image'][content$=?]", "/og-image.png"
+    assert_select ".rich-text", count: 0
+  end
+
+  test "admins can upload a photo and write details" do
+    patch distortion_url(@distortion), params: { distortion: { image: fixture_file_upload("trap.webp", "image/webp"), details: "<p>More to say.</p>" } }
+    assert_redirected_to distortion_url(@distortion)
+    @distortion.reload
+    assert @distortion.image.attached?
+    assert_equal "More to say.", @distortion.details.to_plain_text
+    assert_enqueued_with job: Distortion::RefreshOgImageJob, args: [ @distortion ]
+  end
+
+  test "rejects a photo that is not an image" do
+    patch distortion_url(@distortion), params: { distortion: { image: fixture_file_upload("not-an-image.txt", "text/plain") } }
+    assert_response :unprocessable_content
+    assert_not @distortion.reload.image.attached?
+  end
+
   test "show lists only the current user's entries with that distortion" do
     sign_in_as users(:two)
     get distortion_url(distortions(:mind_reading))

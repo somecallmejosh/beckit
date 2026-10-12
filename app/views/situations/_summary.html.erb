@@ -1,18 +1,18 @@
-<%# locals: (summary:) %>
+<%# locals: (summary:, id: "summary", css: nil) %>
 <% top = summary.frequency.select { it.count.positive? }.first(3) %>
-<section aria-labelledby="summary_heading" class="flex flex-col gap-4 rounded-3xl bg-stone-950/[0.025] p-6 ring-1 ring-stone-950/5 dark:bg-white/[0.03] dark:ring-white/10">
+<section aria-labelledby="<%= id %>_heading" class="<%= css %> flex flex-col gap-4 panel p-6">
   <div class="flex items-baseline justify-between gap-4">
-    <h2 id="summary_heading" class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">Last 30 days</h2>
+    <h2 id="<%= id %>_heading" class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">Last 30 days</h2>
     <p class="text-base/6 text-stone-500 tabular-nums sm:text-sm/6 dark:text-stone-400"><%= pluralize summary.total, "entry" %></p>
   </div>
 
   <% if top.any? %>
     <div class="flex flex-col gap-2">
-      <h3 class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">Most common distortions</h3>
+      <h3 class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">Most common thinking traps</h3>
       <ul role="list" class="flex flex-col gap-1">
         <% top.each do |row| %>
           <li>
-            <%= link_to insights_path(distortion_id: row.distortion.id, range: "30"), class: "-mx-2 flex items-baseline justify-between gap-4 rounded-lg px-2 py-1 text-base/6 hover:bg-stone-950/5 sm:text-sm/6 dark:hover:bg-white/5" do %>
+            <%= link_to insights_path(distortion_id: row.distortion.id, range: "30"), class: "row-link flex items-baseline justify-between gap-4 py-1 text-base/6 sm:text-sm/6" do %>
               <span class="min-w-0 truncate font-medium text-stone-900 dark:text-white"><%= row.distortion.title %></span>
               <span class="shrink-0 text-stone-500 tabular-nums dark:text-stone-400"><%= row.count %></span>
             <% end %>
@@ -22,5 +22,5 @@
     </div>
   <% end %>
 
-  <%= link_to "See insights", insights_path(range: "30"), class: "btn-sm btn-secondary self-start" %>
+  <%= link_to "See 30-day insights", insights_path(range: "30"), class: "btn-sm btn-secondary self-start" %>
 </section>

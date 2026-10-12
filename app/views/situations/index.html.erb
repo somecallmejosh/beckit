@@ -14,7 +14,8 @@
       </div>
 
       <% unless @summary.empty? %>
-        <%= render "summary", summary: @summary %>
+        <%# On small screens the summary moves below the entries (see the end of this page). %>
+        <%= render "summary", summary: @summary, css: "max-lg:hidden" %>
       <% end %>
     </aside>
 
@@ -68,6 +69,10 @@
         <% end %>
       <% else %>
         <%= render "intro", user: Current.user %>
+      <% end %>
+
+      <% unless @summary.empty? %>
+        <%= render "summary", summary: @summary, id: "summary_mobile", css: "lg:hidden" %>
       <% end %>
     </div>
   </div>

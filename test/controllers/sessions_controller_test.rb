@@ -35,7 +35,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
     delete session_path
 
-    assert_redirected_to new_session_path
+    assert_redirected_to root_path
     assert_empty cookies[:session_id]
+
+    follow_redirect!
+    assert_select "#notice", "You're signed out."
+    assert_select "#hero_heading"
   end
 end

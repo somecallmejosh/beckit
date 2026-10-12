@@ -41,7 +41,7 @@
               </div>
             </div>
 
-            <div data-avatar-crop-target="stage" hidden class="flex w-full max-w-sm flex-col gap-4 rounded-3xl bg-stone-950/[0.025] p-5 ring-1 ring-stone-950/5 dark:bg-white/[0.03] dark:ring-white/10">
+            <div data-avatar-crop-target="stage" hidden class="flex w-full max-w-sm flex-col gap-4 panel p-5">
               <p class="field-hint">Drag to position your photo. Arrow keys work too.</p>
               <div data-avatar-crop-target="viewport" tabindex="0" aria-label="Photo position. Drag or use arrow keys to move it."
                    data-action="pointerdown->avatar-crop#startDrag pointermove->avatar-crop#drag pointerup->avatar-crop#endDrag pointercancel->avatar-crop#endDrag keydown->avatar-crop#nudge"
@@ -133,7 +133,7 @@
       <div class="flex max-w-xl min-w-0 flex-col gap-12">
         <%= form_with url: settings_password_path, method: :patch, class: "flex flex-col gap-6" do |form| %>
           <h3 class="text-lg/7 font-semibold text-stone-900 dark:text-white">Change password</h3>
-          <%= render "shared/form_errors", record: @password_user if @password_user %>
+          <%= render "shared/form_errors", record: @password_user, prefix: "" if @password_user %>
 
           <div class="flex flex-col gap-2">
             <%= form.label :password_challenge, "Current password", class: "field-label" %>

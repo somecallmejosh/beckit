@@ -1,0 +1,66 @@
+<%# Why someone would keep this journal. Every claim here is something the app does today (see /privacy). %>
+<% title = "font-display text-2xl font-medium tracking-tight text-balance text-stone-900 dark:text-white" %>
+<% body = "mt-2 max-w-[44ch] text-base/7 text-pretty text-stone-600 dark:text-stone-400" %>
+<section aria-labelledby="benefits_heading" class="mx-auto max-w-7xl px-4 pt-4 pb-20 sm:px-6 lg:px-8 lg:pt-8 lg:pb-24">
+  <h2 id="benefits_heading" class="font-display text-3xl font-medium tracking-tight text-balance text-stone-900 sm:text-4xl dark:text-white">Why write it down</h2>
+  <p class="mt-4 max-w-[56ch] text-lg/8 text-pretty text-stone-600 dark:text-stone-400">Thought records are a common exercise in cognitive behavioral therapy. beckit gives you a simple, private place to keep them.</p>
+
+  <div class="mt-12 grid gap-4 lg:grid-cols-6 lg:gap-6">
+    <div class="panel flex flex-col overflow-hidden lg:col-span-4">
+      <%= image_tag "landing/band.webp", alt: "Hands wrapped around a sage green mug beside a closed notebook and pencil on a wooden table.",
+            width: 1536, height: 640, loading: "lazy", decoding: "async", class: "aspect-[2/1] w-full object-cover sm:aspect-[12/5]" %>
+      <div class="p-6 sm:p-8">
+        <h3 class="<%= title %>">Get it out of your head</h3>
+        <p class="<%= body %>">A thought that keeps looping becomes a few sentences you can read, question and set down.</p>
+      </div>
+    </div>
+
+    <div class="panel-teal flex flex-col justify-between gap-8 rounded-3xl p-6 sm:p-8 lg:col-span-2">
+      <div class="flex flex-col gap-5">
+        <p class="font-display text-xl/8 text-pretty text-stone-800 italic dark:text-stone-100">“They all think I’m not up to the job.”</p>
+        <%# Same look as the thinking-trap chips on the entry form, with one picked. %>
+        <ul role="list" aria-label="Example thinking traps, with mind reading picked" class="flex flex-wrap gap-2">
+          <% [ "Catastrophizing", "Mind reading", "Fortune telling", "Labeling", "Should statements" ].each do |trap| %>
+            <% picked = trap == "Mind reading" %>
+            <li class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-base/6 font-medium ring-1 sm:text-sm/6 <%= picked ? "bg-teal-700 text-white ring-teal-700 dark:bg-teal-600 dark:ring-teal-600" : "bg-white text-stone-700 ring-stone-950/10 dark:bg-white/5 dark:text-stone-300 dark:ring-white/10" %>">
+              <%= icon :check if picked %><%= trap %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <div>
+        <h3 class="<%= title %>">Give the pattern a name</h3>
+        <p class="<%= body %>">Calling it mind reading is a reminder that a thought is a guess, not a fact.</p>
+      </div>
+    </div>
+
+    <div class="panel flex flex-col justify-between gap-8 p-6 sm:p-8 lg:col-span-2">
+      <%# Example ratings on the app's 0 to 10 scale. %>
+      <dl class="grid grid-cols-2 gap-4">
+        <% [ [ "Before", 8 ], [ "After", 5 ] ].each do |label, level| %>
+          <div class="flex flex-col gap-2">
+            <dt class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400"><%= label %></dt>
+            <dd class="font-display text-5xl font-medium tracking-tight text-stone-900 tabular-nums dark:text-white"><%= level %><span class="font-sans text-base font-normal text-stone-500 dark:text-stone-400">/10</span></dd>
+          </div>
+        <% end %>
+      </dl>
+      <div>
+        <h3 class="<%= title %>">See whether it helped</h3>
+        <p class="<%= body %>">Rate the feeling before and after you weigh the evidence, and notice what changed.</p>
+      </div>
+    </div>
+
+    <div class="panel grid gap-8 p-6 sm:p-8 md:grid-cols-2 md:gap-12 lg:col-span-4">
+      <div>
+        <h3 class="<%= title %>">Yours alone</h3>
+        <p class="<%= body %>">A journal only works if you can be honest in it. beckit is built so you can.</p>
+        <%= link_to "How beckit handles your data", privacy_path, class: "mt-4 inline-block text-base/6 font-medium text-teal-700 hover:text-teal-600 sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300" %>
+      </div>
+      <ul role="list" class="flex flex-col gap-3 text-base/7 text-stone-700 md:pt-1 dark:text-stone-300">
+        <% [ "Only you can read your entries.", "No ads, no analytics cookies, no outside services.", "Download or delete everything whenever you like." ].each do |item| %>
+          <li class="flex gap-3"><%= icon :check, "mt-1.5 text-teal-700 dark:text-teal-400" %><span><%= item %></span></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</section>

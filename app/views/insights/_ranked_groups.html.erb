@@ -13,7 +13,7 @@
       <% groups.each do |group| %>
         <% cell = group.cells[distortion] %>
         <% detail = "#{cell.matches} of #{pluralize cell.entries, "entry"} · #{lift_label(cell.lift)}" %>
-        <li class="relative -mx-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg px-2 py-1.5 hover:bg-stone-950/[0.03] dark:hover:bg-white/[0.03]" data-tooltip="<%= group.label %>" data-tooltip-detail="<%= detail %>">
+        <li class="relative row-link grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 py-1.5" data-tooltip="<%= group.label %>" data-tooltip-detail="<%= detail %>">
           <p class="min-w-0 text-base/6 sm:text-sm/6">
             <span class="block truncate font-medium text-stone-900 dark:text-white"><%= group.label %></span>
             <span class="text-stone-500 tabular-nums dark:text-stone-400"><%= cell.matches %> of <%= pluralize cell.entries, "entry" %></span>

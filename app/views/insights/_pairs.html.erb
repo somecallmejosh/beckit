@@ -4,11 +4,11 @@
 <% max = pairs.map(&:count).max.to_i %>
 <section aria-labelledby="pairs_heading" class="flex min-w-0 flex-col gap-6">
   <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "pairs_heading", title: (focus ? "Often with" : "Together"),
-        description: focus ? "Other distortions logged in the same entry as #{focus.title.downcase}, and how often." : "Distortions that most often show up in the same entry." %>
+        description: focus ? "Other thinking traps logged in the same entry as #{focus.title.downcase}, and how often." : "Thinking traps that most often show up in the same entry." %>
 
   <% if pairs.empty? %>
     <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
-      <%= focus ? "#{focus.title} hasn't been logged alongside another distortion in this range." : "No entry in this range has more than one distortion." %>
+      <%= focus ? "#{focus.title} hasn't been logged alongside another thinking trap in this range." : "No entry in this range has more than one thinking trap." %>
     </p>
   <% else %>
     <ul role="list" class="flex flex-col gap-3">

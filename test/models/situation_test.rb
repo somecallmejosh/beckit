@@ -5,10 +5,10 @@ class SituationTest < ActiveSupport::TestCase
     assert situations(:one).valid?
   end
 
-  test "requires title, date and user" do
+  test "requires date and user; the title always gets a default" do
     situation = Situation.new
     assert_not situation.valid?
-    assert_includes situation.errors[:title], "can't be blank"
+    assert_empty situation.errors[:title]
     assert_includes situation.errors[:date], "can't be blank"
     assert_includes situation.errors[:user], "must exist"
   end
@@ -52,6 +52,10 @@ class SituationTest < ActiveSupport::TestCase
 
     situation = users(:one).situations.create!(date: Time.zone.local(2026, 10, 3, 9))
     assert_equal "Entry on Oct 3, 2026", situation.title
+
+    situation = users(:one).situations.build
+    assert_not situation.valid?
+    assert_equal [ "Date can't be blank" ], situation.errors.full_messages
   end
 
   test "emotions are cleaned up and limited to the known list" do

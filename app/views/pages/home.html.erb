@@ -7,16 +7,14 @@
   <p class="-mt-6 pb-10 text-base/6 text-pretty text-stone-500 sm:text-sm/6 dark:text-stone-400">beckit is a self-help journaling tool. It does not provide therapy, diagnosis or medical advice.</p>
 <% end %>
 
-<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[40rem] bg-linear-to-b from-teal-50/40 via-teal-50/30 to-transparent dark:from-teal-950/30 dark:via-transparent"></div>
-
 <%= render "pages/home/nav" %>
 <% if notice.present? || alert.present? %>
   <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 pt-4 sm:px-6 lg:px-8"><%= render "shared/flash" %></div>
 <% end %>
 <%= render "pages/home/hero" %>
-<%= render "pages/home/is_isnt" %>
+<%= render "pages/home/benefits" %>
 <%= render "pages/home/how" %>
-<%= render "pages/home/traps", distortions: @distortions %>
 <%= render "pages/home/patterns", insights: @sample_insights %>
-<%= render "pages/home/band" %>
+<%= render "pages/home/traps", distortions: @distortions %>
+<%= render "pages/home/is_isnt" %>
 <%= render "pages/home/closing" %>

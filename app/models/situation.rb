@@ -58,6 +58,8 @@ class Situation < ApplicationRecord
         thought_imagery.squish.truncate_words(6).truncate(60)
       elsif date
         "Entry on #{I18n.l(date, format: :entry_date)}"
+      else
+        "Untitled entry"
       end
     end
 end

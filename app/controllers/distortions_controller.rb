@@ -7,7 +7,7 @@ class DistortionsController < ApplicationController
 
   # GET /distortions
   def index
-    @distortions = Distortion.order(:title)
+    @distortions = Distortion.includes(image_attachment: { blob: { variant_records: { image_attachment: :blob } } }).order(:title)
   end
 
   # GET /distortions/1
@@ -61,6 +61,6 @@ class DistortionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def distortion_params
-      params.expect(distortion: [ :title, :description ])
+      params.expect(distortion: [ :title, :description, :details, :image ])
     end
 end

@@ -1,6 +1,8 @@
 require "test_helper"
 
 class DistortionTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   test "requires title and description" do
     distortion = Distortion.new
     assert_not distortion.valid?
@@ -21,4 +23,28 @@ class DistortionTest < ActiveSupport::TestCase
     assert Situation.exists?(situation.id)
     assert_equal [ distortions(:mind_reading) ], situation.reload.distortions
   end
+
+  test "builds a 1200x630 social card from the photo" do
+    distortion = distortions(:catastrophizing)
+    perform_enqueued_jobs { distortion.update!(image: photo) }
+
+    assert distortion.og_image.attached?
+    card = Vips::Image.new_from_buffer(distortion.og_image.download, "")
+    assert_equal [ 1200, 630 ], [ card.width, card.height ]
+  end
+
+  test "rebuilds the card when the text changes, and drops it with the photo" do
+    distortion = distortions(:catastrophizing)
+    perform_enqueued_jobs { distortion.update!(image: photo) }
+
+    assert_enqueued_with(job: Distortion::RefreshOgImageJob) { distortion.update!(description: "New words.") }
+    assert_no_enqueued_jobs(only: Distortion::RefreshOgImageJob) { distortion.update!(details: "<p>Only details.</p>") }
+
+    distortion.image.purge
+    distortion.refresh_og_image
+    assert_not distortion.reload.og_image.attached?
+  end
+
+  private
+    def photo = { io: file_fixture("trap.webp").open, filename: "trap.webp", content_type: "image/webp" }
 end
