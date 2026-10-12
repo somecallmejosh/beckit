@@ -72,10 +72,22 @@ class DistortionsControllerTest < ActionDispatch::IntegrationTest
     end
     get distortion_url(@distortion)
     assert_select "main img[src*='/rails/active_storage/']"
-    assert_select "meta[property='og:image'][content*='/rails/active_storage/blobs/']"
+    assert_select "meta[property='og:image'][content*='/rails/active_storage/blobs/proxy/']"
     assert_select "meta[property='og:description'][content=?]", @distortion.description
     assert_select ".rich-text h1", "Examples"
     assert_select ".rich-text li", "One mistake ruins the day."
+  end
+
+  test "link previewers with old browser user agents get the share tags, signed-in old browsers do not" do
+    imessage = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.4 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.4 facebookexternalhit/1.1 Facebot Twitterbot/1.0"
+
+    get distortion_url(@distortion), headers: { "User-Agent" => imessage }
+    assert_response :not_acceptable
+
+    sign_out
+    get distortion_url(@distortion), headers: { "User-Agent" => imessage }
+    assert_response :success
+    assert_select "meta[property='og:title'][content=?]", @distortion.title
   end
 
   test "index shows each trap's photo, or a named tile when it has none" do

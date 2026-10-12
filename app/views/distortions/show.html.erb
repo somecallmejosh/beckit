@@ -1,7 +1,8 @@
 <% content_for :title, @distortion.title %>
 <% content_for :og_description, @distortion.description %>
 <% if @distortion.og_image.attached? %>
-  <% content_for :og_image, rails_blob_path(@distortion.og_image) %>
+  <%# Proxy URL: served directly with a public cache, unlike the redirect URL, whose signed target expires in minutes. %>
+  <% content_for :og_image, rails_storage_proxy_path(@distortion.og_image) %>
   <% content_for :og_image_alt, "beckit thinking trap: #{@distortion.title}" %>
 <% end %>
 
