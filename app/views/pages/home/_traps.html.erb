@@ -10,8 +10,10 @@
 
     <dl class="mt-14 flex flex-col">
       <% featured.each do |distortion| %>
-        <div class="grid gap-2 border-t border-stone-950/10 py-8 md:grid-cols-12 md:gap-12 dark:border-white/15">
-          <dt class="font-display text-2xl font-medium text-stone-900 md:col-span-4 dark:text-white"><%= distortion.title %></dt>
+        <div class="group relative grid gap-2 border-t border-stone-950/10 py-8 md:grid-cols-12 md:gap-12 dark:border-white/15">
+          <dt class="font-display text-2xl font-medium text-stone-900 md:col-span-4 dark:text-white">
+            <%= link_to distortion.title, distortion, class: "after:absolute after:inset-0 group-hover:text-teal-800 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-teal-600 dark:group-hover:text-teal-300" %>
+          </dt>
           <dd class="max-w-[60ch] text-lg/8 text-pretty text-stone-600 md:col-span-8 dark:text-stone-400"><%= distortion.description %></dd>
         </div>
       <% end %>
@@ -22,7 +24,7 @@
         <h3 class="text-base/6 font-semibold text-stone-900 dark:text-white">And <%= rest.size %> more</h3>
         <ul role="list" class="mt-4 flex flex-wrap gap-2">
           <% rest.each do |distortion| %>
-            <li class="rounded-full bg-white px-3.5 py-1.5 text-base/6 text-stone-700 ring-1 ring-stone-950/10 sm:text-sm/6 dark:bg-white/5 dark:text-stone-300 dark:ring-white/10" title="<%= distortion.description %>"><%= distortion.title %></li>
+            <li><%= link_to distortion.title, distortion, class: "block rounded-full bg-white px-3.5 py-1.5 text-base/6 text-stone-700 ring-1 ring-stone-950/10 hover:text-teal-800 hover:ring-teal-600/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 sm:text-sm/6 dark:bg-white/5 dark:text-stone-300 dark:ring-white/10 dark:hover:text-teal-300 dark:hover:ring-teal-400/40" %></li>
           <% end %>
         </ul>
       </div>

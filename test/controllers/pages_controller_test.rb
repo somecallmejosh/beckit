@@ -33,9 +33,11 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "figcaption", text: "Example data. Your insights come from your own entries."
   end
 
-  test "lists every distortion" do
+  test "lists every distortion, each linked to its page" do
     get root_url
-    Distortion.pluck(:title).each { |title| assert_match title, response.body }
+    Distortion.find_each do |distortion|
+      assert_select "#traps_heading ~ * a[href=?]", distortion_path(distortion), text: distortion.title
+    end
   end
 
   test "uses only one label per call to action and no dashes" do
