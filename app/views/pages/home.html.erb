@@ -10,6 +10,9 @@
 <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[40rem] bg-linear-to-b from-teal-50/40 via-teal-50/30 to-transparent dark:from-teal-950/30 dark:via-transparent"></div>
 
 <%= render "pages/home/nav" %>
+<% if notice.present? || alert.present? %>
+  <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 pt-4 sm:px-6 lg:px-8"><%= render "shared/flash" %></div>
+<% end %>
 <%= render "pages/home/hero" %>
 <%= render "pages/home/is_isnt" %>
 <%= render "pages/home/how" %>

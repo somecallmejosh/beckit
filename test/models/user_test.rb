@@ -14,6 +14,14 @@ class UserTest < ActiveSupport::TestCase
     assert_includes user.errors[:name], "can't be blank"
   end
 
+  test "password needs at least 8 characters, and is optional on update" do
+    user = User.new(name: "New", email_address: "new@example.com", password: "short")
+    assert_not user.valid?
+    assert_includes user.errors[:password], "is too short (minimum is 8 characters)"
+
+    assert users(:one).update(name: "Renamed")
+  end
+
   test "requires a valid email_address" do
     user = User.new(name: "New", email_address: "not-an-email", password: "password")
     assert_not user.valid?

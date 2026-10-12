@@ -12,4 +12,8 @@ class PagesController < ApplicationController
       @sample_insights = SampleInsights.new
     end
   end
+
+  # GET /privacy
+  def privacy
+  end
 end

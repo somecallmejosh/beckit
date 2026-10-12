@@ -122,5 +122,60 @@
         </div>
       </div>
     <% end %>
+
+    <%# Separate forms: each has its own submit, and errors autofocus their field so the page scrolls back here. %>
+    <section aria-labelledby="account_heading" class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
+      <div class="flex flex-col gap-1">
+        <h2 id="account_heading" class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Account</h2>
+        <p class="field-hint">Signed in as <%= @user.email_address %>.</p>
+      </div>
+
+      <div class="flex max-w-xl min-w-0 flex-col gap-12">
+        <%= form_with url: settings_password_path, method: :patch, class: "flex flex-col gap-6" do |form| %>
+          <h3 class="text-lg/7 font-semibold text-stone-900 dark:text-white">Change password</h3>
+          <%= render "shared/form_errors", record: @password_user if @password_user %>
+
+          <div class="flex flex-col gap-2">
+            <%= form.label :password_challenge, "Current password", class: "field-label" %>
+            <%= form.password_field :password_challenge, required: true, autofocus: @password_user.present?, autocomplete: "current-password", maxlength: 72, class: "field" %>
+          </div>
+
+          <%= render "shared/new_password_fields", form:, label: "New password", confirm_label: "Confirm new password" %>
+
+          <div>
+            <%= form.submit "Change password", class: "btn btn-secondary" %>
+          </div>
+        <% end %>
+
+        <div class="flex flex-col gap-3 border-t border-stone-950/5 pt-10 dark:border-white/10">
+          <h3 class="text-lg/7 font-semibold text-stone-900 dark:text-white">Export your entries</h3>
+          <p class="field-hint">A CSV file with every journal entry, which opens in any spreadsheet app.</p>
+          <div>
+            <%= link_to "Download CSV", situations_path(format: :csv), class: "btn btn-secondary", data: { turbo: false } %>
+          </div>
+        </div>
+
+        <%= form_with url: settings_account_path, method: :delete, class: "flex flex-col gap-6 border-t border-stone-950/5 pt-10 dark:border-white/10",
+              data: { turbo_confirm: "Delete your account and all #{pluralize @user.situations.count, "entry"}? This can't be undone." } do |form| %>
+          <div class="flex flex-col gap-1">
+            <h3 class="text-lg/7 font-semibold text-stone-900 dark:text-white">Delete account</h3>
+            <p class="field-hint">Permanently deletes your account, every journal entry and your photo. Download your entries first if you want to keep them.</p>
+          </div>
+
+          <% if @delete_error %>
+            <p role="alert" class="rounded-2xl bg-red-50 px-4 py-3 text-base/6 text-red-800 ring-1 ring-red-700/10 sm:text-sm/6 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-400/20"><%= @delete_error %></p>
+          <% end %>
+
+          <div class="flex flex-col gap-2">
+            <%= form.label :password, "Enter your password to confirm", for: "delete_account_password", class: "field-label" %>
+            <%= form.password_field :password, id: "delete_account_password", required: true, autofocus: @delete_error.present?, autocomplete: "current-password", maxlength: 72, class: "field", aria: { invalid: (true if @delete_error) } %>
+          </div>
+
+          <div>
+            <%= form.submit "Delete account", class: "btn btn-danger" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
   </div>
 </div>

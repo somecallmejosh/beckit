@@ -14,18 +14,14 @@
       <%= form.email_field :email_address, required: true, autocomplete: "username", class: "field" %>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <%= form.label :password, class: "field-label" %>
-      <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "field" %>
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <%= form.label :password_confirmation, "Confirm password", class: "field-label" %>
-      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "field" %>
-    </div>
+    <%= render "shared/new_password_fields", form: %>
 
     <%= form.submit "Create account", class: "btn btn-primary w-full" %>
   <% end %>
+
+  <p class="text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">
+    Your entries are visible only to you. <%= link_to "How beckit handles your data", privacy_path, class: "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>
+  </p>
 
   <p class="text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400">
     Already have an account? <%= link_to "Sign in", new_session_path, class: "font-medium text-teal-700 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300" %>

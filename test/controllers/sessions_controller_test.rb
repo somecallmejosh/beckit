@@ -15,6 +15,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id]
   end
 
+  test "create keeps the session after the browser closes only when asked" do
+    post session_path, params: { email_address: @user.email_address, password: "password" }
+    assert_no_match(/expires=/i, response.headers["Set-Cookie"].to_s)
+
+    post session_path, params: { email_address: @user.email_address, password: "password", remember_me: "1" }
+    assert_match(/session_id=.*expires=/i, response.headers["Set-Cookie"].to_s)
+  end
+
   test "create with invalid credentials" do
     post session_path, params: { email_address: @user.email_address, password: "wrong" }
 

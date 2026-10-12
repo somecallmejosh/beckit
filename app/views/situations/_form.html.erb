@@ -1,4 +1,12 @@
-<%= form_with(model: situation, class: "flex flex-col gap-12") do |form| %>
+<%# Drafts are keyed per user and per entry, so a shared tab never shows someone else's text. %>
+<%= form_with(model: situation, class: "flex flex-col gap-12", data: {
+      controller: "draft", draft_key_value: [ "draft", Current.user.id, situation.persisted? ? situation.id : "new" ].join(":"),
+      action: "input->draft#save change->draft#save turbo:submit-end->draft#submitted" }) do |form| %>
+  <div data-draft-target="notice" hidden role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-teal-50 px-4 py-3 text-base/6 text-teal-900 ring-1 ring-teal-700/10 sm:text-sm/6 dark:bg-white/5 dark:text-teal-200 dark:ring-white/10">
+    <p>We restored the text you hadn't saved yet.</p>
+    <button type="button" class="btn-sm btn-ghost" data-action="draft#discard">Discard draft</button>
+  </div>
+
   <%= render "shared/form_errors", record: situation %>
 
   <fieldset class="form-section">
@@ -135,7 +143,7 @@
 
   <div class="form-section border-t border-stone-950/5 pt-8 dark:border-white/10">
     <div class="flex max-w-4xl flex-col-reverse gap-3 sm:flex-row sm:justify-end lg:col-start-2">
-      <%= link_to "Cancel", (situation.persisted? ? situation : situations_path), class: "btn btn-ghost" %>
+      <%= link_to "Cancel", (situation.persisted? ? situation : situations_path), class: "btn btn-ghost", data: { action: "draft#clear" } %>
       <%= form.submit "Save entry", class: "btn btn-primary" %>
     </div>
   </div>

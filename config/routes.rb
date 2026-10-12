@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   resources :distortions
   resource :insights, only: :show
   resource :settings, only: %i[ edit update ]
+  namespace :settings do
+    resource :password, only: :update
+    resource :account, only: :destroy
+  end
   resource :registration, only: %i[ new create ]
   resource :session
   resources :passwords, param: :token
@@ -16,5 +20,6 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  get "privacy" => "pages#privacy"
   root "pages#home"
 end

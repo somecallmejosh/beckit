@@ -5,7 +5,7 @@
     </h2>
     <p class="mt-1.5 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= distortion.description %></p>
   </div>
-  <% if Current.user.admin? %>
+  <% if Current.user&.admin? %>
     <%= link_to "Edit", edit_distortion_path(distortion), class: "btn-sm btn-secondary shrink-0 self-start", aria: { label: "Edit #{distortion.title}" } %>
   <% end %>
 </li>

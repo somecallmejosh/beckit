@@ -6,9 +6,32 @@ class DistortionsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
   end
 
-  test "requires authentication" do
+  test "index and show are public, with the landing nav and no personal panel" do
     sign_out
     get distortions_url
+    assert_response :success
+    assert_select "h1", "Thinking traps"
+    assert_select "a[href=?]", new_registration_path
+    assert_select "a[href=?]", edit_distortion_path(@distortion), count: 0
+
+    get distortion_url(@distortion)
+    assert_response :success
+    assert_select "h2", "Notice this in your own thinking?"
+    assert_select "h2", text: "Your recent entries", count: 0
+  end
+
+  test "signed-in visitors still get admin controls and their entries" do
+    get distortions_url
+    assert_select "a[href=?]", edit_distortion_path(@distortion)
+    assert_select "header nav[aria-label=Main] a[aria-current=page]", "Thinking traps"
+
+    get distortion_url(@distortion)
+    assert_select "h2", "Your recent entries"
+  end
+
+  test "editing still requires sign-in" do
+    sign_out
+    get new_distortion_url
     assert_redirected_to new_session_url
   end
 

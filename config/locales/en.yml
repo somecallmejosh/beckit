@@ -33,3 +33,7 @@ en:
     formats:
       entry: "%B %-d, %Y at %-l:%M %p"
       entry_date: "%b %-d, %Y"
+  activerecord:
+    attributes:
+      user:
+        password_challenge: "Current password"

@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   AVATAR_TYPES = %w[ image/png image/jpeg image/webp ].freeze
   AVATAR_MAX_SIZE = 5.megabytes
+  PASSWORD_MIN_LENGTH = 8
 
   has_secure_password
   has_many :sessions, dependent: :destroy
@@ -17,6 +18,7 @@ class User < ApplicationRecord
   normalizes :name, :preferred_name, :crisis_contact_name, :crisis_contact_phone, with: ->(value) { value.squish.presence }
 
   validates :name, presence: true
+  validates :password, length: { minimum: PASSWORD_MIN_LENGTH }, allow_nil: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map { it.tzinfo.name } }
   validates :date_of_birth, comparison: { greater_than_or_equal_to: Date.new(1900), less_than_or_equal_to: -> { Date.current } }, allow_nil: true

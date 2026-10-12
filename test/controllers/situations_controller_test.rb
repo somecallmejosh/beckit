@@ -110,4 +110,35 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     get situations_url
     assert_select "#summary_heading", count: 0
   end
+
+  test "exports only the current user's entries as CSV, in their time zone" do
+    @user.update!(time_zone: "America/Los_Angeles")
+    @situation.update!(distortion_ids: [ distortions(:mind_reading).id, distortions(:catastrophizing).id ], evidence_for: "=HYPERLINK(1)")
+
+    get situations_url(format: :csv)
+    assert_response :success
+    assert_equal "text/csv", response.media_type
+    assert_match(/attachment; filename="beckit-entries-\d{4}-\d{2}-\d{2}\.csv"/, response.headers["Content-Disposition"])
+
+    rows = CSV.parse(response.body)
+    assert_equal Situation::CSV_HEADERS, rows.first
+    assert_equal 2, rows.size
+    assert_equal [ "2026-10-01 02:00", "Missed deadline" ], rows.second.first(2)
+    assert_equal "Catastrophizing; Mind reading", rows.second[6]
+    assert_equal "'=HYPERLINK(1)", rows.second[7]
+  end
+
+  test "form saves drafts per user and per entry" do
+    get new_situation_url
+    assert_select "form[data-controller=draft][data-draft-key-value=?]", "draft:#{@user.id}:new"
+    assert_select "[data-draft-target=notice][hidden]"
+
+    get edit_situation_url(@situation)
+    assert_select "form[data-draft-key-value=?]", "draft:#{@user.id}:#{@situation.id}"
+  end
+
+  test "entry aside sticks below the header" do
+    get situation_url(@situation)
+    assert_select "aside.lg\\:top-20"
+  end
 end

@@ -33,12 +33,11 @@ module ApplicationHelper
     link_to name, path, class: [ classes, options.delete(:class) ], aria: { current: (active ? "page" : nil) }, **options
   end
 
-  # Placeholder wordmark from the ui.sh marks endpoint, with a light-on-dark variant.
+  # Self-hosted wordmark (no third-party request), with a light-on-dark variant.
   def logo_tag(css = "h-7 w-auto")
-    base = "https://assets.ui.sh/marks/1.svg?text=beckit&font=dm-sans&weight=600&letterSpacing=-0.5&color=teal-600"
     safe_join([
-      image_tag("#{base}&textColor=stone-900", alt: "beckit", class: [ css, "dark:hidden" ]),
-      image_tag("#{base}&textColor=white", alt: "beckit", class: [ css, "not-dark:hidden" ])
+      image_tag("logo.svg", alt: "beckit", class: [ css, "dark:hidden" ]),
+      image_tag("logo-dark.svg", alt: "beckit", class: [ css, "not-dark:hidden" ])
     ])
   end
 end

@@ -5,9 +5,14 @@ class SituationsController < ApplicationController
   before_action :set_distortions, :set_suggestions, only: %i[ new edit create update ]
 
   # GET /situations
+  # GET /situations.csv exports every entry (linked from Settings).
   def index
     @situations = Current.user.situations.includes(:distortions).order(date: :desc)
-    @summary = DistortionInsights.new(Current.user, range: "30")
+
+    respond_to do |format|
+      format.html { @summary = DistortionInsights.new(Current.user, range: "30") }
+      format.csv { send_data @situations.to_csv, filename: "beckit-entries-#{Date.current.iso8601}.csv", type: :csv }
+    end
   end
 
   # GET /situations/1

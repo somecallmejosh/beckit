@@ -48,4 +48,25 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_select "#alert", "You are not authorized to do that."
   end
+
+  test "privacy page is public and describes the account controls" do
+    get privacy_url
+    assert_response :success
+    assert_select "h1", "Privacy"
+    assert_select "h2", "Your controls"
+    assert_no_match(/[—–]/, response.body)
+  end
+
+  test "pages load no third-party fonts, styles or images" do
+    [ root_url, privacy_url, distortions_url, new_session_url ].each do |url|
+      get url
+      assert_select "link[href^='http'], script[src^='http'], img[src^='http']", count: 0
+    end
+  end
+
+  test "footer links to thinking traps and privacy" do
+    get root_url
+    assert_select "footer nav a[href=?]", distortions_path, "Thinking traps"
+    assert_select "footer nav a[href=?]", privacy_path, "Privacy"
+  end
 end

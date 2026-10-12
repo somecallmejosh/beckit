@@ -1,4 +1,4 @@
-<% content_for :title, "Distortions" %>
+<% content_for :title, "Thinking traps" %>
 
 <div class="page">
   <div class="flex flex-col gap-8">
@@ -6,10 +6,10 @@
 
     <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Cognitive distortions</h1>
-        <p class="mt-3 max-w-[48ch] text-lg/7 text-pretty text-stone-600 dark:text-stone-400">Common thinking patterns that can make a situation feel heavier than it is. Naming them is the first step to loosening their grip.</p>
+        <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Thinking traps</h1>
+        <p class="mt-3 max-w-[48ch] text-lg/7 text-pretty text-stone-600 dark:text-stone-400">Common thinking patterns, also called cognitive distortions, that can make a situation feel heavier than it is. Naming them is the first step to loosening their grip.</p>
       </div>
-      <% if Current.user.admin? %>
+      <% if Current.user&.admin? %>
         <%= link_to "New distortion", new_distortion_path, class: "btn btn-primary shrink-0 self-start sm:self-auto" %>
       <% end %>
     </div>

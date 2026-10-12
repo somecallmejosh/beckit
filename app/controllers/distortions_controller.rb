@@ -1,4 +1,7 @@
 class DistortionsController < ApplicationController
+  # Public reference pages; still resume a session so signed-in visitors get their own data and admin controls.
+  allow_unauthenticated_access only: %i[ index show ]
+  before_action :resume_session, only: %i[ index show ]
   require_admin except: %i[ index show ]
   before_action :set_distortion, only: %i[ show edit update destroy ]
 
@@ -9,6 +12,8 @@ class DistortionsController < ApplicationController
 
   # GET /distortions/1
   def show
+    return unless Current.user
+
     entries = Current.user.situations.joins(:situation_distortions).where(situation_distortions: { distortion_id: @distortion.id })
     @entry_count = entries.count
     @recent_entries = entries.order(date: :desc).limit(5)
