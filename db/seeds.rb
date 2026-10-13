@@ -25,8 +25,10 @@
   Distortion.find_or_create_by!(title: title) { |d| d.description = description }
 end
 
-# Starter photos for each trap. Attaching one also builds the trap's social card.
+# Starter photos for each trap, and the social cards built from them. The cards are built inline because
+# the jobs a photo swap enqueues are lost when seeding exits under the async adapter.
 Distortion.find_each(&:refresh_starter_photo)
+Distortion.find_each(&:refresh_og_image)
 
 # Sample journal entries for local development. Skipped once they exist, so
 # re-running db:seed does not add duplicates.
