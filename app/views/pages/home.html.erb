@@ -3,9 +3,6 @@
 <% content_for :head do %>
   <meta name="description" content="A private journal for spotting thinking traps, like catastrophizing or mind reading, and weighing them against the evidence. Not therapy.">
 <% end %>
-<% content_for :footer_note do %>
-  <p class="-mt-6 pb-10 text-base/6 text-pretty text-stone-500 sm:text-sm/6 dark:text-stone-400">beckit is a self-help journaling tool. It does not provide therapy, diagnosis or medical advice.</p>
-<% end %>
 
 <%= render "pages/home/nav" %>
 <% if notice.present? || alert.present? %>

@@ -18,13 +18,22 @@ module ApplicationHelper
   def greeting_for(user, now = Time.current)
     return "Happy birthday, #{user.first_name}" if user.birthday_today?(now.to_date)
 
-    salutation = case now.hour
-    when 5...12 then "Good morning"
-    when 12...17 then "Good afternoon"
-    when 17...22 then "Good evening"
-    else "Hello"
-    end
+    salutation = (part = time_of_day(now)) ? "Good #{part}" : "Hello"
     "#{salutation}, #{user.first_name}"
+  end
+
+  # :morning, :afternoon or :evening; nil late at night.
+  def time_of_day(now = Time.current)
+    case now.hour
+    when 5...12 then :morning
+    when 12...17 then :afternoon
+    when 17...22 then :evening
+    end
+  end
+
+  # Drawing beside the greeting. Late night shares the evening one.
+  def greeting_image(now = Time.current, **options)
+    image_tag "greetings/#{time_of_day(now) || :evening}.svg", alt: "", width: 1380, height: 920, decoding: "async", **options
   end
 
   def nav_link_to(name, path, active:, **options)

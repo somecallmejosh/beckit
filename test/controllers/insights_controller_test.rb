@@ -11,6 +11,12 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
+  test "header shows the drawing beside the heading" do
+    get insights_url
+    assert_select "h1", "Insights"
+    assert_select "img[src*='insights'][alt='']"
+  end
+
   test "shows every distortion for each range" do
     travel_to Time.zone.local(2026, 10, 7, 12) do
       DistortionInsights::RANGES.each_key do |range|

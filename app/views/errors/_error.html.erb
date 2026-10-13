@@ -1,0 +1,11 @@
+<%# locals: (image:, alt:, heading:, message:) %>
+<%# Light mode matches the drawing's paper (#F9F9F9) so there is no seam, as on the "Be kind" card. %>
+<div class="page flex flex-col items-center text-center">
+  <%= image_tag image, alt:, width: 1380, height: 920, decoding: "async",
+        class: "aspect-[3/2] w-full max-w-lg rounded-3xl bg-[#F9F9F9] object-cover ring-1 ring-stone-950/5 dark:ring-white/10" %>
+  <h1 class="mt-10 font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= heading %></h1>
+  <p class="mt-3 max-w-[48ch] text-lg/7 text-pretty text-stone-600 dark:text-stone-400"><%= message %></p>
+  <div class="mt-8">
+    <%= link_to "Take me home", root_path, class: "btn-lg btn-primary" %>
+  </div>
+</div>

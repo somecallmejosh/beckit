@@ -1,0 +1,75 @@
+<% content_for :title, "Disclaimer" %>
+<% content_for :head do %>
+  <meta name="description" content="beckit is a self-help journal, not therapy or medical care. What that means, and the limits of what it offers.">
+<% end %>
+
+<%# Plain-language disclaimer, not reviewed by a lawyer. Keep the claims here in step with the "It isn't" list on the home page. %>
+<% section_heading = "font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white" %>
+<% body = "flex flex-col gap-4 text-base/7 text-pretty text-stone-700 dark:text-stone-300 [&_li]:pl-1 [&_ul]:list-disc [&_ul]:pl-5" %>
+<% link_class = "font-medium text-teal-700 underline decoration-teal-700/30 underline-offset-2 hover:decoration-teal-700 dark:text-teal-400 dark:decoration-teal-400/30 dark:hover:decoration-teal-400" %>
+<div class="page">
+  <article class="flex max-w-[68ch] flex-col gap-12">
+    <div>
+      <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Disclaimer</h1>
+      <p class="mt-3 text-lg/8 text-pretty text-stone-600 dark:text-stone-400">beckit is a self-help journal. Please read this page so you know what it is, what it isn't, and the limits of what it can do for you. By using beckit, you accept the terms below.</p>
+    </div>
+
+    <section aria-labelledby="crisis_disclaimer_heading" class="panel-teal flex flex-col gap-3 rounded-2xl p-6">
+      <h2 id="crisis_disclaimer_heading" class="font-display text-xl font-medium tracking-tight text-stone-900 dark:text-white">If you are in crisis</h2>
+      <p class="text-base/7 text-pretty text-stone-700 dark:text-stone-300">
+        beckit is not an emergency service and can't respond to what you write. If you are thinking about harming yourself or someone else, or you are in danger, call or text <%= link_to "988", "tel:988", class: link_class %> (the Suicide and Crisis Lifeline in the US), call <%= link_to "911", "tel:911", class: link_class %>, or contact your local emergency number right away.
+      </p>
+    </section>
+
+    <section aria-labelledby="not_care_heading" class="flex flex-col gap-4">
+      <h2 id="not_care_heading" class="<%= section_heading %>">Not therapy or medical care</h2>
+      <div class="<%= body %>">
+        <p>beckit is a journaling tool for personal reflection. It does not provide therapy, counseling, diagnosis, treatment or medical advice of any kind, and it is not a substitute for care from a licensed professional.</p>
+        <p>Using beckit does not create a therapist and client, doctor and patient, or any other professional relationship between you and beckit or the people who run it. No one reviews your entries or watches for warning signs.</p>
+        <p>Always talk with a qualified health professional about questions you have regarding your mental or physical health. Don't ignore professional advice, or delay seeking it, because of something you read or wrote in beckit. Don't start, stop or change any treatment or medication based on beckit.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="content_heading" class="flex flex-col gap-4">
+      <h2 id="content_heading" class="<%= section_heading %>">About the content</h2>
+      <div class="<%= body %>">
+        <p>The descriptions of thinking traps are general educational information, drawn from widely published ideas in cognitive behavioral therapy. They are simplified, they may not fit your situation, and they are not a clinical tool.</p>
+        <p>Insights are counts and charts built from the thinking traps you tag yourself. They describe your own entries. They are not an assessment, a score or a measure of your mental health.</p>
+        <p>We try to keep everything accurate, but we make no promise that the content is complete, current or free of errors.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="your_responsibility_heading" class="flex flex-col gap-4">
+      <h2 id="your_responsibility_heading" class="<%= section_heading %>">Your choices, your responsibility</h2>
+      <div class="<%= body %>">
+        <p>Writing about hard moments can bring up difficult feelings. If journaling makes you feel worse, stop and reach out to someone you trust or a professional.</p>
+        <p>You decide how to use beckit and what to do with anything you learn from it. You are responsible for those decisions and their results.</p>
+        <p>beckit is intended for adults 18 and older.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="as_is_heading" class="flex flex-col gap-4">
+      <h2 id="as_is_heading" class="<%= section_heading %>">Provided as is</h2>
+      <div class="<%= body %>">
+        <p>beckit is provided "as is" and "as available," without warranties of any kind, whether express or implied. That includes any warranty of fitness for a particular purpose, accuracy, or uninterrupted, secure or error-free service.</p>
+        <p>The service may change, pause or end at any time, and data can be lost. If your entries matter to you, download a copy regularly from <%= link_to "Settings", edit_settings_path, class: link_class %>.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="liability_heading" class="flex flex-col gap-4">
+      <h2 id="liability_heading" class="<%= section_heading %>">Limitation of liability</h2>
+      <div class="<%= body %>">
+        <p>To the fullest extent the law allows, beckit and the people who build and run it are not liable for any direct, indirect, incidental, consequential or other damages arising from your use of, or inability to use, beckit or its content. This includes harm to your health or wellbeing, decisions you make, and loss of data.</p>
+        <p>Some places don't allow certain warranties to be excluded or liability to be limited, so parts of this section may not apply to you.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="changes_heading" class="flex flex-col gap-4">
+      <h2 id="changes_heading" class="<%= section_heading %>">Changes to this page</h2>
+      <div class="<%= body %>">
+        <p>We may update this disclaimer as beckit changes. Continuing to use beckit after an update means you accept the new version. For how your data is handled, see <%= link_to "Privacy", privacy_path, class: link_class %>.</p>
+        <p class="text-stone-500 dark:text-stone-400">Last updated <time datetime="2026-10-13">October 13, 2026</time>.</p>
+      </div>
+    </section>
+  </article>
+</div>

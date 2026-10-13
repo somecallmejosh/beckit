@@ -31,11 +31,12 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#error_explanation li", /too short/
   end
 
-  test "new shows the password rule and links to the privacy page" do
+  test "new shows the password rule and links to the privacy page and disclaimer" do
     get new_registration_url
     assert_select "#password_hint", "At least 8 characters."
     assert_select "input[name=?][minlength='8']", "user[password]"
     assert_select "a[href=?]", privacy_path
+    assert_select "a[href=?]", disclaimer_path
   end
 
   test "create cannot grant admin" do

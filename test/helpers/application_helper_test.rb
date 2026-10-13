@@ -17,6 +17,12 @@ class ApplicationHelperTest < ActionView::TestCase
     end
   end
 
+  test "greeting image follows the time of day, with evening late at night" do
+    { 9 => "morning", 14 => "afternoon", 19 => "evening", 23 => "evening", 3 => "evening" }.each do |hour, part|
+      assert_match %r{greetings/#{part}[-.]}, greeting_image(Time.zone.local(2026, 10, 7, hour))
+    end
+  end
+
   test "greeting wishes a happy birthday" do
     assert_equal "Happy birthday, Josh", greeting_for(@user, Time.zone.local(2026, 6, 1, 9))
   end

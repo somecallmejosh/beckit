@@ -1,19 +1,20 @@
-<%# Same 4:5 crop as the trap page: the photos put their subject at different heights, so a wider crop loses some.
-    The whole card links to the trap (the title link stretches over it); the admin Edit button sits above that layer. %>
+<%# Same 4:5 crop as the trap page: the images put their subject at different heights, so a wider crop loses some.
+    The whole card links to the trap (the title link stretches over it); the admin Edit button sits above that layer.
+    Pass heading: :h3 where the card sits under a section's h2, as on the home page. %>
 <li id="<%= dom_id distortion %>" class="group relative flex flex-col">
   <% if distortion.image.attached? %>
-    <%= image_tag distortion.image.variant(:page), alt: "", width: 720, height: 900, loading: "lazy", decoding: "async",
-          class: "aspect-[4/5] w-full rounded-3xl object-cover ring-1 ring-stone-950/5 transition-opacity group-hover:opacity-90 motion-reduce:transition-none dark:ring-white/10" %>
+    <%= image_tag distortion_image_source(distortion), alt: "", width: 720, height: 900, loading: "lazy", decoding: "async",
+          class: "aspect-[4/5] w-full rounded-3xl object-cover ring-1 ring-stone-950/5 transition-opacity group-hover:opacity-90 motion-reduce:transition-none dark:ring-white/10  bg-stone-50 duration-300" %>
   <% else %>
-    <%# No photo yet: a teal tile with the name, so the grid never shows an empty frame. %>
+    <%# No image yet: a teal tile with the name, so the grid never shows an empty frame. %>
     <div aria-hidden="true" class="panel-teal flex aspect-[4/5] w-full items-end rounded-3xl p-6">
-      <span class="font-display text-2xl font-medium tracking-tight text-balance text-teal-900 dark:text-teal-100"><%= distortion.title %></span>
+      <span class="font-display text-2xl font-medium tracking-tight text-balance text-teal-900 dark:text-teal-100 group-hover:underline"><%= distortion.title %></span>
     </div>
   <% end %>
 
-  <h2 class="mt-5 font-display text-xl font-medium text-balance text-stone-900 dark:text-white">
+  <%= content_tag local_assigns.fetch(:heading, :h2), class: "mt-5 font-display text-xl font-medium text-balance text-stone-900 dark:text-white group-hover:underline" do %>
     <%= link_to distortion.title, distortion, class: "after:absolute after:inset-0 after:rounded-3xl group-hover:text-teal-800 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-teal-600 dark:group-hover:text-teal-300" %>
-  </h2>
+  <% end %>
   <p class="mt-1.5 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= distortion.description %></p>
   <% if Current.user&.admin? %>
     <%= link_to "Edit", edit_distortion_path(distortion), class: "btn-sm btn-secondary relative mt-4 self-start", aria: { label: "Edit #{distortion.title}" } %>

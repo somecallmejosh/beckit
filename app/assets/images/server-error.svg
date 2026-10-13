@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1380 920" width="1380" height="920"><style>.accent{transform-box:fill-box;transform-origin:50% 60%;animation:float 6s ease-in-out infinite}@keyframes float{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(0,-22px) rotate(-3deg)}}@media (prefers-reduced-motion:reduce){.accent{animation:none}}</style>
+<rect width="1380" height="920" fill="#F9F9F9"/>
+<g stroke-linecap="round" stroke-linejoin="round">
+  <!-- Ground -->
+  <ellipse cx="690" cy="792" rx="440" ry="30" fill="#EDEDEA"/>
+  <path d="M290 796 l -4 -22 M304 798 l 6 -26" fill="none" stroke="#262626" stroke-width="9"/>
+  <path d="M1110 784 l -6 -28 M1126 786 l 4 -34 M1142 784 l 10 -24" fill="none" stroke="#262626" stroke-width="9"/>
+
+  <!-- Spilled tea -->
+  <path d="M760 790 C 760 770, 830 762, 900 768 C 980 760, 1080 770, 1074 786 C 1070 800, 980 804, 900 800 C 830 806, 760 806, 760 790 Z" fill="#B6B6B3" stroke="#262626" stroke-width="10"/>
+  <circle cx="1100" cy="770" r="9" fill="#B6B6B3" stroke="#262626" stroke-width="7"/>
+  <circle cx="1128" cy="752" r="6" fill="#B6B6B3" stroke="#262626" stroke-width="6"/>
+
+  <!-- Mug on its side -->
+  <path d="M722 700 C 718 636, 806 630, 806 694" fill="none" stroke="#262626" stroke-width="34" transform="rotate(-6 760 738)"/>
+  <path d="M722 700 C 718 636, 806 630, 806 694" fill="none" stroke="#FFFFFF" stroke-width="14" transform="rotate(-6 760 738)"/>
+  <path d="M686 690 h 156 c 18 0 18 96 0 96 h -156 c -18 0 -18 -96 0 -96 z" fill="#FFFFFF" stroke="#262626" stroke-width="11" transform="rotate(-6 760 738)"/>
+  <ellipse cx="842" cy="730" rx="20" ry="48" fill="#8E8E8B" stroke="#262626" stroke-width="10" transform="rotate(-6 760 738)"/>
+  <path d="M716 718 v40 M746 714 v26" fill="none" stroke="#D2D2CF" stroke-width="10" transform="rotate(-6 760 738)"/>
+
+  <!-- Cat, looking away innocently -->
+  <g transform="translate(-40 0)">
+    <path d="M598 770 C 660 778, 690 730, 652 700" fill="none" stroke="#262626" stroke-width="34"/>
+    <path d="M598 770 C 660 778, 690 730, 652 700" fill="none" stroke="#B6B6B3" stroke-width="14"/>
+    <path d="M446 790 C 432 714, 468 664, 522 664 C 578 664, 612 714, 598 790 Z" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+    <path d="M520 700 C 532 730, 530 760, 520 786" fill="none" stroke="#8E8E8B" stroke-width="10"/>
+    <ellipse cx="488" cy="786" rx="28" ry="16" fill="#B6B6B3" stroke="#262626" stroke-width="10"/>
+    <ellipse cx="556" cy="786" rx="28" ry="16" fill="#B6B6B3" stroke="#262626" stroke-width="10"/>
+    <g transform="rotate(10 522 610)">
+      <path d="M470 590 L 466 524 L 512 562 Z M574 590 L 578 524 L 532 562 Z" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+      <path d="M478 572 L 477 548 L 494 562 Z M566 572 L 567 548 L 550 562 Z" fill="#8E8E8B"/>
+      <ellipse cx="522" cy="612" rx="68" ry="58" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+      <path d="M488 600 q 10 -10 22 0 M534 600 q 10 -10 22 0" fill="none" stroke="#262626" stroke-width="7"/>
+      <path d="M523 618 l -6 6 h12 z" fill="#262626" stroke="#262626" stroke-width="5"/>
+      <path d="M510 634 q 6 7 13 0 q 7 7 13 0" fill="none" stroke="#262626" stroke-width="6"/>
+      <path d="M454 618 h-30 M456 632 l -28 8 M590 618 h30 M588 632 l 28 8" fill="none" stroke="#262626" stroke-width="5"/>
+    </g>
+  </g>
+
+  <!-- Loose yarn from the cat's paw up to the ball -->
+  <path d="M440 794 C 330 806, 270 730, 310 650 C 350 570, 290 490, 370 420 C 430 370, 500 336, 540 304" fill="none" stroke="#0F9488" stroke-width="7"/>
+
+  <!-- Ball of yarn, drifting up -->
+  <g class="accent">
+    <circle cx="590" cy="250" r="72" fill="#0F9488" stroke="#262626" stroke-width="11"/>
+    <path d="M538 208 C 580 232, 612 266, 624 316 M560 192 C 610 220, 644 254, 656 290 M528 254 C 560 268, 584 296, 590 320 M612 184 C 640 204, 658 222, 662 240" fill="none" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="7"/>
+  </g>
+
+  <!-- Sparkles -->
+  <path d="M900 330 Q 904 360 930 364 Q 904 368 900 398 Q 896 368 870 364 Q 896 360 900 330 Z" fill="#262626"/>
+  <circle cx="900" cy="364" r="5" fill="#F9F9F9"/>
+  <path d="M1040 520 Q 1042 536 1056 538 Q 1042 540 1040 556 Q 1038 540 1024 538 Q 1038 536 1040 520 Z" fill="#262626"/>
+  <path d="M960 640 q 14 -12 30 -10 M968 672 q 18 -4 30 4" fill="none" stroke="#262626" stroke-width="8"/>
+</g>
+</svg>

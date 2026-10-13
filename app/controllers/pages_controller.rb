@@ -8,12 +8,16 @@ class PagesController < ApplicationController
       flash.keep
       redirect_to situations_path
     else
-      @distortions = Distortion.order(:title)
+      @distortions = Distortion.includes(image_attachment: { blob: { variant_records: { image_attachment: :blob } } }).order(:title)
       @sample_insights = SampleInsights.new
     end
   end
 
   # GET /privacy
   def privacy
+  end
+
+  # GET /disclaimer
+  def disclaimer
   end
 end

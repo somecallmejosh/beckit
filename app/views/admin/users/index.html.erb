@@ -1,0 +1,44 @@
+<% content_for :title, "Users" %>
+
+<div class="page">
+  <div class="flex flex-col gap-8">
+    <%= render "shared/flash" %>
+
+    <div>
+      <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Users</h1>
+      <p class="mt-3 text-lg/7 text-pretty text-stone-600 dark:text-stone-400"><%= pluralize @users.size, "member" %>, newest first.</p>
+    </div>
+
+    <div class="-mx-4 overflow-x-auto sm:mx-0">
+      <table id="users" class="w-full min-w-[36rem] text-left text-base/6 sm:text-sm/6">
+        <thead class="text-stone-500 dark:text-stone-400">
+          <tr class="border-b border-stone-950/10 dark:border-white/10">
+            <th scope="col" class="px-4 py-3 font-medium">Name</th>
+            <th scope="col" class="px-4 py-3 font-medium">Email</th>
+            <th scope="col" class="px-4 py-3 font-medium">Member for</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-stone-950/5 dark:divide-white/5">
+          <% @users.each do |user| %>
+            <tr id="<%= dom_id user %>">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <%= render "shared/avatar", user: user %>
+                  <span class="font-medium text-stone-900 dark:text-white"><%= user.name %></span>
+                  <% if user.admin? %>
+                    <span class="rounded-full bg-stone-950/5 px-2 py-0.5 text-xs font-medium text-stone-600 dark:bg-white/10 dark:text-stone-300">Admin</span>
+                  <% end %>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-stone-600 dark:text-stone-400"><%= mail_to user.email_address, class: "hover:text-stone-900 dark:hover:text-white" %></td>
+              <td class="px-4 py-3 text-stone-600 dark:text-stone-400">
+                <%= time_ago_in_words(user.created_at) %>
+                <span class="block text-sm/5 text-stone-500 sm:text-xs/5">Since <%= tag.time l(user.created_at.to_date, format: :long), datetime: user.created_at.to_date.iso8601 %></span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

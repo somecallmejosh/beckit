@@ -32,10 +32,10 @@
       </div>
 
       <div class="flex flex-col gap-6 self-start max-lg:w-full max-lg:max-w-md">
-        <%# Still-life metaphor for the trap; decorative, since the title and description carry the meaning. %>
+        <%# Illustration of the trap; decorative, since the title and description carry the meaning. %>
         <% if @distortion.image.attached? %>
-          <%= image_tag @distortion.image.variant(:page), alt: "", width: 720, height: 900, decoding: "async",
-                class: "aspect-[4/5] w-full rounded-3xl object-cover ring-1 ring-stone-950/5 dark:ring-white/10" %>
+          <%= image_tag distortion_image_source(@distortion), alt: "", width: 720, height: 900, decoding: "async",
+                class: "aspect-[4/5] w-full rounded-3xl object-cover ring-1 ring-stone-950/5 dark:ring-white/10 bg-stone-50" %>
         <% end %>
 
         <% if Current.user %>

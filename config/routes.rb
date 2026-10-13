@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   resource :registration, only: %i[ new create ]
   resource :session
   resources :passwords, param: :token
+  namespace :admin do
+    resources :users, only: :index
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -22,5 +25,11 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
   get "privacy" => "pages#privacy"
+  get "disclaimer" => "pages#disclaimer"
+
+  # Error pages, reached through config.exceptions_app. Any verb, since the failed request may have been a POST.
+  match "404" => "errors#not_found", via: :all
+  match "500" => "errors#internal_server_error", via: :all
+
   root "pages#home"
 end

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1380 920" width="1380" height="920"><style>.accent{transform-box:fill-box;transform-origin:50% 60%;animation:float 6s ease-in-out infinite}@keyframes float{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(0,-22px) rotate(-3deg)}}@media (prefers-reduced-motion:reduce){.accent{animation:none}}</style>
+<rect width="1380" height="920" fill="#F9F9F9"/>
+<g stroke-linecap="round" stroke-linejoin="round">
+  <!-- Ground -->
+  <ellipse cx="700" cy="792" rx="430" ry="30" fill="#EDEDEA"/>
+  <path d="M90 742 C 170 712, 240 756, 310 736" fill="none" stroke="#B6B6B3" stroke-width="12" stroke-dasharray="0 34"/>
+  <path d="M1000 780 l -6 -28 M1016 782 l 4 -34 M1032 780 l 10 -24" fill="none" stroke="#262626" stroke-width="9"/>
+  <path d="M250 796 l -4 -22 M264 798 l 6 -26" fill="none" stroke="#262626" stroke-width="9"/>
+
+  <!-- Signpost -->
+  <path d="M672 300 h56 v490 h-56 z" fill="#B6B6B3" transform="translate(-9 7)" stroke="#D2D2CF" stroke-width="10"/>
+  <path d="M672 300 h56 v490 h-56 z" fill="#8E8E8B" stroke="#262626" stroke-width="11"/>
+  <circle cx="700" cy="292" r="22" fill="#8E8E8B" stroke="#262626" stroke-width="11"/>
+
+  <!-- Sign pointing right -->
+  <path d="M598 352 H 902 L 948 396 L 902 440 H 598 Z" fill="#FFFFFF" stroke="#262626" stroke-width="11"/>
+  <path d="M640 382 h170 M640 412 h110" fill="none" stroke="#B6B6B3" stroke-width="12"/>
+  <circle cx="700" cy="396" r="7" fill="#262626"/>
+
+  <!-- Sign pointing left -->
+  <path d="M800 474 H 500 L 454 518 L 500 562 H 800 Z" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+  <path d="M540 504 h150 M540 534 h90" fill="none" stroke="#8E8E8B" stroke-width="12"/>
+  <circle cx="700" cy="518" r="7" fill="#262626"/>
+
+  <!-- Empty bracket where a third sign came loose -->
+  <path d="M728 610 h40 M728 650 h40" fill="none" stroke="#262626" stroke-width="10"/>
+
+  <!-- The loose sign, drifting off -->
+  <g class="accent">
+    <g transform="rotate(-14 1040 200)">
+      <path d="M900 158 H 1150 L 1194 200 L 1150 242 H 900 Z" fill="#0F9488" stroke="#262626" stroke-width="11"/>
+      <path d="M1022 186 C 1022 162, 1062 162, 1062 186 C 1062 204, 1042 204, 1042 222" fill="none" stroke="#FFFFFF" stroke-width="11"/>
+      <circle cx="1042" cy="242" r="8" fill="#FFFFFF"/>
+    </g>
+  </g>
+  <path d="M1010 330 q 10 -20 30 -22 M1060 330 q 6 -14 22 -18" fill="none" stroke="#262626" stroke-width="8"/>
+
+  <!-- Cat, head tilted, looking up -->
+  <g transform="translate(-110 0)">
+  <path d="M598 770 C 660 778, 690 730, 652 700" fill="none" stroke="#262626" stroke-width="34"/>
+  <path d="M598 770 C 660 778, 690 730, 652 700" fill="none" stroke="#B6B6B3" stroke-width="14"/>
+  <path d="M446 790 C 432 714, 468 664, 522 664 C 578 664, 612 714, 598 790 Z" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+  <path d="M520 700 C 532 730, 530 760, 520 786" fill="none" stroke="#8E8E8B" stroke-width="10"/>
+  <ellipse cx="488" cy="786" rx="28" ry="16" fill="#B6B6B3" stroke="#262626" stroke-width="10"/>
+  <ellipse cx="556" cy="786" rx="28" ry="16" fill="#B6B6B3" stroke="#262626" stroke-width="10"/>
+  <g transform="rotate(-14 522 610)">
+    <path d="M470 590 L 466 524 L 512 562 Z M574 590 L 578 524 L 532 562 Z" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+    <path d="M478 572 L 477 548 L 494 562 Z M566 572 L 567 548 L 550 562 Z" fill="#8E8E8B"/>
+    <ellipse cx="522" cy="612" rx="68" ry="58" fill="#B6B6B3" stroke="#262626" stroke-width="11"/>
+    <circle cx="500" cy="598" r="9" fill="#262626"/>
+    <circle cx="546" cy="598" r="9" fill="#262626"/>
+    <circle cx="503" cy="594" r="3" fill="#FFFFFF"/>
+    <circle cx="549" cy="594" r="3" fill="#FFFFFF"/>
+    <path d="M523 618 l -6 6 h12 z" fill="#262626" stroke="#262626" stroke-width="5"/>
+    <path d="M510 634 q 6 7 13 0 q 7 7 13 0" fill="none" stroke="#262626" stroke-width="6"/>
+    <path d="M454 618 h-30 M456 632 l -28 8 M590 618 h30 M588 632 l 28 8" fill="none" stroke="#262626" stroke-width="5"/>
+  </g>
+  </g>
+
+  <!-- Sparkles -->
+  <path d="M380 250 Q 384 280 410 284 Q 384 288 380 318 Q 376 288 350 284 Q 376 280 380 250 Z" fill="#262626"/>
+  <circle cx="380" cy="284" r="5" fill="#F9F9F9"/>
+  <path d="M1170 470 Q 1172 486 1186 488 Q 1172 490 1170 506 Q 1168 490 1154 488 Q 1168 486 1170 470 Z" fill="#262626"/>
+</g>
+</svg>

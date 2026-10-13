@@ -23,5 +23,14 @@ module Beckit
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # 404 and 500 get in-app pages (ErrorsController); other statuses keep their static pages in public/.
+    config.exceptions_app = ->(env) do
+      if %w[ /404 /500 ].include?(env["PATH_INFO"])
+        routes.call(env)
+      else
+        ActionDispatch::PublicExceptions.new(Rails.public_path).call(env)
+      end
+    end
   end
 end

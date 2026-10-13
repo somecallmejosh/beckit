@@ -13,8 +13,15 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
   test "states plainly that it is not therapy" do
     get root_url
     assert_select "#is_isnt_heading + div li", text: "Therapy, or a substitute for it."
-    assert_select "footer p", text: "beckit is a self-help journaling tool. It does not provide therapy, diagnosis or medical advice."
+    assert_select "footer p", text: "beckit is a self-help journaling tool. It does not provide therapy, diagnosis or medical advice. Read the disclaimer"
+    assert_select "footer p a[href=?]", disclaimer_path
     assert_select "a[href='tel:988']", minimum: 1
+  end
+
+  test "footer reminds you to be kind to yourself" do
+    get privacy_url
+    assert_select "footer #be_kind_heading", "Be kind to yourself"
+    assert_select "footer img[src*='be-kind'][alt]"
   end
 
   test "explains the benefits, with privacy claims that match the privacy page" do
@@ -67,17 +74,28 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/[—–]/, response.body)
   end
 
+  test "disclaimer page is public, points to crisis lines and limits liability" do
+    get disclaimer_url
+    assert_response :success
+    assert_select "h1", "Disclaimer"
+    assert_select "#crisis_disclaimer_heading ~ p a[href='tel:988']"
+    assert_select "h2", "Not therapy or medical care"
+    assert_select "h2", "Limitation of liability"
+    assert_no_match(/[—–]/, response.body)
+  end
+
   test "pages load no third-party fonts, styles or images" do
-    [ root_url, privacy_url, distortions_url, new_session_url ].each do |url|
+    [ root_url, privacy_url, disclaimer_url, distortions_url, new_session_url ].each do |url|
       get url
       assert_select "link[href^='http'], script[src^='http'], img[src^='http']", count: 0
     end
   end
 
-  test "footer links to thinking traps and privacy" do
+  test "footer links to thinking traps, privacy and the disclaimer" do
     get root_url
     assert_select "footer nav a[href=?]", distortions_path, "Thinking traps"
     assert_select "footer nav a[href=?]", privacy_path, "Privacy"
+    assert_select "footer nav a[href=?]", disclaimer_path, "Disclaimer"
   end
 
   test "landing shows the sample insights right after how an entry works" do

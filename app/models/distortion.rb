@@ -2,7 +2,7 @@ class Distortion < ApplicationRecord
   has_many :situation_distortions, dependent: :destroy
   has_many :situations, through: :situation_distortions
 
-  # Still-life photo shown on the trap's page, and the 1200x630 social card built from it (see OgCard).
+  # Image shown on the trap's page (unless it has an illustration), and the 1200x630 social card built from it (see OgCard).
   has_one_attached :image do |attachable|
     attachable.variant :page, resize_to_fill: [ 720, 900 ], format: :webp, saver: { quality: 80 }, preprocessed: true
   end
@@ -12,6 +12,7 @@ class Distortion < ApplicationRecord
 
   IMAGE_TYPES = %w[ image/png image/jpeg image/webp ].freeze
   STARTER_PHOTOS = Rails.root.join("db/seeds/traps")
+  ILLUSTRATIONS = Rails.root.glob("app/assets/images/traps/*.svg").map { "traps/#{it.basename}" }.to_set.freeze
 
   validates :title, presence: true, uniqueness: { case_sensitive: false }
   validates :description, presence: true
@@ -32,6 +33,13 @@ class Distortion < ApplicationRecord
     return if image.attached? && (image.filename != path.basename.to_s || image.checksum == Digest::MD5.file(path).base64digest)
 
     image.attach(io: path.open, filename: path.basename.to_s, content_type: "image/webp")
+  end
+
+  # The animated drawing (app/assets/images/traps/<slug>.svg) shown in place of the starter image, which is
+  # its still copy for the social card. An image uploaded through the admin form is shown as is.
+  def illustration
+    path = "traps/#{slug}.svg"
+    path if path.in?(ILLUSTRATIONS) && image.attached? && image.filename.to_s == "#{slug}.webp"
   end
 
   def refresh_og_image
