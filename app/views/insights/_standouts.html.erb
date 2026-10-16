@@ -5,10 +5,11 @@
 <% places = insights.standout_groups(:location) %>
 <% people = insights.standout_groups(:who_was_involved) %>
 <% companion = insights.pairs.first if insights.pairs.first&.count.to_i >= 2 %>
-<section aria-labelledby="standouts_heading" class="flex flex-col gap-4">
-  <h3 id="standouts_heading" class="text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white">What stands out</h3>
-  <ul role="list" class="flex max-w-[65ch] flex-col gap-3 border-l-2 border-teal-600 pl-5 text-lg/7 text-pretty text-stone-700 dark:border-teal-400 dark:text-stone-300">
-    <li>Came up in <%= row.count %> of your <%= pluralize insights.total, "entry" %> <%= range_phrase(insights.range) %>.</li>
+<%# The same summary card as the overview's "In short": the findings first, the charts below back them up. %>
+<section aria-labelledby="standouts_heading" class="rounded-3xl panel-teal p-6 sm:p-10">
+  <h3 id="standouts_heading" class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300">What stands out</h3>
+  <ul role="list" class="mt-4 flex max-w-[60ch] flex-col gap-3 text-lg/8 text-pretty text-stone-800 dark:text-stone-200">
+    <li class="mb-2 font-display text-2xl/9 font-medium tracking-tight text-balance text-stone-900 sm:text-3xl/10 dark:text-white">Came up in <%= row.count %> of your <%= pluralize insights.total, "entry" %> <%= range_phrase(insights.range) %>.</li>
     <% if standout %>
       <% (wday, part), cell = standout %>
       <li>Most often on <%= when_phrase(wday, part) %>: <%= cell.matches %> of <%= pluralize cell.entries, "entry" %> then.</li>

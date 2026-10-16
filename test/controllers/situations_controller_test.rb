@@ -128,7 +128,8 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
       assert_difference("@user.situations.count") do
         post situations_url, params: { situation: { thought_imagery: "Nobody replied", emotions: [ "" ] }, go_to: "what-happened" }
       end
-      situation = @user.situations.order(:created_at).last
+      # Found by its answer: under freeze_time a fixture's created_at can tie with or follow the new entry's.
+      situation = @user.situations.find_by!(thought_imagery: "Nobody replied")
       assert_redirected_to situation_step_url(situation, "what-happened")
       assert_equal Time.current.change(sec: 0), situation.date
     end
@@ -279,9 +280,14 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[data-draft-key-value=?]", "draft:#{@user.id}:#{@situation.id}:weigh-it-up"
   end
 
-  test "entry aside sticks below the header" do
+  test "an entry reads as one record: the thought and feeling first, the balanced thought and feeling afterwards last" do
+    @situation.update!(emotion_level: 7, emotion_level_after: 4, balanced_thought: "It went better than I feared.")
     get situation_url(@situation)
-    assert_select "aside.lg\\:top-24"
+    assert_select "ol[aria-label=?] > li", "The thought record", 4
+    assert_select "ol > li:first-child #feeling_before", /7/
+    assert_select "ol > li:last-child #balanced_heading", "A more balanced thought"
+    assert_select "ol > li:last-child #feeling_after", /4/
+    assert_select "#feeling_shift", "Down 3 from 7"
   end
 
   test "the first step asks for the thought and feelings; the short name comes later, with no default" do
@@ -371,14 +377,14 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
 
   test "creates an entry with feelings, a re-rating and no short name yet" do
     post situations_url, params: { situation: { date: "2026-10-05T08:30", thought_imagery: "They are all judging me", emotions: [ "", "Anxious", "Ashamed" ], emotion_level: 8, emotion_level_after: 5 } }
-    situation = @user.situations.order(:created_at).last
+    situation = @user.situations.find_by!(thought_imagery: "They are all judging me")
     assert_nil situation.title
     assert_equal [ "They are all judging me", %w[ Anxious Ashamed ], 5 ], [ situation.display_title, situation.emotions, situation.emotion_level_after ]
 
     follow_redirect!
     assert_select "#notice", "Entry saved."
     assert_select "li.badge-neutral", "Anxious"
-    assert_select "section[aria-labelledby=feeling_heading] p", "Down 3 from 8"
+    assert_select "#feeling_shift", "Down 3 from 8"
   end
 
   test "index keeps search folded away until a search is showing" do
@@ -425,12 +431,30 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     get situations_url
     assert_select "#situations section > ul > li", 20
     assert_select "#situations h2", "September 2026"
-    assert_select "nav[aria-label=Pages] a", "Older entries"
+    assert_select "#page_status", count: 0
+    assert_select "nav[aria-label=Pages]", /Page 1 of 2/
+    assert_select "nav[aria-label=Pages] a[href=?]", situations_path(page: 2, anchor: "entries"), /Older entries/
+    assert_select "title", "Journal"
 
     get situations_url(page: 2)
     assert_select "#situations section > ul > li", 2
-    assert_select "#situations h2", "September 2026"
-    assert_select "nav[aria-label=Pages] a[href=?]", situations_path, /Newer entries/
+    assert_select "#situations h2", "September 2026, continued"
+    assert_select "#page_status", /Page 2 of 2\s*Entries from Sep 2, 2026 back to Sep 1, 2026/
+    assert_select "#page_status a[href=?]", situations_path(anchor: "entries"), /Newest entries/
+    assert_select "nav[aria-label=Pages] a[href=?]", situations_path(anchor: "entries"), /Newer entries/
+    assert_select "nav[aria-label=Pages] a", { text: /Older/, count: 0 }
+    assert_select "title", "Journal, page 2"
+  end
+
+  test "only the month carried over from the page before is called continued" do
+    # With the fixture's October 1 entry, page 2 starts with the last October entry, then September begins.
+    20.times { |i| @user.situations.create!(title: "October #{i}", date: Time.zone.local(2026, 10, 2, 9) + i.hours) }
+    @user.situations.create!(title: "September", date: Time.zone.local(2026, 9, 30, 9))
+
+    get situations_url(page: 2)
+    assert_select "#situations h2" do |headings|
+      assert_equal [ "October 2026, continued", "September 2026" ], headings.map(&:text)
+    end
   end
 
   test "an empty journal shows the intro with time zone and crisis line prompts" do

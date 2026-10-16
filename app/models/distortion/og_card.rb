@@ -61,7 +61,9 @@ class Distortion::OgCard
     end
 
     def distance_outside_corner(coord, size)
-      inner = (coord * -1 + PHOTO_RADIUS).maxpair(coord - (size - 1 - PHOTO_RADIUS))
+      left, right = coord * -1 + PHOTO_RADIUS, coord - (size - 1 - PHOTO_RADIUS)
+      # ifthenelse rather than maxpair, which needs libvips 8.16 (CI's Ubuntu has 8.15).
+      inner = (left > right).ifthenelse(left, right)
       (inner < 0).ifthenelse(0, inner)
     end
 

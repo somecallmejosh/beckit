@@ -71,6 +71,13 @@
     50% { transform: translateX(10px) rotate(4deg); }
   }
 
+  /* A panel that unfolds on request (the journal's search): eases down into place. */
+  --animate-reveal: reveal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(-0.5rem); }
+  }
+
   /* The plant's next stage (shared/_stage_up). The four share one timeline so their percentages line up: the card
      rises (0-12%), the sketch gives way to the drawing with a small swell (22-40%), the burst (28-48%), a hold,
      then the card sinks (82-100%). */

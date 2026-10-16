@@ -3,7 +3,7 @@
 <% focus = insights.weekly_focus %>
 <% max = [ totals.max.to_i, 1 ].max %>
 <section aria-labelledby="weekly_heading" class="flex min-w-0 flex-col gap-6">
-  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "weekly_heading", title: "Over time",
+  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "weekly_heading", title: (focus ? "How often it came up" : "How often you wrote"),
         description: focus ? "Entries per week, with #{insights.distortion.title.downcase} highlighted." : "Entries per week." %>
 
   <% if focus %>

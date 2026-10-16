@@ -80,7 +80,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   test "shows distortions logged together" do
     travel_to Time.zone.local(2026, 10, 7, 12) do
       get insights_url
-      assert_select "#pairs_heading", text: "Together"
+      assert_select "#pairs_heading", text: "Which traps show up together"
       assert_match "Catastrophizing + Mind reading", response.body
     end
   end

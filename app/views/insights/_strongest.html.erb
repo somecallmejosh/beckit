@@ -1,7 +1,7 @@
 <%# locals: (insights:) %>
 <% rows = insights.strongest %>
 <section aria-labelledby="strongest_heading" class="flex min-w-0 flex-col gap-6">
-  <%= render "insights/section_heading", id: "strongest_heading", title: "Strongest feelings",
+  <%= render "insights/section_heading", id: "strongest_heading", title: "Which traps felt strongest",
         description: "Thinking traps with the highest average intensity, among those with at least #{DistortionInsights::MIN_ENTRIES} entries." %>
 
   <% if rows.empty? %>

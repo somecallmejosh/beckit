@@ -2,7 +2,7 @@
 <% focus = insights.distortion %>
 <% max = insights.heatmap.values.map(&:entries).max.to_i %>
 <section aria-labelledby="heatmap_heading" class="flex min-w-0 flex-col gap-6">
-  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "heatmap_heading", title: "When",
+  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "heatmap_heading", title: "When it tends to happen",
         description: focus ? "How often #{focus.title.downcase} came up at each time, compared with your overall rate. Numbers are entries with it." : "Entries by day of the week and time of day. Entries after midnight count toward the night before. Pick a distortion to see when it tends to show up." %>
 
   <table data-controller="cell-nav" data-action="keydown->cell-nav#move" class="w-full table-fixed border-separate border-spacing-0.5 text-center text-base/6 tabular-nums sm:border-spacing-1 sm:text-sm/6">

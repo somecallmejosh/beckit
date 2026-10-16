@@ -1,50 +1,62 @@
-<%# The title's link covers the whole row, so the Continue link for an entry in progress can sit on top of it. %>
+<%# A journal page rather than a list row: the day sits on its own stub at the left (the month is the section heading
+    above), the entry gets room to breathe, and how it felt closes the card. The title's link covers the whole card,
+    so the Continue link for an entry in progress can sit on top of it. %>
 <li id="<%= dom_id situation %>">
-  <div class="group relative -mx-4 flex flex-col gap-3 rounded-2xl px-4 py-6 hover:bg-stone-950/[0.03] sm:flex-row sm:items-start sm:justify-between sm:gap-8 dark:hover:bg-white/[0.03]">
-    <div class="min-w-0 flex-1">
-      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
-          <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time>
+  <article class="group relative grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 rounded-3xl bg-stone-950/[0.02] p-5 ring-1 ring-stone-950/5 transition-colors hover:bg-stone-950/[0.04] sm:grid-cols-[3.5rem_minmax(0,1fr)] sm:gap-x-6 sm:p-7 dark:bg-white/[0.03] dark:ring-white/10 dark:hover:bg-white/[0.05]">
+    <time datetime="<%= situation.date.iso8601 %>" class="flex flex-col items-center self-start rounded-2xl bg-white py-2 ring-1 ring-stone-950/5 dark:bg-white/5 dark:ring-white/10">
+      <span class="sr-only"><%= l situation.date, format: :entry_date %></span>
+      <span aria-hidden="true" class="text-sm/5 text-stone-500 sm:text-xs/5 dark:text-stone-400"><%= l situation.date, format: "%a" %></span>
+      <span aria-hidden="true" class="font-display text-2xl/8 font-medium text-stone-900 tabular-nums dark:text-white"><%= situation.date.day %></span>
+    </time>
+
+    <div class="min-w-0">
+      <% if situation.location.present? || situation.next_step %>
+        <div class="mb-1 flex flex-wrap items-center gap-x-3 gap-y-1">
           <% if situation.location.present? %>
-            <span aria-hidden="true">&middot;</span> <%= situation.location %>
+            <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400"><%= situation.location %></p>
           <% end %>
-        </p>
-        <%= in_progress_badge situation %>
-      </div>
-      <h3 class="mt-1 font-display text-xl font-medium text-balance text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300">
-        <%= link_to situation.display_title, situation, class: "after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-teal-600" %>
+          <%= in_progress_badge situation %>
+        </div>
+      <% end %>
+      <h3 class="font-display text-xl/8 font-medium text-balance text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300">
+        <%= link_to situation.display_title, situation, class: "after:absolute after:inset-0 after:rounded-3xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-teal-600" %>
       </h3>
       <%# The original thought is what people scan for when looking for an entry. %>
-      <%# Skipped when the title was generated from the thought, so the row doesn't say it twice. %>
+      <%# Skipped when the title was generated from the thought, so the card doesn't say it twice. %>
       <% snippet = situation.thought_imagery.presence || situation.balanced_thought.presence %>
       <% if snippet && !snippet.squish.start_with?(situation.display_title.delete_suffix("...")) %>
-        <p class="mt-2 line-clamp-2 text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= snippet %></p>
-      <% end %>
-      <% if situation.distortions.any? %>
-        <ul role="list" class="mt-3 flex flex-wrap gap-1.5">
-          <% situation.distortions.sort_by(&:title).each do |distortion| %>
-            <li class="badge"><%= distortion.title %></li>
-          <% end %>
-        </ul>
+        <p class="mt-2 line-clamp-2 max-w-[60ch] text-base/7 text-pretty text-stone-600 dark:text-stone-400"><%= snippet %></p>
       <% end %>
       <% if (step = situation.next_step) %>
         <%= link_to situation_step_path(situation, step), class: "relative mt-3 inline-flex items-center gap-1 text-base/6 font-medium text-teal-700 hover:text-teal-600 hover:underline sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300" do %>
           Continue this entry<span class="sr-only">: <%= situation.display_title %></span>
         <% end %>
       <% end %>
+
+      <% if situation.distortions.any? || situation.emotion_level || situation.emotions.any? %>
+        <div class="mt-5 flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
+          <% if situation.distortions.any? %>
+            <ul role="list" class="flex flex-wrap gap-1.5">
+              <% situation.distortions.sort_by(&:title).each do |distortion| %>
+                <li class="badge"><%= distortion.title %></li>
+              <% end %>
+            </ul>
+          <% end %>
+          <% if situation.emotion_level || situation.emotions.any? %>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 sm:ml-auto">
+              <% if situation.emotions.any? %>
+                <p class="text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= situation.emotions.to_sentence %></p>
+              <% end %>
+              <% if situation.emotion_level %>
+                <%= render "shared/emotion_level", level: situation.emotion_level %>
+              <% end %>
+              <% if (shift = feeling_shift(situation)) %>
+                <p class="text-base/6 text-teal-800 sm:text-sm/6 dark:text-teal-300"><%= shift %></p>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
-    <% if situation.emotion_level || situation.emotions.any? %>
-      <div class="flex shrink-0 flex-col gap-1 sm:items-end sm:pt-7">
-        <% if situation.emotions.any? %>
-          <p class="text-base/6 text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= situation.emotions.to_sentence %></p>
-        <% end %>
-        <% if situation.emotion_level %>
-          <%= render "shared/emotion_level", level: situation.emotion_level %>
-        <% end %>
-        <% if (shift = feeling_shift(situation)) %>
-          <p class="text-base/6 text-teal-800 sm:text-sm/6 dark:text-teal-300"><%= shift %></p>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+  </article>
 </li>

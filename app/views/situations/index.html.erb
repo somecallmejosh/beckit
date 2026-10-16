@@ -1,4 +1,4 @@
-<% content_for :title, @distortion ? "#{@distortion.title} entries" : "Journal" %>
+<% content_for :title, [ @distortion ? "#{@distortion.title} entries" : "Journal", ("page #{@page}" if @page > 1) ].compact.join(", ") %>
 
 <div class="page">
   <div class="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-16">
@@ -42,19 +42,24 @@
           </section>
         <% end %>
 
-        <div class="flex items-center justify-between">
-          <%= link_to "New entry", new_situation_path, class: "btn btn-primary self-start" %>
+        <%# One toolbar: the two buttons share a size and a row, and the search panel opens beneath them at the
+            list's full width. The toggle sits in the row's corner (absolute), so opening it doesn't move "New entry". %>
+        <div id="entries" class="relative scroll-mt-24">
+          <%= link_to new_situation_path, class: "btn btn-primary" do %><%= icon :plus %> New entry<% end %>
 
           <%# Search is occasional, so it stays folded away until asked for, or while a search or filter is showing. %>
-          <details class="group/search flex flex-col flex-1" <%= "open" if @match_count %>>
-            <summary class="btn-sm btn-ghost list-none [&::-webkit-details-marker]:hidden border border-stone-950/10 lg:ml-auto">
-              <%= icon :magnifying_glass %>
-              <span class="group-open/search:hidden">Search entries</span><span class="group-not-open/search:hidden">Hide search</span>
+          <details class="group/search" <%= "open" if @match_count %>>
+            <summary class="btn btn-secondary absolute top-0 right-0 list-none [&::-webkit-details-marker]:hidden group-open/search:bg-stone-50 dark:group-open/search:bg-white/10">
+              <span class="group-open/search:hidden contents"><%= icon :magnifying_glass %> Search entries</span>
+              <span class="group-not-open/search:hidden contents"><%= icon :x_mark %> Hide search</span>
             </summary>
-            <%= form_with url: situations_path, method: :get, html: { role: "search" }, class: "mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 panel p-4 sm:grid-cols-[minmax(0,1fr)_14rem_auto] sm:p-5" do |form| %>
+            <%= form_with url: situations_path, method: :get, html: { role: "search" }, class: "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 panel p-4 motion-safe:animate-reveal sm:grid-cols-[minmax(0,1fr)_14rem_auto] sm:p-5" do |form| %>
               <div class="col-span-2 flex flex-col gap-2 sm:col-span-1">
                 <%= form.label :q, "Words to find", class: "field-label" %>
-                <%= form.search_field :q, value: @query, class: "field" %>
+                <div class="relative">
+                  <%= icon :magnifying_glass, "pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-stone-400" %>
+                  <%= form.search_field :q, value: @query, class: "field pl-9" %>
+                </div>
               </div>
               <div class="flex min-w-0 flex-col gap-2">
                 <%= form.label :distortion_id, "Thinking trap", class: "field-label" %>
@@ -66,11 +71,22 @@
           </details>
         </div>
 
-        <div id="situations" class="flex flex-col gap-10">
+        <%# Past the first page the list looks just like the first, so say where in the journal this is. %>
+        <% if @page > 1 && @situations.any? %>
+          <div id="page_status" class="flex flex-col gap-3 rounded-2xl panel px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p role="status" class="flex flex-col text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">
+              <span class="font-medium text-stone-900 dark:text-white">Page <%= @page %> of <%= @page_count %></span>
+              <span>Entries from <span class="whitespace-nowrap"><%= l @situations.first.date, format: :entry_date %></span> back to <span class="whitespace-nowrap"><%= l @situations.last.date, format: :entry_date %></span></span>
+            </p>
+            <%= link_to situations_path(filters.merge(anchor: "entries")), class: "btn-sm btn-ghost -mx-3 self-start sm:mx-0 sm:self-auto" do %><%= icon :arrow_left %> Newest entries<% end %>
+          </div>
+        <% end %>
+
+        <div id="situations" class="flex flex-col gap-14">
           <% @situations.group_by { it.date.beginning_of_month }.each do |month, situations| %>
             <section aria-labelledby="month_<%= month.strftime("%Y_%m") %>">
-              <h2 id="month_<%= month.strftime("%Y_%m") %>" class="border-b border-stone-950/5 pb-2 text-base/6 font-medium text-stone-500 sm:text-sm/6 dark:border-white/10 dark:text-stone-400"><%= l month, format: "%B %Y" %></h2>
-              <ul role="list" class="divide-y divide-stone-950/5 dark:divide-white/10">
+              <h2 id="month_<%= month.strftime("%Y_%m") %>" class="mb-5 font-display text-lg/7 font-medium text-stone-900 dark:text-white"><%= l month, format: "%B %Y" %><% if month == @continued_month %><span class="font-normal text-stone-400 dark:text-stone-500">, continued</span><% end %></h2>
+              <ul role="list" class="flex flex-col gap-4">
                 <%= render situations %>
               </ul>
             </section>
@@ -82,14 +98,16 @@
         <% end %>
 
         <% if @page > 1 || @older_page %>
-          <nav aria-label="Pages" class="flex items-center justify-between gap-4 border-t border-stone-950/5 pt-6 dark:border-white/10">
+          <%# Page links land on the list, not the page top: on a phone the greeting would otherwise fill the screen. %>
+          <nav aria-label="Pages" class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 border-t border-stone-950/5 pt-6 dark:border-white/10">
             <% if @page > 1 %>
-              <%= link_to situations_path(filters.merge(page: (@page - 1 if @page > 2)).compact), class: "btn btn-secondary" do %><%= icon :arrow_left %> Newer entries<% end %>
+              <%= link_to situations_path(filters.merge(page: (@page - 1 if @page > 2), anchor: "entries").compact), class: "btn btn-secondary justify-self-start" do %><%= icon :arrow_left %> <span><span class="max-sm:hidden">Newer entries</span><span class="sm:hidden">Newer</span></span><% end %>
             <% else %>
               <span></span>
             <% end %>
+            <p class="text-base/6 text-stone-500 tabular-nums sm:text-sm/6 dark:text-stone-400">Page <%= @page %> of <%= @page_count %></p>
             <% if @older_page %>
-              <%= link_to "Older entries", situations_path(filters.merge(page: @page + 1)), class: "btn btn-secondary" %>
+              <%= link_to situations_path(filters.merge(page: @page + 1, anchor: "entries")), class: "btn btn-secondary justify-self-end" do %><span class="max-sm:hidden">Older entries</span><span class="sm:hidden">Older</span><% end %>
             <% end %>
           </nav>
         <% end %>

@@ -1,7 +1,7 @@
 <%# locals: (insights:) %>
 <% distortion = insights.distortion %>
 <% row = insights.focus_row %>
-<article aria-labelledby="profile_heading" class="flex flex-col gap-12">
+<article aria-labelledby="profile_heading" class="flex flex-col gap-16">
   <header class="flex flex-col gap-8">
     <div>
       <h2 id="profile_heading" class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= distortion.title %></h2>
@@ -39,13 +39,15 @@
   <% else %>
     <%= render "insights/standouts", insights: %>
 
-    <div class="grid gap-12 xl:grid-cols-2 xl:gap-x-12">
-      <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/weekly", insights: %></div>
-      <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/pairs", insights: %></div>
-      <div class="min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10"><%= render "insights/heatmap", insights: %></div>
-      <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/ranked_groups", insights:, column: :location, title: "Where", noun: "place" %></div>
-      <div class="min-w-0 border-t border-stone-950/5 pt-10 dark:border-white/10"><%= render "insights/ranked_groups", insights:, column: :who_was_involved, title: "Who was involved", noun: "person" %></div>
-      <div class="min-w-0 border-t border-stone-950/5 pt-10 xl:col-span-2 dark:border-white/10"><%= render "insights/recent_entries", insights: %></div>
+    <%# One chart at a time, each headed by the question it answers. Where and who are short lists and a natural pair,
+        so they share a row on wide screens. %>
+    <%= render "insights/weekly", insights: %>
+    <%= render "insights/heatmap", insights: %>
+    <%= render "insights/pairs", insights: %>
+    <div class="grid gap-16 lg:grid-cols-2 lg:gap-12">
+      <div class="min-w-0"><%= render "insights/ranked_groups", insights:, column: :location, title: "Where it happens", noun: "place" %></div>
+      <div class="min-w-0"><%= render "insights/ranked_groups", insights:, column: :who_was_involved, title: "Who you were with", noun: "person" %></div>
     </div>
+    <%= render "insights/recent_entries", insights: %>
   <% end %>
 </article>

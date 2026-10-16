@@ -3,7 +3,7 @@
 <% pairs = insights.pairs %>
 <% max = pairs.map(&:count).max.to_i %>
 <section aria-labelledby="pairs_heading" class="flex min-w-0 flex-col gap-6">
-  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "pairs_heading", title: (focus ? "Often with" : "Together"),
+  <%= render "insights/section_heading", level: (insights.distortion ? 3 : 2), id: "pairs_heading", title: (focus ? "What it shows up alongside" : "Which traps show up together"),
         description: focus ? "Other thinking traps logged in the same entry as #{focus.title.downcase}, and how often." : "Thinking traps that most often show up in the same entry." %>
 
   <% if pairs.empty? %>

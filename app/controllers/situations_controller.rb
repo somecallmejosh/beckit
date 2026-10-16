@@ -61,9 +61,14 @@ class SituationsController < ApplicationController
       @match_count = situations.count if @query.present? || @distortion
 
       @page = [ params[:page].to_i, 1 ].max
-      records = situations.offset((@page - 1) * PER_PAGE).limit(PER_PAGE + 1).to_a
-      @older_page = records.size > PER_PAGE
-      @situations = records.first(PER_PAGE)
+      @page_count = [ ((@match_count || situations.count) / PER_PAGE.to_f).ceil, 1 ].max
+      @older_page = @page < @page_count
+      offset = (@page - 1) * PER_PAGE
+      @situations = situations.offset(offset).limit(PER_PAGE).to_a
+      # The month at the top of a later page may have started on the page before; its heading says so.
+      if @page > 1 && (first = @situations.first)
+        @continued_month = first.date.beginning_of_month if situations.offset(offset - 1).limit(1).pick(:date)&.beginning_of_month == first.date.beginning_of_month
+      end
     end
 
     # Scoped to the current user so other users' situations are not reachable.
