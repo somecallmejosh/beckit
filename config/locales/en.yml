@@ -34,9 +34,18 @@ en:
       entry: "%B %-d, %Y at %-l:%M %p"
       entry_date: "%b %-d, %Y"
   activerecord:
+    errors:
+      models:
+        situation:
+          attributes:
+            distortion_ids:
+              blank: "need at least one picked"
     attributes:
       user:
         password_challenge: "Current password"
       situation:
+        title: "Short name"
+        thought_imagery: "What went through your mind"
+        distortion_ids: "Thinking traps"
         emotions: "Feelings"
         emotion_level_after: "Feeling now"

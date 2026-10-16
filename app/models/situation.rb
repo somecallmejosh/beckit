@@ -1,6 +1,10 @@
 class Situation < ApplicationRecord
   EMOTIONS = %w[ Anxious Sad Angry Ashamed Guilty Frustrated Hurt Lonely Overwhelmed Hopeless ].freeze
   RESTORE_WINDOW = 30.days
+  # The entry form's pages, in order, each with the one answer it needs before it saves. The first creates the entry.
+  REQUIRED_ANSWERS = { "whats-on-your-mind" => :thought_imagery, "what-happened" => :title,
+    "name-the-pattern" => :distortion_ids, "weigh-it-up" => :balanced_thought }.freeze
+  STEPS = REQUIRED_ANSWERS.keys.freeze
   SEARCHABLE = %w[ title thought_imagery location who_was_involved evidence_for evidence_against balanced_thought ].freeze
 
   belongs_to :user
@@ -16,14 +20,47 @@ class Situation < ApplicationRecord
     where(SEARCHABLE.map { "situations.#{it} ILIKE :pattern" }.join(" OR "), pattern:)
   }
 
-  normalizes :location, :who_was_involved, with: ->(value) { value.squish.presence }
+  normalizes :title, :location, :who_was_involved, with: ->(value) { value.squish.presence }
   normalizes :emotions, with: ->(list) { list.compact_blank.uniq }
 
-  before_validation :default_title
-
-  validates :title, :date, presence: true
+  validates :date, presence: true
+  REQUIRED_ANSWERS.each { |step, attribute| validates attribute, presence: true, on: step.underscore.to_sym }
   validates :emotion_level, :emotion_level_after, numericality: { only_integer: true, in: 0..10 }, allow_nil: true
   validate { errors.add(:emotions, "include one we don't recognize") unless (emotions - EMOTIONS).empty? }
+
+  # Saves one page of the entry form, checking that page's question. Rolls back if it can't: assigning
+  # distortion_ids to a saved entry writes the links straight away. The save that answers the last open
+  # question adds one to the user's finished entries (see #just_completed?).
+  def save_step(step, attributes)
+    was_complete = complete?
+    @just_completed = false
+    transaction do
+      assign_attributes(attributes)
+      save(context: step.underscore.to_sym) || raise(ActiveRecord::Rollback)
+      if complete? && !was_complete
+        user.increment!(:finished_entries_count)
+        @just_completed = true
+      end
+      true
+    end || false
+  end
+
+  # Whether the last #save_step finished this entry.
+  def just_completed? = @just_completed.present?
+
+  def answered?(step) = public_send(REQUIRED_ANSWERS.fetch(step)).present?
+
+  # The first step still waiting for its answer, or nil once every step has one.
+  def next_step = STEPS.find { !answered?(it) }
+  def complete? = next_step.nil?
+
+  # Steps open in order: any up to the first one still waiting for its answer.
+  def reachable?(step) = complete? || STEPS.index(step) <= STEPS.index(next_step)
+
+  # The short name, or until it's given on the second step, the start of the thought or the date.
+  def display_title
+    title.presence || thought_imagery.to_s.squish.truncate_words(6).truncate(60).presence || "Entry on #{I18n.l(date, format: :entry_date)}"
+  end
 
   def trash! = update!(deleted_at: Time.current)
   def restore! = update!(deleted_at: nil)
@@ -48,18 +85,4 @@ class Situation < ApplicationRecord
     value.is_a?(String) && value.start_with?("=", "+", "-", "@", "\t", "\r") ? "'#{value}" : value
   end
   private_class_method :spreadsheet_safe
-
-  private
-    # The title is optional in the form: use the start of the thought, or the date.
-    def default_title
-      return if title.present?
-
-      self.title = if thought_imagery.present?
-        thought_imagery.squish.truncate_words(6).truncate(60)
-      elsif date
-        "Entry on #{I18n.l(date, format: :entry_date)}"
-      else
-        "Untitled entry"
-      end
-    end
 end

@@ -29,6 +29,16 @@ class DistortionsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h2", "Your recent entries"
   end
 
+  test "your recent entries mark ones in progress" do
+    sign_in_as users(:one)
+    get distortion_url(distortions(:mind_reading))
+    assert_select "section[aria-labelledby=recent_entries_heading] .badge-sky", count: 0
+
+    situations(:one).update_column(:balanced_thought, nil)
+    get distortion_url(distortions(:mind_reading))
+    assert_select "section[aria-labelledby=recent_entries_heading] .badge-sky", "In progress"
+  end
+
   test "editing still requires sign-in" do
     sign_out
     get new_distortion_url

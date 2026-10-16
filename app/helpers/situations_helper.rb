@@ -1,4 +1,23 @@
 module SituationsHelper
+  STEP_TITLES = { "whats-on-your-mind" => "What's on your mind", "what-happened" => "What happened",
+    "name-the-pattern" => "Name the pattern", "weigh-it-up" => "Weigh it up" }.freeze
+
+  # The line under each step's heading.
+  STEP_INTROS = { "whats-on-your-mind" => "Take a breath. There's no right or wrong way to fill this in.",
+    "what-happened" => "Think back to the moment it started. A few details are enough.",
+    "name-the-pattern" => "Look at the thought again. Does it fall into a familiar thinking trap?",
+    "weigh-it-up" => "Set the thought beside the facts, then find a fairer way to say it." }.freeze
+
+  # Heading and nav label for one page of the entry form (Situation::STEPS).
+  def step_title(step) = STEP_TITLES.fetch(step)
+  def step_intro(step) = STEP_INTROS.fetch(step)
+
+  # Drawing that stands on the rule under a step's heading. All four share one square canvas with the
+  # figure's feet at the bottom, so they line up from step to step; each recolours itself for dark mode.
+  def step_image(step, **options)
+    image_tag "steps/#{step}.svg", alt: "", width: 1000, height: 1000, decoding: "async", **options
+  end
+
   # The sentence under a filtered journal's heading, e.g. "7 entries with this thinking trap, across your whole journal."
   def filter_summary(count, distortion:, query:)
     entries = pluralize(count, "entry")
@@ -6,6 +25,11 @@ module SituationsHelper
     elsif distortion then "#{entries} with this thinking trap, across your whole journal."
     else "#{entries} #{count == 1 ? "matches" : "match"} “#{query}”."
     end
+  end
+
+  # Marks an entry in a list when a step still waits for its answer (Situation#next_step).
+  def in_progress_badge(situation)
+    tag.span("In progress", class: "badge-sky") if situation.next_step
   end
 
   # Placeholder for an empty field on an entry, muted so recorded answers stand out.

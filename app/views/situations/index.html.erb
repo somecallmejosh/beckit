@@ -11,7 +11,6 @@
             <%= Current.user.birthday_today? ? "Be kind to yourself today." : "Notice the thought, weigh the evidence, and find a kinder way of seeing things." %>
           </p>
         </div>
-        <%= link_to "New entry", new_situation_path, class: "btn btn-primary self-start" %>
       </div>
 
       <% unless @summary.empty? %>
@@ -43,14 +42,29 @@
           </section>
         <% end %>
 
-        <%= form_with url: situations_path, method: :get, role: "search", class: "flex flex-col gap-3 sm:flex-row" do |form| %>
-          <%= form.label :q, "Search your entries", class: "sr-only" %>
-          <%= form.search_field :q, value: @query, placeholder: "Search your entries", class: "field min-w-0 sm:flex-1" %>
-          <%= form.label :distortion_id, "Thinking trap", class: "sr-only" %>
-          <%= form.select :distortion_id, options_from_collection_for_select(Distortion.order(:title), :id, :title, @distortion&.id),
-                { include_blank: "All thinking traps" }, class: "field sm:w-56" %>
-          <%= form.submit "Search", name: nil, class: "btn btn-secondary" %>
-        <% end %>
+        <div class="flex items-center justify-between">
+          <%= link_to "New entry", new_situation_path, class: "btn btn-primary self-start" %>
+
+          <%# Search is occasional, so it stays folded away until asked for, or while a search or filter is showing. %>
+          <details class="group/search flex flex-col flex-1" <%= "open" if @match_count %>>
+            <summary class="btn-sm btn-ghost list-none [&::-webkit-details-marker]:hidden border border-stone-950/10 lg:ml-auto">
+              <%= icon :magnifying_glass %>
+              <span class="group-open/search:hidden">Search entries</span><span class="group-not-open/search:hidden">Hide search</span>
+            </summary>
+            <%= form_with url: situations_path, method: :get, html: { role: "search" }, class: "mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 panel p-4 sm:grid-cols-[minmax(0,1fr)_14rem_auto] sm:p-5" do |form| %>
+              <div class="col-span-2 flex flex-col gap-2 sm:col-span-1">
+                <%= form.label :q, "Words to find", class: "field-label" %>
+                <%= form.search_field :q, value: @query, class: "field" %>
+              </div>
+              <div class="flex min-w-0 flex-col gap-2">
+                <%= form.label :distortion_id, "Thinking trap", class: "field-label" %>
+                <%= form.select :distortion_id, options_from_collection_for_select(Distortion.order(:title), :id, :title, @distortion&.id),
+                      { include_blank: "Any" }, class: "field" %>
+              </div>
+              <%= form.submit "Search", name: nil, class: "btn btn-secondary py-3 sm:py-2.5" %>
+            <% end %>
+          </details>
+        </div>
 
         <div id="situations" class="flex flex-col gap-10">
           <% @situations.group_by { it.date.beginning_of_month }.each do |month, situations| %>

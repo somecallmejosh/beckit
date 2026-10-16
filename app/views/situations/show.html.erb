@@ -1,4 +1,4 @@
-<% content_for :title, @situation.title %>
+<% content_for :title, @situation.display_title %>
 
 <div class="page">
   <div class="flex flex-col gap-6">
@@ -7,7 +7,12 @@
         <%= icon :arrow_left %> Journal
       <% end %>
       <div class="flex items-center gap-2">
-        <%= link_to "Edit", edit_situation_path(@situation), class: "btn-sm btn-secondary" %>
+        <%# An entry in progress picks up where it stopped; a finished one is edited from the first step. %>
+        <% if (step = @situation.next_step) %>
+          <%= link_to "Continue", situation_step_path(@situation, step), class: "btn-sm btn-primary" %>
+        <% else %>
+          <%= link_to "Edit", situation_step_path(@situation, Situation::STEPS.first), class: "btn-sm btn-secondary" %>
+        <% end %>
         <%= button_to "Delete", @situation, method: :delete, class: "btn-sm btn-danger" %>
       </div>
     </div>
@@ -21,7 +26,7 @@
         <p class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">
           <time datetime="<%= @situation.date.iso8601 %>"><%= l @situation.date, format: :entry %></time>
         </p>
-        <h1 class="mt-2 font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= @situation.title %></h1>
+        <h1 class="mt-2 font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= @situation.display_title %></h1>
         <% context = [ [ "Where", @situation.location ], [ "With", @situation.who_was_involved ] ].select { it.last.present? } %>
         <% if context.any? %>
           <dl class="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-base/6 sm:text-sm/6">

@@ -46,16 +46,50 @@ class SituationTest < ActiveSupport::TestCase
     assert_nil situation.who_was_involved
   end
 
-  test "title defaults to the start of the thought, then the date" do
+  test "until it has a short name, an entry shows the start of the thought, then the date" do
     situation = users(:one).situations.create!(date: Time.zone.local(2026, 10, 3, 9), thought_imagery: "Everyone in the room could tell I had no idea what I was saying")
-    assert_equal "Everyone in the room could tell...", situation.title
+    assert_nil situation.title
+    assert_equal "Everyone in the room could tell...", situation.display_title
 
     situation = users(:one).situations.create!(date: Time.zone.local(2026, 10, 3, 9))
-    assert_equal "Entry on Oct 3, 2026", situation.title
+    assert_equal "Entry on Oct 3, 2026", situation.display_title
+
+    situation.update!(title: "  Stand-up  ")
+    assert_equal "Stand-up", situation.display_title
 
     situation = users(:one).situations.build
     assert_not situation.valid?
     assert_equal [ "Date can't be blank" ], situation.errors.full_messages
+  end
+
+  test "each step of the form has one required answer" do
+    situation = users(:one).situations.build(date: Time.current)
+    assert_not situation.save_step("whats-on-your-mind", thought_imagery: " ")
+    assert situation.save_step("whats-on-your-mind", thought_imagery: "I froze")
+
+    assert_not situation.save_step("what-happened", title: "")
+    assert situation.save_step("what-happened", title: "Stand-up")
+
+    situation.save_step("name-the-pattern", distortion_ids: [ distortions(:catastrophizing).id ])
+    assert_not situation.save_step("name-the-pattern", distortion_ids: [ "" ])
+    assert_equal [ distortions(:catastrophizing) ], situation.reload.distortions
+
+    assert_not situation.save_step("weigh-it-up", balanced_thought: "")
+    assert situation.save_step("weigh-it-up", balanced_thought: "One pause is normal")
+  end
+
+  test "the next step is the first without its answer, and steps past it are out of reach" do
+    situation = users(:one).situations.build(date: Time.current)
+    assert_equal "whats-on-your-mind", situation.next_step
+    assert_not situation.reachable?("what-happened")
+
+    situation.update!(thought_imagery: "I froze", balanced_thought: "It happens")
+    assert_equal "what-happened", situation.next_step
+    assert situation.reachable?("what-happened")
+    assert_not situation.reachable?("weigh-it-up")
+
+    assert_nil situations(:one).next_step
+    assert situations(:one).reachable?("weigh-it-up")
   end
 
   test "emotions are cleaned up and limited to the known list" do

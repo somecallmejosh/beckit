@@ -50,8 +50,11 @@
                 <% @recent_entries.each do |situation| %>
                   <li>
                     <%= link_to situation, class: "row-link flex flex-col py-1.5" do %>
-                      <time datetime="<%= situation.date.iso8601 %>" class="text-base/6 text-stone-500 sm:text-xs/5 dark:text-stone-400"><%= l situation.date, format: :entry_date %></time>
-                      <span class="truncate text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white"><%= situation.title %></span>
+                      <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <time datetime="<%= situation.date.iso8601 %>" class="text-base/6 text-stone-500 sm:text-xs/5 dark:text-stone-400"><%= l situation.date, format: :entry_date %></time>
+                        <%= in_progress_badge situation %>
+                      </span>
+                      <span class="truncate text-base/6 font-medium text-stone-900 sm:text-sm/6 dark:text-white"><%= situation.display_title %></span>
                     <% end %>
                   </li>
                 <% end %>

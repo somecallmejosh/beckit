@@ -16,7 +16,7 @@ class DistortionsController < ApplicationController
 
     entries = Current.user.situations.joins(:situation_distortions).where(situation_distortions: { distortion_id: @distortion.id })
     @entry_count = entries.count
-    @recent_entries = entries.order(date: :desc).limit(5)
+    @recent_entries = entries.includes(:distortions).order(date: :desc).limit(5)
   end
 
   # GET /distortions/new

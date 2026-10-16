@@ -12,6 +12,19 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_url
   end
 
+  test "the plant grows a stage for every ten finished entries" do
+    @user.update_column(:finished_entries_count, 1)
+    get edit_settings_url
+    assert_select "#plant p", text: /finished 1 entry\.\s+9 more until it's planted\./
+    assert_includes milestone_images, "seed-locked"
+
+    @user.update_column(:finished_entries_count, 10)
+    get edit_settings_url
+    assert_select "#plant p", text: /finished 10 entries\.\s+10 more until it's a sprout\./
+    assert_includes milestone_images, "seed"
+    assert_includes milestone_images, "sprout-locked"
+  end
+
   test "shows the current time zone selected" do
     get edit_settings_url
     assert_response :success
@@ -41,8 +54,8 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
 
   test "dates use the chosen time zone" do
     @user.update!(time_zone: "America/Los_Angeles")
-    post situations_url, params: { situation: { title: "Pacific", date: "2026-10-01T21:00" } }
-    assert_equal Time.utc(2026, 10, 2, 4, 0), Situation.last.date
+    patch situation_step_url(situations(:one), "what-happened"), params: { situation: { date: "2026-10-01T21:00" } }
+    assert_equal Time.utc(2026, 10, 2, 4, 0), situations(:one).reload.date
   end
 
   test "updates profile fields" do
@@ -85,4 +98,10 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "footer a[href='tel:116123']", text: "116 123"
     assert_select "footer p", text: /contact Samaritans at/
   end
+
+  private
+    # Stage drawings on the page, e.g. "seed" or "sprout-locked" (asset digests stripped).
+    def milestone_images
+      css_select("img[src*='milestones/']").map { it["src"][%r{milestones/([a-z-]+?)(?:-[0-9a-f]{8,})?\.svg}, 1] }
+    end
 end

@@ -1,9 +1,10 @@
 class SituationsController < ApplicationController
-  WHO_PRESETS = %w[ Self Colleague Spouse Daughter Son Parent Friend ].freeze
+  include SituationSteps
+
   PER_PAGE = 20
 
-  before_action :set_situation, only: %i[ show edit update destroy ]
-  before_action :set_distortions, :set_suggestions, only: %i[ new edit create update ]
+  before_action :set_situation, only: %i[ show destroy ]
+  before_action :set_distortions, :set_suggestions, only: %i[ new create ]
 
   # GET /situations
   # GET /situations?q=&distortion_id=&insights_range=&page= ; GET /situations.csv exports every entry (linked from Settings).
@@ -24,32 +25,19 @@ class SituationsController < ApplicationController
   def show
   end
 
-  # GET /situations/new
+  # GET /situations/new ; the first step. The date is on the second, so it starts as now.
   def new
     @situation = Current.user.situations.build(date: Time.current.change(sec: 0))
   end
 
-  # GET /situations/1/edit
-  def edit
-  end
-
-  # POST /situations
+  # POST /situations ; saves the first step, then goes where its button says (see SituationSteps).
   def create
-    @situation = Current.user.situations.build(situation_params)
+    @situation = Current.user.situations.build(date: Time.current.change(sec: 0))
 
-    if @situation.save
-      redirect_to @situation, notice: "Entry saved."
+    if @situation.save_step(Situation::STEPS.first, situation_params)
+      redirect_after_step @situation
     else
       render :new, status: :unprocessable_content
-    end
-  end
-
-  # PATCH/PUT /situations/1
-  def update
-    if @situation.update(situation_params)
-      redirect_to @situation, notice: "Entry updated.", status: :see_other
-    else
-      render :edit, status: :unprocessable_content
     end
   end
 
@@ -81,28 +69,5 @@ class SituationsController < ApplicationController
     # Scoped to the current user so other users' situations are not reachable.
     def set_situation
       @situation = Current.user.situations.find(params.expect(:id))
-    end
-
-    # The user's most-used thinking traps first, then alphabetical.
-    def set_distortions
-      usage = Current.user.situations.joins(:situation_distortions).group("situation_distortions.distortion_id").count
-      @distortions = Distortion.order(:title).sort_by { [ -usage.fetch(it.id, 0), it.title ] }
-      @distortions_used = usage.any?
-    end
-
-    # Past answers (most used first) offered as datalist suggestions.
-    def set_suggestions
-      @location_options = past_values(:location)
-      @who_options = (WHO_PRESETS + past_values(:who_was_involved)).uniq(&:downcase)
-    end
-
-    def past_values(column)
-      Current.user.situations.where.not(column => nil).group(column).order(Arel.sql("COUNT(*) DESC"), column).pluck(column)
-    end
-
-    # Only allow a list of trusted parameters through. user_id is set from Current.user.
-    def situation_params
-      params.expect(situation: [ :title, :date, :location, :distortion_id, :who_was_involved, :thought_imagery, :emotion_level, :emotion_level_after,
-        :evidence_for, :evidence_against, :balanced_thought, distortion_ids: [], emotions: [] ])
     end
 end

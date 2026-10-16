@@ -1,0 +1,24 @@
+<%# locals: (form:, situation:) %>
+<div class="grid gap-6 sm:grid-cols-2">
+  <div class="flex flex-col gap-2">
+    <%= form.label :date, "When did this occur?", class: "field-label" %>
+    <%= form.datetime_field :date, required: true, step: 60, value: situation.date&.strftime("%Y-%m-%dT%H:%M"), class: "field" %>
+  </div>
+  <div class="flex flex-col gap-2">
+    <%= form.label :location, "Where were you when it happened?", class: "field-label" %>
+    <%= render "situations/suggested_field", form:, field: :location, options: @location_options %>
+  </div>
+</div>
+
+<div class="flex flex-col gap-2">
+  <%= form.label :who_was_involved, "Who was involved?", class: "field-label" %>
+  <%= render "situations/suggested_field", form:, field: :who_was_involved, options: @who_options %>
+</div>
+
+<div class="flex flex-col gap-2">
+  <div>
+    <%= form.label :title, "Give this entry a short name", class: "field-label" %>
+    <p id="title_hint" class="field-hint">A few words to help you find this entry later.</p>
+  </div>
+  <%= form.text_field :title, required: true, placeholder: "e.g. Presentation at work", class: "field", aria: { describedby: "title_hint" } %>
+</div>

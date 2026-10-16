@@ -1,0 +1,23 @@
+<%# locals: (form:, situation:) %>
+<%# Thought and feeling come first: they are what's pressing when someone opens a new entry. %>
+<div class="flex flex-col gap-2">
+  <div>
+    <%= form.label :thought_imagery, "What went through your mind?", class: "field-label" %>
+    <p id="thought_imagery_hint" class="field-hint">Words, images, or memories that came up in the moment.</p>
+  </div>
+  <%= form.textarea :thought_imagery, rows: 4, required: true, autofocus: situation.new_record?, class: "field", aria: { describedby: "thought_imagery_hint" } %>
+</div>
+
+<fieldset id="situation_emotions" aria-describedby="emotions_hint" class="flex flex-col gap-2">
+  <legend class="field-label">What did you feel?</legend>
+  <p id="emotions_hint" class="field-hint">Pick any that fit, or none.</p>
+  <%= hidden_field_tag "situation[emotions][]", "", id: nil %>
+  <div class="flex flex-wrap gap-2 pt-1">
+    <% Situation::EMOTIONS.each do |emotion| %>
+      <%= render "situations/chip", name: "situation[emotions][]", value: emotion, label: emotion, checked: situation.emotions.include?(emotion), id: "situation_emotions_#{emotion.downcase}" %>
+    <% end %>
+  </div>
+</fieldset>
+
+<%= render "situations/intensity", form:, attribute: :emotion_level, legend: "How strong was the feeling?",
+      hint: "0 is barely noticeable, 10 is the most intense you can imagine." %>

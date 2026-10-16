@@ -1,0 +1,13 @@
+<%# A balloon that rises once, from below the window and out the top, after an entry's last question is answered.
+    Decorative: the "Entry complete." notice says the same thing. Turbo leaves it out of the page cache so Back doesn't
+    replay it, and reduced motion skips it. %>
+<div data-turbo-temporary aria-hidden="true" class="pointer-events-none fixed inset-0 z-50 overflow-hidden motion-reduce:hidden">
+  <div class="absolute top-full left-[62%] w-20 animate-balloon-rise sm:w-24">
+    <svg viewBox="0 0 120 264" fill="none" stroke-linecap="round" stroke-linejoin="round" class="w-full origin-[50%_25%] animate-balloon-sway">
+      <path d="M60 134c-9 22 12 40-1 62s9 38 1 64" class="stroke-stone-800 dark:stroke-stone-300" stroke-width="3" />
+      <path d="M53 134l7-10 7 10z" class="fill-teal-600 stroke-stone-800 dark:fill-teal-500 dark:stroke-stone-300" stroke-width="3.5" />
+      <path d="M60 6C30 6 12 30 12 58c0 34 28 60 48 66 20-6 48-32 48-66C108 30 90 6 60 6z" class="fill-teal-600 stroke-stone-800 dark:fill-teal-500 dark:stroke-stone-300" stroke-width="3.5" />
+      <path d="M32 46c2-11 10-20 21-23" class="stroke-white/70" stroke-width="6" />
+    </svg>
+  </div>
+</div>

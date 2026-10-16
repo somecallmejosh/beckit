@@ -1,0 +1,27 @@
+<%# locals: (form:, situation:) %>
+<fieldset id="situation_distortion_ids" aria-describedby="distortions_hint" class="flex flex-col gap-2">
+  <legend class="field-label">Which thinking traps might be at play?</legend>
+  <p id="distortions_hint" class="field-hint">Choose at least one that fits.<% if @distortions_used %> The ones you use most are first.<% end %></p>
+  <%= hidden_field_tag "situation[distortion_ids][]", "", id: nil %>
+  <div class="flex flex-wrap gap-2 pt-1">
+    <% @distortions.each do |distortion| %>
+      <% checkbox_id = "situation_distortion_ids_#{distortion.id}" %>
+      <%= render "situations/chip", name: "situation[distortion_ids][]", value: distortion.id, label: distortion.title,
+            checked: situation.distortion_ids.include?(distortion.id), id: checkbox_id, describedby: "#{checkbox_id}_description" %>
+    <% end %>
+  </div>
+</fieldset>
+
+<details class="group/meanings">
+  <summary class="inline-flex cursor-pointer list-none items-center gap-1 text-base/6 font-medium text-teal-700 hover:text-teal-600 sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300 [&::-webkit-details-marker]:hidden">
+    <span class="group-open/meanings:hidden">What do these mean?</span><span class="group-not-open/meanings:hidden">Hide descriptions</span>
+  </summary>
+  <dl class="mt-4 grid gap-x-8 gap-y-4 text-base/6 sm:grid-cols-2 sm:text-sm/6">
+    <% @distortions.each do |distortion| %>
+      <div>
+        <dt class="font-medium text-stone-900 dark:text-white"><%= distortion.title %></dt>
+        <dd id="situation_distortion_ids_<%= distortion.id %>_description" class="mt-0.5 text-pretty text-stone-500 dark:text-stone-400"><%= distortion.description %></dd>
+      </div>
+    <% end %>
+  </dl>
+</details>

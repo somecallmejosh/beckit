@@ -7,10 +7,12 @@
       <h1 class="font-display text-4xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">Settings</h1>
     </div>
 
+    <%= render "settings/milestones", user: @user %>
+
     <%= form_with(model: @user, url: settings_path, method: :patch, multipart: true, class: "flex flex-col gap-12") do |form| %>
       <%= render "shared/form_errors", record: @user %>
 
-      <div class="form-section">
+      <div class="form-section border-t border-stone-950/5 pt-12 dark:border-white/10">
         <div class="flex flex-col gap-1">
           <h2 class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white">Profile</h2>
           <p class="field-hint">How the app greets you and shows you.</p>

@@ -4,13 +4,13 @@
 <section aria-labelledby="intro_heading" class="flex flex-col gap-8 panel p-6 sm:p-10">
   <div>
     <h2 id="intro_heading" class="font-display text-2xl font-medium tracking-tight text-balance text-stone-900 dark:text-white">A quiet place to begin</h2>
-    <p class="mt-2 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">Each entry is a short thought record. Take it at your own pace; every part except the date is optional.</p>
+    <p class="mt-2 max-w-[56ch] text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">Each entry is a short thought record. Take it at your own pace; each page asks for just one answer, and the rest is up to you.</p>
   </div>
 
   <ol role="list" class="flex flex-col gap-6">
     <% [
       [ "Write down a moment", "Pick one moment that felt heavy. A sentence about what went through your mind is enough." ],
-      [ "Name the pattern", capture { concat "Tag any thinking traps that seem to fit. "; concat link_to("Browse the thinking traps", distortions_path, class: link_class) } ],
+      [ "Name the pattern", capture { concat "Tag the thinking traps that seem to fit. "; concat link_to("Browse the thinking traps", distortions_path, class: link_class) } ],
       [ "Weigh it up", "Note the evidence for and against the thought, then try a kinder, more balanced one." ]
     ].each.with_index(1) do |(title, body), step| %>
       <li class="flex gap-4">

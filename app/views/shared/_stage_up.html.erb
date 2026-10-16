@@ -1,0 +1,21 @@
+<%# locals: (milestone:) %>
+<%# Shown instead of the balloon when finishing an entry reaches the plant's next stage: a card rises from the bottom,
+    the stage's pale sketch fills in to its drawing with a small teal burst, then the card sinks away. Decorative: the
+    notice names the stage and links to the plant. Left out of Turbo's page cache, and skipped with reduced motion. %>
+<div data-turbo-temporary aria-hidden="true" class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center overflow-hidden px-4 pt-8 pb-6 motion-reduce:hidden">
+  <div class="flex animate-stage-card items-center gap-5 rounded-3xl bg-white py-4 pr-8 pl-4 shadow-xl shadow-stone-950/10 ring-1 ring-stone-950/5 dark:bg-stone-900 dark:shadow-none dark:ring-white/10">
+    <div class="relative size-28 shrink-0">
+      <%= image_tag "milestones/#{milestone.slug}-locked.svg", alt: "", width: 900, height: 900, class: "absolute inset-0 size-full animate-stage-sketch" %>
+      <%= image_tag "milestones/#{milestone.slug}.svg", alt: "", width: 900, height: 900, class: "absolute inset-0 size-full animate-stage-drawing" %>
+      <% 6.times do |i| %>
+        <% angle = (i * 60 - 90) * Math::PI / 180 %>
+        <span class="absolute top-2/5 left-1/2 -mt-1 -ml-1 size-2 rounded-full bg-teal-500 opacity-0 animate-stage-burst dark:bg-teal-400"
+              style="--burst-x: <%= (Math.cos(angle) * 56).round %>px; --burst-y: <%= (Math.sin(angle) * 56).round %>px"></span>
+      <% end %>
+    </div>
+    <div>
+      <p class="font-display text-2xl font-medium tracking-tight text-stone-900 dark:text-white"><%= milestone.name %></p>
+      <p class="text-base/6 text-stone-600 tabular-nums sm:text-sm/6 dark:text-stone-400"><%= milestone.entries %> entries finished</p>
+    </div>
+  </div>
+</div>

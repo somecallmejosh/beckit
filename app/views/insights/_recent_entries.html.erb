@@ -9,10 +9,13 @@
       <li>
         <%= link_to situation, data: { turbo_frame: "_top" }, class: "group row-link flex items-center justify-between gap-6 py-3" do %>
           <div class="min-w-0">
-            <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
-              <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time><% if situation.location.present? %> · <%= situation.location %><% end %>
-            </p>
-            <p class="truncate font-display text-lg font-medium text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300"><%= situation.title %></p>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
+                <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time><% if situation.location.present? %> · <%= situation.location %><% end %>
+              </p>
+              <%= in_progress_badge situation %>
+            </div>
+            <p class="truncate font-display text-lg font-medium text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300"><%= situation.display_title %></p>
           </div>
           <% if situation.emotion_level %>
             <div class="shrink-0"><%= render "shared/emotion_level", level: situation.emotion_level %></div>

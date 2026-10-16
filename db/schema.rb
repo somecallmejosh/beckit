@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_12_181634) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,7 +80,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_181634) do
   end
 
   create_table "situations", force: :cascade do |t|
-    t.string "title", null: false
+    t.string "title"
     t.datetime "date", null: false
     t.string "location"
     t.string "who_was_involved"
@@ -114,6 +114,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_181634) do
     t.date "date_of_birth"
     t.string "crisis_contact_name"
     t.string "crisis_contact_phone"
+    t.integer "finished_entries_count", default: 0, null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

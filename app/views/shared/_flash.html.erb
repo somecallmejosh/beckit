@@ -3,6 +3,11 @@
     <p><%= notice %></p>
     <%= button_to "Undo", situation_restoration_path(flash[:undo_situation_id]), class: "btn-sm btn-secondary" %>
   </div>
+<% elsif notice.present? && flash[:grown] %>
+  <div id="notice" role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl panel-teal px-4 py-3 text-base/6 text-pretty text-teal-900 sm:text-sm/6 dark:text-teal-200">
+    <p><%= notice %></p>
+    <%= link_to "See your plant", edit_settings_path(anchor: "plant"), class: "btn-sm btn-secondary" %>
+  </div>
 <% elsif notice.present? %>
   <p id="notice" role="status" class="rounded-2xl panel-teal px-4 py-3 text-base/6 text-pretty text-teal-900 sm:text-sm/6 dark:text-teal-200"><%= notice %></p>
 <% end %>

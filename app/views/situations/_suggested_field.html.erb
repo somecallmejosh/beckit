@@ -1,0 +1,22 @@
+<%# locals: (form:, field:, options:) %>
+<%# A free-text field offering the user's past answers as a filterable list (see combobox_controller.js). New answers are saved
+    with the entry and offered from then on. Without past answers it's a plain text field. %>
+<% if options.empty? %>
+  <%= form.text_field field, placeholder: "Optional", autocomplete: "off", class: "field" %>
+<% else %>
+  <% listbox_id = form.field_id(field, :options) %>
+  <div class="relative" data-controller="combobox">
+    <%= form.text_field field, placeholder: "Optional", autocomplete: "off", class: "field", role: "combobox",
+          aria: { autocomplete: "list", expanded: false, controls: listbox_id },
+          data: { combobox_target: "input",
+            action: "focus->combobox#open click->combobox#open input->combobox#filter keydown->combobox#navigate blur->combobox#close" } %>
+    <ul id="<%= listbox_id %>" role="listbox" aria-label="Past answers" hidden data-combobox-target="listbox"
+        class="absolute inset-x-0 top-full z-10 mt-1 max-h-60 overflow-y-auto overscroll-contain rounded-xl bg-white p-1 shadow-lg ring-1 ring-stone-950/10 dark:bg-stone-900 dark:shadow-none dark:ring-white/10">
+      <% options.each_with_index do |option, i| %>
+        <%= tag.li option, id: "#{listbox_id}_#{i}", role: "option", aria: { selected: false },
+              data: { combobox_target: "option", action: "mousedown->combobox#pick:prevent" },
+              class: "cursor-pointer truncate rounded-lg px-2.5 py-2 text-base/6 text-stone-700 hover:bg-stone-950/[0.04] aria-selected:bg-teal-50 aria-selected:text-teal-900 sm:py-1.5 sm:text-sm/6 dark:text-stone-300 dark:hover:bg-white/5 dark:aria-selected:bg-teal-400/10 dark:aria-selected:text-teal-200" %>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

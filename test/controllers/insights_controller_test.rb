@@ -39,6 +39,14 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "recent entries mark ones in progress" do
+    situations(:one).update_column(:balanced_thought, nil)
+    travel_to Time.zone.local(2026, 10, 7, 12) do
+      get insights_url(distortion_id: distortions(:mind_reading).id)
+      assert_select "section[aria-labelledby=recent_heading] .badge-sky", "In progress"
+    end
+  end
+
   test "shows the empty state when there are no entries in range" do
     sign_in_as users(:admin)
     get insights_url

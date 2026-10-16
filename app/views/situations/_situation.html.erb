@@ -1,17 +1,23 @@
+<%# The title's link covers the whole row, so the Continue link for an entry in progress can sit on top of it. %>
 <li id="<%= dom_id situation %>">
-  <%= link_to situation, class: "group -mx-4 flex flex-col gap-3 rounded-2xl px-4 py-6 hover:bg-stone-950/[0.03] sm:flex-row sm:items-start sm:justify-between sm:gap-8 dark:hover:bg-white/[0.03]" do %>
+  <div class="group relative -mx-4 flex flex-col gap-3 rounded-2xl px-4 py-6 hover:bg-stone-950/[0.03] sm:flex-row sm:items-start sm:justify-between sm:gap-8 dark:hover:bg-white/[0.03]">
     <div class="min-w-0 flex-1">
-      <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
-        <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time>
-        <% if situation.location.present? %>
-          <span aria-hidden="true">&middot;</span> <%= situation.location %>
-        <% end %>
-      </p>
-      <h3 class="mt-1 font-display text-xl font-medium text-balance text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300"><%= situation.title %></h3>
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">
+          <time datetime="<%= situation.date.iso8601 %>"><%= l situation.date, format: :entry_date %></time>
+          <% if situation.location.present? %>
+            <span aria-hidden="true">&middot;</span> <%= situation.location %>
+          <% end %>
+        </p>
+        <%= in_progress_badge situation %>
+      </div>
+      <h3 class="mt-1 font-display text-xl font-medium text-balance text-stone-900 group-hover:text-teal-800 dark:text-white dark:group-hover:text-teal-300">
+        <%= link_to situation.display_title, situation, class: "after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-teal-600" %>
+      </h3>
       <%# The original thought is what people scan for when looking for an entry. %>
       <%# Skipped when the title was generated from the thought, so the row doesn't say it twice. %>
       <% snippet = situation.thought_imagery.presence || situation.balanced_thought.presence %>
-      <% if snippet && !snippet.squish.start_with?(situation.title.delete_suffix("...")) %>
+      <% if snippet && !snippet.squish.start_with?(situation.display_title.delete_suffix("...")) %>
         <p class="mt-2 line-clamp-2 text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400"><%= snippet %></p>
       <% end %>
       <% if situation.distortions.any? %>
@@ -20,6 +26,11 @@
             <li class="badge"><%= distortion.title %></li>
           <% end %>
         </ul>
+      <% end %>
+      <% if (step = situation.next_step) %>
+        <%= link_to situation_step_path(situation, step), class: "relative mt-3 inline-flex items-center gap-1 text-base/6 font-medium text-teal-700 hover:text-teal-600 hover:underline sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300" do %>
+          Continue this entry<span class="sr-only">: <%= situation.display_title %></span>
+        <% end %>
       <% end %>
     </div>
     <% if situation.emotion_level || situation.emotions.any? %>
@@ -35,5 +46,5 @@
         <% end %>
       </div>
     <% end %>
-  <% end %>
+  </div>
 </li>

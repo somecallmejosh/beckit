@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
-  resources :situations do
+  # New entries are created by the first step (new/create); each step after that, and editing, has its own page.
+  resources :situations, except: %i[ edit update ] do
     resource :restoration, only: :create, module: :situations
+    resources :steps, only: %i[ show update ], module: :situations
   end
   resources :distortions
   resource :insights, only: :show
