@@ -20,15 +20,16 @@
 
     <%# Drafts are keyed per user, entry and step, so a shared tab never shows someone else's text. %>
     <%= form_with model: situation, url: (situation.persisted? ? situation_step_path(situation, step) : situations_path), class: "flex flex-col gap-8",
-          data: { controller: "draft", draft_key_value: [ "draft", Current.user.id, situation.id || "new", (step if situation.persisted?) ].compact.join(":"),
-            action: "input->draft#save change->draft#save turbo:submit-end->draft#submitted" } do |form| %>
+          data: { controller: "draft conversation", draft_key_value: [ "draft", Current.user.id, situation.id || "new", (step if situation.persisted?) ].compact.join(":"),
+            conversation_open_value: situation.complete?,
+            action: "input->draft#save change->draft#save turbo:submit-end->draft#submitted input->conversation#update change->conversation#update keydown.enter->conversation#advance keydown.meta+enter->conversation#advance keydown.ctrl+enter->conversation#advance" } do |form| %>
       <%# Enter submits with the form's first button, so this one (visually hidden, but rendered so every browser uses it) makes Enter mean Next (or Save on the last step). %>
       <%= button_tag "", name: (following && "go_to"), value: following, tabindex: -1, aria: { hidden: true }, class: "sr-only" %>
 
       <%# Steps open in order: earlier ones are links, this one and later ones are buttons that save first, up to the first step still
           waiting for its answer (or the next one, which saving this step reaches). Past that they wait. The bars fill up to the step showing. %>
       <nav aria-label="Entry steps">
-        <ol role="list" class="grid grid-cols-4 gap-2 sm:gap-3">
+        <ol role="list" class="grid grid-cols-5 gap-2 sm:gap-3">
           <% steps.each_with_index do |other, i| %>
             <li>
               <% item_class = "group flex w-full flex-col gap-2 rounded-xs pb-1 text-left text-sm/5" %>
@@ -62,14 +63,19 @@
         <div class="flex items-end gap-4 border-b border-stone-950/10 sm:gap-8 dark:border-white/10">
           <div class="min-w-0 flex-1 pb-6">
             <h1 id="step_heading" class="font-display text-3xl/tight font-medium tracking-tight text-balance text-stone-900 sm:text-4xl/tight dark:text-white"><%= step_title(step) %></h1>
-            <p class="mt-3 text-lg/7 text-pretty text-stone-600 sm:text-base/7 dark:text-stone-400"><%= step_intro(step) %></p>
+            <p class="mt-3 text-lg/7 text-pretty text-stone-600 sm:text-base/7 dark:text-stone-400"><%= step_intro(step, situation) %></p>
           </div>
-          <%= step_image step, class: "size-28 shrink-0 sm:size-44" %>
+          <%= step_image step, class: "size-28 shrink-0 sm:size-44", data: { conversation_target: "drawing" } %>
         </div>
         <%= render "situations/steps/#{step.underscore}", form:, situation: %>
       </fieldset>
 
-      <%# Save entry is on every step, so an entry can stop wherever it feels finished. %>
+      <%# Saving is on every step, so an entry can stop wherever it feels finished. Until it's finished, it says so:
+          the first step's reads as a quick note, the others as coming back later. %>
+      <% save_label = if situation.complete? || following.nil? then "Save entry"
+         elsif index.zero? then "Jot it down for now"
+         else "Finish later"
+         end %>
       <div class="flex items-center gap-3 border-t border-stone-950/5 pt-6 dark:border-white/10">
         <% if index > 0 %>
           <%= link_to situation_step_path(situation, steps[index - 1]), class: "btn-lg btn-ghost -ml-3" do %>
@@ -78,7 +84,7 @@
         <% end %>
         <div class="ml-auto flex items-center gap-2">
           <% if following %>
-            <%= button_tag "Save entry", class: "btn-lg btn-ghost" %>
+            <%= button_tag save_label, class: "btn-lg btn-ghost" %>
             <%= button_tag "Next", name: "go_to", value: following, class: "btn-lg btn-primary min-w-24" %>
           <% else %>
             <%= button_tag "Save entry", class: "btn-lg btn-primary" %>

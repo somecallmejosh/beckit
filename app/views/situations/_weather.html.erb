@@ -1,0 +1,28 @@
+<%# The rating slider's weather, from clear (0) to storm (10): one shows at a time (rating controller), each drawn in the
+    illustrations' ink with one teal thing, and clouds that darken as the feeling gets stronger. Decorative. %>
+<% ink = "stroke-stone-800 dark:stroke-stone-300" %>
+<% teal = "fill-teal-600 dark:fill-teal-500" %>
+<% cloud = "M14 36h21a7 7 0 0 0 .6-14A10 10 0 0 0 16.4 24 6 6 0 0 0 14 36Z" %>
+<% rays = ->(cx, cy, r1, r2, angles) { angles.map { |a| t = a * Math::PI / 180; tag.line(x1: (cx + r1 * Math.cos(t)).round(1), y1: (cy + r1 * Math.sin(t)).round(1), x2: (cx + r2 * Math.cos(t)).round(1), y2: (cy + r2 * Math.sin(t)).round(1)) }.join.html_safe } %>
+<span class="relative size-12 shrink-0 *:absolute *:inset-0 *:size-12">
+  <svg data-rating-target="weather" data-max="2" viewBox="0 0 48 48" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="<%= ink %>">
+    <circle cx="24" cy="24" r="8" class="<%= teal %>" />
+    <%= rays.(24, 24, 12.5, 17, (0...360).step(45)) %>
+  </svg>
+  <svg hidden data-rating-target="weather" data-max="4" viewBox="0 0 48 48" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="<%= ink %>">
+    <circle cx="18" cy="17" r="7" class="<%= teal %>" />
+    <%= rays.(18, 17, 11, 14.5, [ 180, 225, 270, 315 ]) %>
+    <path d="<%= cloud %>" transform="translate(3 2)" class="fill-white dark:fill-stone-800" />
+  </svg>
+  <svg hidden data-rating-target="weather" data-max="6" viewBox="0 0 48 48" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="<%= ink %>">
+    <path d="<%= cloud %>" transform="translate(0 -3)" class="fill-white dark:fill-stone-800" />
+  </svg>
+  <svg hidden data-rating-target="weather" data-max="8" viewBox="0 0 48 48" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="<%= ink %>">
+    <path d="<%= cloud %>" transform="translate(0 -7)" class="fill-[#B6B6B3] dark:fill-stone-600" />
+    <path d="M18 35l-2 5M25 35l-2 5M32 35l-2 5" />
+  </svg>
+  <svg hidden data-rating-target="weather" data-max="10" viewBox="0 0 48 48" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="<%= ink %>">
+    <path d="<%= cloud %>" transform="translate(0 -9)" class="fill-[#8E8E8B] dark:fill-stone-500" />
+    <path d="M26 29l-6 9h5l-3 7 9-10h-5l3-6z" stroke-width="2" class="<%= teal %>" />
+  </svg>
+</span>

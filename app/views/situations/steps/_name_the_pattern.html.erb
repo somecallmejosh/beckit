@@ -1,9 +1,11 @@
 <%# locals: (form:, situation:) %>
-<fieldset id="situation_distortion_ids" aria-describedby="distortions_hint" class="flex flex-col gap-2">
-  <legend class="field-label">Which thinking traps might be at play?</legend>
-  <p id="distortions_hint" class="field-hint">Choose at least one that fits.<% if @distortions_used %> The ones you use most are first.<% end %></p>
+<%= render "situations/your_thought", situation: %>
+
+<fieldset id="situation_distortion_ids" aria-describedby="distortions_hint" class="flex flex-col gap-4">
+  <legend class="question">Does it fall into any of these traps?</legend>
+  <p id="distortions_hint" class="mt-1 field-hint">Pick at least one that fits.<% if @distortions_used %> The ones you spot most are first.<% end %></p>
   <%= hidden_field_tag "situation[distortion_ids][]", "", id: nil %>
-  <div class="flex flex-wrap gap-2 pt-1">
+  <div class="flex flex-wrap gap-2">
     <% @distortions.each do |distortion| %>
       <% checkbox_id = "situation_distortion_ids_#{distortion.id}" %>
       <%= render "situations/chip", name: "situation[distortion_ids][]", value: distortion.id, label: distortion.title,
@@ -13,8 +15,11 @@
 </fieldset>
 
 <details class="group/meanings">
-  <summary class="inline-flex cursor-pointer list-none items-center gap-1 text-base/6 font-medium text-teal-700 hover:text-teal-600 sm:text-sm/6 dark:text-teal-400 dark:hover:text-teal-300 [&::-webkit-details-marker]:hidden">
+  <%# Underlined teal with a chevron, so it reads as something to press that opens in place. Not outlined: beside the pills it
+      would look like one more trap to pick. %>
+  <summary class="inline-flex cursor-pointer list-none items-center gap-1 text-base/6 font-medium text-teal-700 underline decoration-teal-700/30 underline-offset-4 hover:text-teal-600 hover:decoration-teal-600 sm:text-sm/6 dark:text-teal-400 dark:decoration-teal-400/40 dark:hover:text-teal-300 dark:hover:decoration-teal-300 [&::-webkit-details-marker]:hidden">
     <span class="group-open/meanings:hidden">What do these mean?</span><span class="group-not-open/meanings:hidden">Hide descriptions</span>
+    <%= icon :chevron_down, "group-open/meanings:rotate-180 motion-safe:transition-transform" %>
   </summary>
   <dl class="mt-4 grid gap-x-8 gap-y-4 text-base/6 sm:grid-cols-2 sm:text-sm/6">
     <% @distortions.each do |distortion| %>

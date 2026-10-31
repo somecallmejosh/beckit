@@ -23,7 +23,12 @@ class Distortion < ApplicationRecord
   after_save { @card_outdated = attachment_changes.key?("image") || saved_change_to_title? || saved_change_to_description? }
   after_commit :refresh_og_image_later, on: %i[ create update ], if: -> { @card_outdated }
 
+  normalizes :questions, with: ->(text) { text.lines.map(&:squish).compact_blank.join("\n").presence }
+
   def slug = title.parameterize
+
+  # Questions that help test a thought caught in this trap, offered on the Weigh it up step.
+  def question_list = questions.to_s.split("\n")
 
   # Attaches the trap's starter photo (db/seeds/traps/<slug>.webp) when it has none, or swaps in a newer
   # version when it still shows an older starter photo. A photo uploaded through the admin form is kept.

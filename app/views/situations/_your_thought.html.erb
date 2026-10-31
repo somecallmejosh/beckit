@@ -1,0 +1,11 @@
+<%# locals: (situation:) %>
+<%# The thought from the first step, repeated so it doesn't have to be remembered while weighing it up or reframing it.
+    A pull quote, open on the page with a bar and a quote mark, so its shape alone tells it apart from the enclosed
+    writing pads (the writing utility) where answers go. %>
+<% if situation.thought_imagery.present? %>
+  <figure class="relative border-l-4 border-teal-600/60 py-1 pl-12 sm:pl-14 dark:border-teal-400/50">
+    <span aria-hidden="true" class="absolute top-0 left-4 font-display text-5xl/none text-teal-700/70 select-none sm:left-5 dark:text-teal-400/70">&ldquo;</span>
+    <figcaption class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300">Your thought</figcaption>
+    <blockquote class="mt-1 line-clamp-4 font-display text-lg/7 text-pretty text-stone-800 italic dark:text-stone-100"><%= situation.thought_imagery %></blockquote>
+  </figure>
+<% end %>

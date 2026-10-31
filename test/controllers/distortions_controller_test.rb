@@ -150,9 +150,10 @@ class DistortionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update distortion" do
-    patch distortion_url(@distortion), params: { distortion: { description: "Updated" } }
+    patch distortion_url(@distortion), params: { distortion: { description: "Updated", questions: "Is this a fact?\nWhat else could it be?" } }
     assert_redirected_to distortion_url(@distortion)
     assert_equal "Updated", @distortion.reload.description
+    assert_equal [ "Is this a fact?", "What else could it be?" ], @distortion.question_list
   end
 
   test "should destroy distortion" do

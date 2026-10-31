@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Draw a new beckit illustration with OpenAI's image API, using the thinking-trap drawings as the
+# style reference so the character and line match. Then trace it with script/illustrations/trace.
+#
+#   OPENAI_API_KEY=... script/illustrations/generate "The person waters a small plant..." raw.png [1536x1024]
+#
+# The scene names the pose, props and the one teal accent; style_prompt.txt supplies everything else.
+set -euo pipefail
+DIR=$(cd "$(dirname "$0")" && pwd)
+ROOT=$(cd "$DIR/../.." && pwd)
+SCENE=$1; OUT=$2; SIZE=${3:-1536x1024}
+: "${OPENAI_API_KEY:?set OPENAI_API_KEY}"
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+
+refs=()
+for f in traps/mental-filter traps/labeling traps/overgeneralization traps/emotional-reasoning be-kind/hug; do
+  rsvg-convert -h 1024 -b white "$ROOT/app/assets/images/$f.svg" -o "$T/$(basename "$f").png"
+  refs+=(-F "image[]=@$T/$(basename "$f").png")
+done
+{ cat "$DIR/style_prompt.txt"; echo "$SCENE"; } > "$T/prompt.txt"
+
+curl -sS https://api.openai.com/v1/images/edits -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -F model="${MODEL:-gpt-image-2}" -F size="$SIZE" -F quality=high "${refs[@]}" \
+  -F "prompt=<$T/prompt.txt" -o "$T/response.json"
+ruby -rjson -rbase64 -e '
+  body = JSON.parse(File.read(ARGV[0]))
+  abort(body.to_json[0, 600]) unless body["data"]
+  File.binwrite(ARGV[1], Base64.decode64(body["data"][0]["b64_json"]))' "$T/response.json" "$OUT"
+echo "$OUT"

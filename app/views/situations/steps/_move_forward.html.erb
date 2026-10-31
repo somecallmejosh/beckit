@@ -1,0 +1,25 @@
+<%# locals: (form:, situation:) %>
+<%= render "situations/your_thought", situation: %>
+
+<%= render layout: "situations/question" do %>
+  <div>
+    <%= form.label :balanced_thought, "What would you tell a friend who had this thought?", class: "question" %>
+    <p id="balanced_thought_hint" class="mt-1 field-hint">A kinder, truer way to say it. This becomes your balanced thought.</p>
+  </div>
+  <%= form.textarea :balanced_thought, rows: 2, required: true, class: "writing", placeholder: "I was nervous, and it still went well…",
+        aria: { describedby: "balanced_thought_hint" } %>
+<% end %>
+
+<%= render layout: "situations/question" do %>
+  <%= render "situations/intensity", form:, attribute: :emotion_level_after, legend: "How strong is the feeling now?",
+        hint: situation.emotion_level ? "It was #{situation.emotion_level} out of 10 before. Optional." : "Optional, on the same 0 to 10 scale." %>
+<% end %>
+
+<%= render layout: "situations/question", locals: { last: true } do %>
+  <div>
+    <%= form.label :action_next_time, "Next time this comes up, what's one thing you could try?", class: "question" %>
+    <p id="action_next_time_hint" class="mt-1 field-hint">Optional. Something small counts.</p>
+  </div>
+  <%= form.textarea :action_next_time, rows: 2, class: "writing", placeholder: "Take a slow breath before the first slide…",
+        aria: { describedby: "action_next_time_hint" } %>
+<% end %>

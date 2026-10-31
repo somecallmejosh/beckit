@@ -6,7 +6,8 @@ module ApplicationHelper
     bars_3: "M2 3.75A.75.75 0 0 1 2.75 3h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 3.75ZM2 8a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 8Zm0 4.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z",
     x_mark: "M5.28 4.22a.75.75 0 0 0-1.06 1.06L6.94 8l-2.72 2.72a.75.75 0 1 0 1.06 1.06L8 9.06l2.72 2.72a.75.75 0 1 0 1.06-1.06L9.06 8l2.72-2.72a.75.75 0 0 0-1.06-1.06L8 6.94 5.28 4.22Z",
     magnifying_glass: "M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z",
-    plus: "M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z"
+    plus: "M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z",
+    chevron_down: "M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
   }.freeze
 
   def icon(name, css = nil)
@@ -35,6 +36,44 @@ module ApplicationHelper
   # Drawing beside the greeting. Late night shares the evening one.
   def greeting_image(now = Time.current, **options)
     image_tag "greetings/#{time_of_day(now) || :evening}.svg", alt: "", width: 1380, height: 920, decoding: "async", **options
+  end
+
+  # Footer card. One is picked at random on each render; drawings live in images/be-kind/.
+  KIND_WORDS = [
+    { image: "hug", heading: "Be kind to yourself",
+      body: "A hard thought is not a verdict on who you are. Talk to yourself the way you would talk to a good friend having the same kind of day.",
+      alt: "Drawing of a person sitting cross-legged with eyes closed, giving themself a hug, beside a sleeping cat and a mug of tea." },
+    { image: "forgive", heading: "Let yourself off the hook",
+      body: "Everyone gets things wrong. A mistake is something that happened, not proof of who you are. You can learn from it and still let it go.",
+      alt: "Drawing of a person kneeling on a cushion, smiling as they release a paper bird from their open hands." },
+    { image: "rest", heading: "Rest is allowed",
+      body: "You don't have to earn a break. Resting is part of doing well, not a reward for it.",
+      alt: "Drawing of a person lying on a couch with their feet up and a book open on their chest, under a crescent moon." },
+    { image: "gratitude", heading: "Notice what went right",
+      body: "Before the day ends, name one thing that went okay. It counts, however small it seems.",
+      alt: "Drawing of a person at a small table writing in a notebook beside a potted plant." },
+    { image: "progress", heading: "You're growing, even when it's slow",
+      body: "Progress is quiet. Showing up today matters more than how it went.",
+      alt: "Drawing of a person watering a small sprouting plant." },
+    { image: "body", heading: "Thank your body",
+      body: "Your body carried you through today. A slow breath, a stretch or a glass of water is a way of saying thanks.",
+      alt: "Drawing of a person sitting cross-legged on a mat, stretching their arms overhead, with a glass of water nearby." },
+    { image: "weather", heading: "Feelings are like weather",
+      body: "This one will pass, like the others have. You don't have to fix it. You only have to wait it out kindly.",
+      alt: "Drawing of a person standing calmly under an umbrella in light rain." },
+    { image: "wins", heading: "Small wins count",
+      body: "Got out of bed? Ate something? Answered that message? Those are wins. Give yourself credit for them.",
+      alt: "Drawing of a person raising a mug in a happy cheer." },
+    { image: "worth", heading: "You deserve your own care",
+      body: "Offer yourself the patience and warmth you give everyone else. You're worth looking after too.",
+      alt: "Drawing of a person wrapped in a blanket in an armchair, holding a small vase with a flower." },
+    { image: "again", heading: "You can always begin again",
+      body: "A fresh start doesn't have to wait for tomorrow. You can begin again after lunch, or right now.",
+      alt: "Drawing of a person with a backpack walking along a winding path toward a rising sun." }
+  ].freeze
+
+  def kind_words
+    KIND_WORDS.sample
   end
 
   def nav_link_to(name, path, active:, **options)

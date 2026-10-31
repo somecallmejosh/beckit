@@ -22,6 +22,11 @@
 
     <%= render "shared/flash" %>
 
+    <%# The save that finished this entry sets one of these (SituationSteps#redirect_after_step). %>
+    <% if (flash[:celebrate] || flash[:grown]) && @situation.balanced_thought.present? %>
+      <%= render "reframed", situation: @situation %>
+    <% end %>
+
     <header>
       <p class="text-base/6 font-medium text-teal-700 sm:text-sm/6 dark:text-teal-400">
         <time datetime="<%= @situation.date.iso8601 %>"><%= l @situation.date, format: :entry %></time>
@@ -79,6 +84,15 @@
               <% end %>
             </div>
           <% end %>
+
+          <% if @situation.action_in_moment.present? %>
+            <div id="action_in_moment" class="mt-6 flex flex-col gap-2">
+              <p class="text-base/6 text-stone-500 sm:text-sm/6 dark:text-stone-400">What you did</p>
+              <div class="max-w-[60ch] text-base/7 text-pretty text-stone-700 dark:text-stone-300 [&_p+p]:mt-3">
+                <%= simple_format(@situation.action_in_moment, {}, wrapper_tag: "p") %>
+              </div>
+            </div>
+          <% end %>
         </section>
       </li>
 
@@ -118,7 +132,7 @@
         </section>
       </li>
 
-      <% if @situation.balanced_thought.present? || @situation.emotion_level_after %>
+      <% if @situation.balanced_thought.present? || @situation.emotion_level_after || @situation.action_next_time.present? %>
         <li class="<%= stage %>">
           <span aria-hidden="true" class="<%= marker %> bg-teal-600 text-white dark:bg-teal-500"><%= icon :check, "size-3.5" %></span>
           <section aria-labelledby="balanced_heading" class="rounded-3xl panel-teal p-6 sm:p-8">
@@ -139,6 +153,15 @@
                 <% if (shift = feeling_shift(@situation)) %>
                   <p id="feeling_shift" class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300"><%= shift %></p>
                 <% end %>
+              </div>
+            <% end %>
+
+            <% if @situation.action_next_time.present? %>
+              <div id="action_next_time" class="mt-6 flex flex-col gap-2 border-t border-teal-700/10 pt-5 dark:border-teal-400/20">
+                <h3 class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300">Next time</h3>
+                <div class="max-w-[60ch] text-base/7 text-pretty text-stone-800 dark:text-stone-100 [&_p+p]:mt-3">
+                  <%= simple_format(@situation.action_next_time, {}, wrapper_tag: "p") %>
+                </div>
               </div>
             <% end %>
           </section>

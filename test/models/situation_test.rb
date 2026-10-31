@@ -62,20 +62,21 @@ class SituationTest < ActiveSupport::TestCase
     assert_equal [ "Date can't be blank" ], situation.errors.full_messages
   end
 
-  test "each step of the form has one required answer" do
+  test "each step of the form has its required answers" do
     situation = users(:one).situations.build(date: Time.current)
-    assert_not situation.save_step("whats-on-your-mind", thought_imagery: " ")
-    assert situation.save_step("whats-on-your-mind", thought_imagery: "I froze")
+    assert_not situation.save_step("whats-on-your-mind", thought_imagery: " ", title: "Stand-up")
+    assert_not situation.save_step("whats-on-your-mind", thought_imagery: "I froze", title: "")
+    assert situation.save_step("whats-on-your-mind", thought_imagery: "I froze", title: "Stand-up")
 
-    assert_not situation.save_step("what-happened", title: "")
-    assert situation.save_step("what-happened", title: "Stand-up")
+    assert situation.save_step("what-happened", location: "")
+    assert situation.save_step("weigh-it-up", evidence_for: "")
 
     situation.save_step("name-the-pattern", distortion_ids: [ distortions(:catastrophizing).id ])
     assert_not situation.save_step("name-the-pattern", distortion_ids: [ "" ])
     assert_equal [ distortions(:catastrophizing) ], situation.reload.distortions
 
-    assert_not situation.save_step("weigh-it-up", balanced_thought: "")
-    assert situation.save_step("weigh-it-up", balanced_thought: "One pause is normal")
+    assert_not situation.save_step("move-forward", balanced_thought: "")
+    assert situation.save_step("move-forward", balanced_thought: "One pause is normal")
   end
 
   test "the next step is the first without its answer, and steps past it are out of reach" do
@@ -84,7 +85,10 @@ class SituationTest < ActiveSupport::TestCase
     assert_not situation.reachable?("what-happened")
 
     situation.update!(thought_imagery: "I froze", balanced_thought: "It happens")
-    assert_equal "what-happened", situation.next_step
+    assert_equal "whats-on-your-mind", situation.next_step
+
+    situation.update!(title: "Stand-up")
+    assert_equal "name-the-pattern", situation.next_step
     assert situation.reachable?("what-happened")
     assert_not situation.reachable?("weigh-it-up")
 

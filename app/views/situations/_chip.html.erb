@@ -1,7 +1,11 @@
 <%# locals: (name:, value:, label:, checked:, id:, describedby: nil) %>
-<%# A checkbox styled as a pill; the whole pill is the hit area and a check mark shows the state without relying on color. %>
-<label class="group relative inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-base/6 font-medium text-stone-700 ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-teal-700 has-checked:text-white has-checked:ring-teal-700 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 sm:text-sm/6 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-teal-600 dark:has-checked:text-white dark:has-checked:ring-teal-600">
+<%# A checkbox styled as a pill; the whole pill is the hit area. A plus turns into a check mark, so the state shows without
+    relying on color. Both icons share one slot, so picking a pill never changes its width or reflows the row. The icons sit inset in their box, so the left padding is trimmed to match the right by eye. %>
+<label class="group relative inline-flex cursor-pointer items-center gap-1.5 rounded-full py-1.5 pr-4 pl-2.5 text-base/6 font-medium text-stone-700 ring-1 ring-stone-950/10 hover:bg-stone-50 has-checked:bg-teal-700 has-checked:text-white has-checked:ring-teal-700 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-teal-600 motion-safe:transition-colors sm:text-sm/6 dark:text-stone-300 dark:ring-white/10 dark:hover:bg-white/5 dark:has-checked:bg-teal-600 dark:has-checked:text-white dark:has-checked:ring-teal-600">
   <%= check_box_tag name, value, checked, id:, aria: { describedby: }, class: "absolute inset-0 appearance-none rounded-full focus:outline-hidden" %>
-  <%= icon :check, "hidden group-has-checked:block" %>
+  <span class="grid *:col-start-1 *:row-start-1">
+    <%= icon :plus, "text-stone-400 group-has-checked:scale-50 group-has-checked:opacity-0 motion-safe:transition dark:text-stone-500" %>
+    <%= icon :check, "scale-50 opacity-0 group-has-checked:scale-100 group-has-checked:opacity-100 motion-safe:transition" %>
+  </span>
   <%= label %>
 </label>

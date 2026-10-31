@@ -1,23 +1,37 @@
 <%# locals: (form:, situation:) %>
-<%# Thought and feeling come first: they are what's pressing when someone opens a new entry. %>
-<div class="flex flex-col gap-2">
+<%# Thought and feeling come first: they are what's pressing when someone opens a new entry. The name sits right
+    after the thought, while it's fresh. %>
+<%= render layout: "situations/question" do %>
   <div>
-    <%= form.label :thought_imagery, "What went through your mind?", class: "field-label" %>
-    <p id="thought_imagery_hint" class="field-hint">Words, images, or memories that came up in the moment.</p>
+    <%= form.label :thought_imagery, "What went through your mind?", class: "question" %>
+    <p id="thought_imagery_hint" class="mt-1 field-hint">Words, images or memories. Write it the way it sounded in your head.</p>
   </div>
-  <%= form.textarea :thought_imagery, rows: 4, required: true, autofocus: situation.new_record?, class: "field", aria: { describedby: "thought_imagery_hint" } %>
-</div>
+  <%= form.textarea :thought_imagery, rows: 2, required: true, autofocus: situation.new_record?, class: "writing",
+        placeholder: "Everyone could tell I was nervous…", aria: { describedby: "thought_imagery_hint" } %>
+<% end %>
 
-<fieldset id="situation_emotions" aria-describedby="emotions_hint" class="flex flex-col gap-2">
-  <legend class="field-label">What did you feel?</legend>
-  <p id="emotions_hint" class="field-hint">Pick any that fit, or none.</p>
-  <%= hidden_field_tag "situation[emotions][]", "", id: nil %>
-  <div class="flex flex-wrap gap-2 pt-1">
-    <% Situation::EMOTIONS.each do |emotion| %>
-      <%= render "situations/chip", name: "situation[emotions][]", value: emotion, label: emotion, checked: situation.emotions.include?(emotion), id: "situation_emotions_#{emotion.downcase}" %>
-    <% end %>
+<%= render layout: "situations/question" do %>
+  <div>
+    <%= form.label :title, "What would you call this moment?", class: "question" %>
+    <p id="title_hint" class="mt-1 field-hint">A few words, so you can find it again later.</p>
   </div>
-</fieldset>
+  <%= form.text_field :title, required: true, placeholder: "Presentation at work", class: "writing", aria: { describedby: "title_hint" } %>
+<% end %>
 
-<%= render "situations/intensity", form:, attribute: :emotion_level, legend: "How strong was the feeling?",
-      hint: "0 is barely noticeable, 10 is the most intense you can imagine." %>
+<%= render layout: "situations/question" do %>
+  <fieldset id="situation_emotions" aria-describedby="emotions_hint" class="flex flex-col gap-4">
+    <legend class="question">What did you feel?</legend>
+    <p id="emotions_hint" class="mt-1 field-hint">Pick any that fit, or none.</p>
+    <%= hidden_field_tag "situation[emotions][]", "", id: nil %>
+    <div class="flex flex-wrap gap-2">
+      <% Situation::EMOTIONS.each do |emotion| %>
+        <%= render "situations/chip", name: "situation[emotions][]", value: emotion, label: emotion, checked: situation.emotions.include?(emotion), id: "situation_emotions_#{emotion.downcase}" %>
+      <% end %>
+    </div>
+  </fieldset>
+<% end %>
+
+<%= render layout: "situations/question", locals: { last: true } do %>
+  <%= render "situations/intensity", form:, attribute: :emotion_level, legend: "How strong was the feeling?",
+        hint: "0 is barely there, 10 is the most intense you can imagine." %>
+<% end %>

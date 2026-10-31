@@ -1,6 +1,9 @@
 catastrophizing:
   title: Catastrophizing
   description: Expecting the worst possible outcome.
+  questions: |-
+    What's the most likely outcome, not the worst one?
+    Will this matter a year from now?
 
 mind_reading:
   title: Mind reading

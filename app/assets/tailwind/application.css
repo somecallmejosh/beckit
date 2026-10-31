@@ -78,6 +78,24 @@
     from { opacity: 0; transform: translateY(-0.5rem); }
   }
 
+  /* The next question in an entry step (conversation controller): rises gently into place below the last. */
+  --animate-question-in: question-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes question-in {
+    from { opacity: 0; transform: translateY(0.75rem); }
+  }
+
+  /* An entry just finished (situations/_reframed): the old thought settles back, then the balanced one rises over it. */
+  --animate-reframe-old: reframe-old 1.2s ease-out 0.4s both;
+  --animate-reframe-new: reframe-new 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both;
+
+  @keyframes reframe-old {
+    to { opacity: 0.45; }
+  }
+  @keyframes reframe-new {
+    from { opacity: 0; transform: translateY(0.75rem); }
+  }
+
   /* The plant's next stage (shared/_stage_up). The four share one timeline so their percentages line up: the card
      rises (0-12%), the sketch gives way to the drawing with a small swell (22-40%), the burst (28-48%), a hold,
      then the card sinks (82-100%). */
@@ -111,6 +129,15 @@
 @layer base {
   :where(a, button):focus-visible {
     @apply rounded-xs outline-2 outline-offset-2 outline-teal-600 dark:outline-teal-500;
+  }
+}
+
+/* The hand on everything clickable. Tailwind's reset leaves buttons on the arrow; links already get the hand. Checkboxes and radios
+   are included because the pills stretch theirs over the whole pill, so the input, not its label, is what's under the pointer.
+   Disabled ones keep the arrow. */
+@layer base {
+  :where(button, summary, [role='button'], input:is([type='submit'], [type='button'], [type='reset'], [type='checkbox'], [type='radio'])):not(:disabled, [aria-disabled='true']) {
+    cursor: pointer;
   }
 }
 
@@ -150,6 +177,14 @@
     min-height: 1lh;
     text-align: start;
   }
+
+  /* Textareas start at two lines and grow with what's typed, so an empty box asks for a sentence, not an essay. Past twelve
+     lines they scroll. Browsers without field-sizing keep the height from rows and the resize handle. */
+  &:where(textarea) {
+    field-sizing: content;
+    min-height: calc(2lh + 1.25rem);
+    max-height: calc(12lh + 1.25rem);
+  }
 }
 
 @utility field-label {
@@ -163,6 +198,35 @@
 
 @utility field-hint {
   @apply text-base/6 text-pretty text-stone-500 sm:text-sm/6 dark:text-stone-400;
+}
+
+/* The rating slider (situations/_intensity): a tall hit area for thumbs, in the brand teal. Faded until it's been
+   dragged (data-unrated), so a resting 5 doesn't read as an answer. */
+@utility rating-range {
+  @apply h-11 w-full cursor-pointer rounded-full accent-teal-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:accent-teal-500;
+
+  &[data-unrated] {
+    @apply opacity-50;
+  }
+}
+
+/* An entry step's question, asked the way a person would: in the display face, larger than a field label. */
+@utility question {
+  @apply font-display text-xl/8 font-medium text-balance text-stone-900 sm:text-2xl/9 dark:text-white;
+}
+
+/* Where an answer is written on an entry step: a soft writing pad rather than a plain box. A warm tinted fill and a
+   visible edge say "write here" at a glance; while it's being written in it turns white with a teal outline. The display
+   face and larger size keep it feeling like writing, not data entry. Textareas start at two lines and grow, scrolling
+   past twelve; browsers without field-sizing keep the height from rows. */
+@utility writing {
+  @apply block w-full resize-none rounded-2xl bg-stone-100/70 px-4 py-3 font-display text-lg/8 text-stone-900 ring-1 ring-stone-950/15 transition-colors outline-none placeholder:text-stone-400 placeholder:italic hover:ring-stone-950/25 focus:bg-white focus:ring-2 focus:ring-teal-600 aria-invalid:ring-red-600/50 aria-invalid:focus:ring-red-600 sm:px-5 sm:py-4 sm:text-xl/9 dark:bg-white/5 dark:text-white dark:ring-white/15 dark:placeholder:text-stone-500 dark:hover:ring-white/25 dark:focus:bg-white/[0.07] dark:focus:ring-teal-500 dark:aria-invalid:ring-red-500/60 dark:aria-invalid:focus:ring-red-500;
+  field-sizing: content;
+
+  &:where(textarea) {
+    min-height: calc(2lh + 2rem);
+    max-height: calc(12lh + 2rem);
+  }
 }
 
 /* Tinted surface for asides, summaries and intros. */

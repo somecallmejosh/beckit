@@ -1,0 +1,22 @@
+<%# locals: (situation:) %>
+<%# Shown once, on the entry just finished: the thought it started with settles back and the balanced thought rises in
+    its place, with how the feeling changed. The point of the whole entry, so it ends there rather than on a form. Left
+    out of the page cache, so Back doesn't show it again. %>
+<section id="reframed" data-turbo-temporary aria-labelledby="reframed_heading" class="rounded-3xl panel-teal p-6 sm:p-8">
+  <h2 id="reframed_heading" class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300">You reframed it</h2>
+  <p class="mt-4 line-clamp-3 font-display text-lg/7 text-pretty text-stone-700 motion-safe:animate-reframe-old motion-reduce:opacity-45 dark:text-stone-300">
+    <span class="sr-only">From: </span><%= situation.thought_imagery %>
+  </p>
+  <%= icon :chevron_down, "mt-3 size-5 text-teal-700 motion-safe:animate-reframe-new dark:text-teal-400" %>
+  <blockquote class="mt-3 max-w-[60ch] font-display text-2xl/9 text-pretty text-stone-900 italic motion-safe:animate-reframe-new sm:text-3xl/10 dark:text-white">
+    <span class="sr-only">To: </span><%= situation.balanced_thought %>
+  </blockquote>
+  <% if (shift = feeling_shift(situation)) %>
+    <p class="mt-6 flex items-baseline gap-3 border-t border-teal-700/10 pt-5 motion-safe:animate-reframe-new dark:border-teal-400/20">
+      <span class="font-display text-3xl font-medium text-stone-900 tabular-nums dark:text-white">
+        <%= situation.emotion_level %> <span aria-hidden="true" class="text-teal-700 dark:text-teal-400">→</span><span class="sr-only">to</span> <%= situation.emotion_level_after %>
+      </span>
+      <span class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300"><%= shift %></span>
+    </p>
+  <% end %>
+</section>

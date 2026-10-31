@@ -26,4 +26,12 @@ class ApplicationHelperTest < ActionView::TestCase
   test "greeting wishes a happy birthday" do
     assert_equal "Happy birthday, Josh", greeting_for(@user, Time.zone.local(2026, 6, 1, 9))
   end
+
+  test "every kind word has its own drawing and copy" do
+    assert_equal 10, KIND_WORDS.map { |words| words[:image] }.uniq.size
+    KIND_WORDS.each do |words|
+      assert Rails.root.join("app/assets/images/be-kind/#{words[:image]}.svg").exist?, words[:image]
+      assert words.values_at(:heading, :body, :alt).all?(&:present?), words[:image]
+    end
+  end
 end

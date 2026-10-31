@@ -16,6 +16,17 @@ class DistortionTest < ActiveSupport::TestCase
     assert_includes distortion.errors[:title], "has already been taken"
   end
 
+  test "questions are kept one per line, without blank lines or stray spaces" do
+    distortion = distortions(:mind_reading)
+    distortion.update!(questions: "  What do you know?  \n\n Could you ask them?\r\n")
+    assert_equal "What do you know?\nCould you ask them?", distortion.questions
+    assert_equal [ "What do you know?", "Could you ask them?" ], distortion.question_list
+
+    distortion.update!(questions: " \n ")
+    assert_nil distortion.questions
+    assert_empty distortion.question_list
+  end
+
   test "destroying a distortion keeps its situations" do
     situation = situations(:one)
     distortions(:catastrophizing).destroy

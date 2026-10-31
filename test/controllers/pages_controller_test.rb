@@ -20,8 +20,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
   test "footer reminds you to be kind to yourself" do
     get privacy_url
-    assert_select "footer #be_kind_heading", "Be kind to yourself"
-    assert_select "footer img[src*='be-kind'][alt]"
+    assert_select "footer #be_kind_heading", /\A#{Regexp.union(ApplicationHelper::KIND_WORDS.pluck(:heading))}\z/
+    assert_select "footer img[src*='be-kind/'][alt]"
   end
 
   test "explains the benefits, with privacy claims that match the privacy page" do

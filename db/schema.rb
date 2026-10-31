@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,6 +57,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_170000) do
     t.text "description", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "questions"
     t.index ["title"], name: "index_distortions_on_title", unique: true
   end
 
@@ -95,6 +96,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_170000) do
     t.datetime "deleted_at"
     t.string "emotions", default: [], null: false, array: true
     t.integer "emotion_level_after"
+    t.text "action_in_moment"
+    t.text "action_next_time"
     t.index ["deleted_at"], name: "index_situations_on_deleted_at", where: "(deleted_at IS NOT NULL)"
     t.index ["user_id", "date"], name: "index_situations_on_user_id_and_date"
     t.index ["user_id"], name: "index_situations_on_user_id"

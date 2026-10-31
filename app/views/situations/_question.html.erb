@@ -1,0 +1,13 @@
+<%# locals: (last: false) %>
+<%# One question on an entry step. The conversation controller asks them one at a time; without it they all show.
+    Every question but the last has a Continue button for that, hidden until the controller needs it. %>
+<div data-conversation-target="question" class="flex scroll-mt-24 flex-col gap-4 outline-none">
+  <%= yield %>
+  <% unless last %>
+    <div hidden data-conversation-target="continue">
+      <button type="button" data-action="conversation#next" class="btn-sm btn-secondary">
+        <span data-conversation-target="continueLabel">Continue</span> <%= icon :chevron_down %>
+      </button>
+    </div>
+  <% end %>
+</div>

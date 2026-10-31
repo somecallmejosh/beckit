@@ -8,21 +8,33 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
-# Common cognitive distortions (Beck / Burns).
+# Common cognitive distortions (Beck / Burns), with questions that help test a thought caught in each.
 [
-  [ "All-or-nothing thinking", "Seeing things in black-and-white categories; if a situation falls short of perfect, it is seen as a total failure." ],
-  [ "Overgeneralization", "Viewing a single negative event as a never-ending pattern of defeat, often using words like \"always\" or \"never\"." ],
-  [ "Mental filter", "Dwelling on a single negative detail so that it colors the perception of the whole situation." ],
-  [ "Disqualifying the positive", "Rejecting positive experiences by insisting they \"don't count\" for some reason." ],
-  [ "Mind reading", "Concluding that someone is reacting negatively to you without checking it out." ],
-  [ "Fortune telling", "Anticipating that things will turn out badly and treating the prediction as an established fact." ],
-  [ "Catastrophizing", "Exaggerating the importance or likely consequences of problems, or expecting the worst possible outcome." ],
-  [ "Emotional reasoning", "Assuming that negative emotions reflect the way things really are: \"I feel it, so it must be true.\"" ],
-  [ "Should statements", "Motivating yourself or judging others with rigid rules about what \"should\" or \"must\" happen." ],
-  [ "Labeling", "Attaching a global negative label to yourself or others instead of describing the specific behavior." ],
-  [ "Personalization", "Seeing yourself as the cause of a negative external event for which you were not primarily responsible." ]
-].each do |title, description|
-  Distortion.find_or_create_by!(title: title) { |d| d.description = description }
+  [ "All-or-nothing thinking", "Seeing things in black-and-white categories; if a situation falls short of perfect, it is seen as a total failure.",
+    [ "Is there a middle ground between total success and total failure?", "What went partly right?" ] ],
+  [ "Overgeneralization", "Viewing a single negative event as a never-ending pattern of defeat, often using words like \"always\" or \"never\".",
+    [ "Is it really always, or was it this time?", "Can you think of a time it went differently?" ] ],
+  [ "Mental filter", "Dwelling on a single negative detail so that it colors the perception of the whole situation.",
+    [ "What else happened that you might be leaving out?", "Zoom out on the whole day. What do you see?" ] ],
+  [ "Disqualifying the positive", "Rejecting positive experiences by insisting they \"don't count\" for some reason.",
+    [ "Would you dismiss this if it happened to a friend?", "What good thing aren't you counting?" ] ],
+  [ "Mind reading", "Concluding that someone is reacting negatively to you without checking it out.",
+    [ "What do you actually know about what they were thinking?", "Is there another reason they might have acted that way?" ] ],
+  [ "Fortune telling", "Anticipating that things will turn out badly and treating the prediction as an established fact.",
+    [ "Has a prediction like this come true before?", "What's another way this could turn out?" ] ],
+  [ "Catastrophizing", "Exaggerating the importance or likely consequences of problems, or expecting the worst possible outcome.",
+    [ "What's the most likely outcome, not the worst one?", "If the worst did happen, how would you cope?", "Will this matter a year from now?" ] ],
+  [ "Emotional reasoning", "Assuming that negative emotions reflect the way things really are: \"I feel it, so it must be true.\"",
+    [ "Is this a feeling or a fact?", "What would you think about it if you felt calm?" ] ],
+  [ "Should statements", "Motivating yourself or judging others with rigid rules about what \"should\" or \"must\" happen.",
+    [ "Whose rule is this, and is it a fair one?", "How would it sound as \"it would be nice if\"?" ] ],
+  [ "Labeling", "Attaching a global negative label to yourself or others instead of describing the specific behavior.",
+    [ "What did you actually do, rather than what you are?", "Would you call a friend that for the same thing?" ] ],
+  [ "Personalization", "Seeing yourself as the cause of a negative external event for which you were not primarily responsible.",
+    [ "What else played a part in this?", "How much of it was really in your control?" ] ]
+].each do |title, description, questions|
+  distortion = Distortion.find_or_create_by!(title: title) { |d| d.description = description }
+  distortion.update!(questions: questions.join("\n")) if distortion.questions.blank?
 end
 
 # Starter photos for each trap, and the social cards built from them. The cards are built inline because

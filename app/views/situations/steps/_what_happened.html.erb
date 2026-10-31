@@ -1,24 +1,34 @@
 <%# locals: (form:, situation:) %>
-<div class="grid gap-6 sm:grid-cols-2">
-  <div class="flex flex-col gap-2">
-    <%= form.label :date, "When did this occur?", class: "field-label" %>
-    <%= form.datetime_field :date, required: true, step: 60, value: situation.date&.strftime("%Y-%m-%dT%H:%M"), class: "field" %>
-  </div>
-  <div class="flex flex-col gap-2">
-    <%= form.label :location, "Where were you when it happened?", class: "field-label" %>
-    <%= render "situations/suggested_field", form:, field: :location, options: @location_options %>
-  </div>
-</div>
+<%# The date starts as now, so the conversation controller doesn't count it as an answer (data-conversation-prefilled). %>
+<%= render layout: "situations/question" do %>
+  <fieldset class="flex flex-col gap-4">
+    <legend class="question">When and where was this?</legend>
+    <div class="mt-1 grid gap-6 sm:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <%= form.label :date, "When", class: "field-label" %>
+        <%= form.datetime_field :date, required: true, step: 60, value: situation.date&.strftime("%Y-%m-%dT%H:%M"), class: "field",
+              data: { conversation_prefilled: true } %>
+      </div>
+      <div class="flex flex-col gap-2">
+        <%= form.label :location, "Where", class: "field-label" %>
+        <%= render "situations/suggested_field", form:, field: :location, options: @location_options %>
+      </div>
+    </div>
+  </fieldset>
+<% end %>
 
-<div class="flex flex-col gap-2">
-  <%= form.label :who_was_involved, "Who was involved?", class: "field-label" %>
+<%= render layout: "situations/question" do %>
+  <%= form.label :who_was_involved, "Who was there?", class: "question" %>
   <%= render "situations/suggested_field", form:, field: :who_was_involved, options: @who_options %>
-</div>
+<% end %>
 
-<div class="flex flex-col gap-2">
+<%= render layout: "situations/question", locals: { last: true } do %>
   <div>
-    <%= form.label :title, "Give this entry a short name", class: "field-label" %>
-    <p id="title_hint" class="field-hint">A few words to help you find this entry later.</p>
+    <%= form.label :action_in_moment, "What did you do in the moment?", class: "question" %>
+    <p id="action_in_moment_hint" class="mt-1 field-hint">
+      <%= feelings_sentence(situation) %> What you said or did, or held back from doing.
+    </p>
   </div>
-  <%= form.text_field :title, required: true, placeholder: "e.g. Presentation at work", class: "field", aria: { describedby: "title_hint" } %>
-</div>
+  <%= form.textarea :action_in_moment, rows: 2, class: "writing", placeholder: "I went quiet and looked at my notes…",
+        aria: { describedby: "action_in_moment_hint" } %>
+<% end %>

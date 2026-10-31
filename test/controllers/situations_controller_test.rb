@@ -27,7 +27,7 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create situation for the current user" do
     assert_difference("@user.situations.count") do
-      post situations_url, params: { situation: { thought_imagery: "They'll see I'm a fraud", date: Time.current, distortion_ids: [ distortions(:catastrophizing).id, distortions(:mind_reading).id ], emotion_level: 3, user_id: users(:two).id } }
+      post situations_url, params: { situation: { thought_imagery: "They'll see I'm a fraud", title: "Review", date: Time.current, distortion_ids: [ distortions(:catastrophizing).id, distortions(:mind_reading).id ], emotion_level: 3, user_id: users(:two).id } }
     end
 
     assert_equal @user, Situation.last.user
@@ -86,27 +86,33 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     patch situation_step_url(@situation, "what-happened"), params: { situation: { title: "Still going" } }
     follow_redirect!
     assert_select "#notice", "Entry saved."
-    assert_select "[data-turbo-temporary] svg", count: 0
+    assert_select "[data-turbo-temporary]:not(#reframed) svg", count: 0
 
-    patch situation_step_url(@situation, "weigh-it-up"), params: { situation: { balanced_thought: "It went better than I feared." } }
+    patch situation_step_url(@situation, "move-forward"), params: { situation: { balanced_thought: "It went better than I feared." } }
     follow_redirect!
     assert_select "#notice", "Entry complete."
-    assert_select "[data-turbo-temporary] svg", count: 1
+    assert_select "[data-turbo-temporary]:not(#reframed) svg", count: 1
+    assert_select "#reframed[data-turbo-temporary]" do
+      assert_select "h2", "You reframed it"
+      assert_select "p", /#{Regexp.escape(@situation.thought_imagery)}/
+      assert_select "blockquote", /It went better than I feared/
+    end
 
-    patch situation_step_url(@situation, "weigh-it-up"), params: { situation: { balanced_thought: "It went fine." } }
+    patch situation_step_url(@situation, "move-forward"), params: { situation: { balanced_thought: "It went fine." } }
     follow_redirect!
     assert_select "#notice", "Entry saved."
-    assert_select "[data-turbo-temporary] svg", count: 0
+    assert_select "[data-turbo-temporary]:not(#reframed) svg", count: 0
+    assert_select "#reframed", count: 0
   end
 
   test "finishing an entry counts once, and trashing it doesn't take it back" do
     @situation.update_column(:balanced_thought, nil)
 
     assert_difference -> { @user.reload.finished_entries_count }, 1 do
-      patch situation_step_url(@situation, "weigh-it-up"), params: { situation: { balanced_thought: "It went fine." } }
+      patch situation_step_url(@situation, "move-forward"), params: { situation: { balanced_thought: "It went fine." } }
     end
     assert_no_difference -> { @user.reload.finished_entries_count } do
-      patch situation_step_url(@situation, "weigh-it-up"), params: { situation: { balanced_thought: "It went well." } }
+      patch situation_step_url(@situation, "move-forward"), params: { situation: { balanced_thought: "It went well." } }
       delete situation_url(@situation)
     end
   end
@@ -115,18 +121,18 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     @user.update_column(:finished_entries_count, 9)
     @situation.update_column(:balanced_thought, nil)
 
-    patch situation_step_url(@situation, "weigh-it-up"), params: { situation: { balanced_thought: "It went better than I feared." } }
+    patch situation_step_url(@situation, "move-forward"), params: { situation: { balanced_thought: "It went better than I feared." } }
     follow_redirect!
     assert_select "#notice p", "Entry complete. You planted a seed."
     assert_select "#notice a[href=?]", edit_settings_path(anchor: "plant"), text: "See your plant"
     assert_select "[data-turbo-temporary] img[src*='milestones/seed']", count: 2
-    assert_select "[data-turbo-temporary] svg", count: 0
+    assert_select "[data-turbo-temporary]:not(#reframed) svg", count: 0
   end
 
   test "the first step creates the entry, dated now, and moves on" do
     freeze_time do
       assert_difference("@user.situations.count") do
-        post situations_url, params: { situation: { thought_imagery: "Nobody replied", emotions: [ "" ] }, go_to: "what-happened" }
+        post situations_url, params: { situation: { thought_imagery: "Nobody replied", title: "Group chat", emotions: [ "" ] }, go_to: "what-happened" }
       end
       # Found by its answer: under freeze_time a fixture's created_at can tie with or follow the new entry's.
       situation = @user.situations.find_by!(thought_imagery: "Nobody replied")
@@ -176,11 +182,11 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#error_explanation a[href='#situation_distortion_ids']", "Thinking traps need at least one picked"
     assert_equal 2, @situation.reload.distortions.count
 
-    patch situation_step_url(@situation, "what-happened"), params: { situation: { title: " " } }
+    patch situation_step_url(@situation, "whats-on-your-mind"), params: { situation: { title: " " } }
     assert_select "#situation_title_error", "Short name can't be blank"
     assert_equal "Missed deadline", @situation.reload.title
 
-    patch situation_step_url(@situation, "weigh-it-up"), params: { situation: { balanced_thought: "" } }
+    patch situation_step_url(@situation, "move-forward"), params: { situation: { balanced_thought: "" } }
     assert_response :unprocessable_content
 
     assert_no_difference("Situation.count") { post situations_url, params: { situation: { thought_imagery: "", emotions: [ "Sad" ] } } }
@@ -213,7 +219,7 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
   test "an entry shows Continue until it's finished, then Edit" do
     @situation.update_column(:balanced_thought, nil)
     get situation_url(@situation)
-    assert_select "a[href=?]", situation_step_path(@situation, "weigh-it-up"), text: "Continue"
+    assert_select "a[href=?]", situation_step_path(@situation, "move-forward"), text: "Continue"
     assert_select "a", text: "Edit", count: 0
 
     @situation.update_column(:balanced_thought, "It went better than I feared.")
@@ -267,8 +273,23 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Situation::CSV_HEADERS, rows.first
     assert_equal 2, rows.size
     assert_equal [ "2026-10-01 02:00", "Missed deadline" ], rows.second.first(2)
-    assert_equal "Catastrophizing; Mind reading", rows.second[7]
-    assert_equal "'=HYPERLINK(1)", rows.second[8]
+    assert_equal "Catastrophizing; Mind reading", rows.second[8]
+    assert_equal "'=HYPERLINK(1)", rows.second[9]
+  end
+
+  test "asks what you did on What happened and what you can do next time on Move forward, and shows both on the entry" do
+    get situation_step_url(@situation, "what-happened")
+    assert_select "textarea[name=?]:not([required])", "situation[action_in_moment]"
+    get situation_step_url(@situation, "move-forward")
+    assert_select "textarea[name=?]:not([required])", "situation[action_next_time]"
+
+    patch situation_step_url(@situation, "what-happened"), params: { situation: { action_in_moment: "I went quiet." } }
+    patch situation_step_url(@situation, "move-forward"), params: { situation: { action_next_time: "Ask for more time early." } }
+    assert_equal [ "I went quiet.", "Ask for more time early." ], @situation.reload.values_at(:action_in_moment, :action_next_time)
+
+    get situation_url(@situation)
+    assert_select "ol > li:first-child #action_in_moment", /I went quiet/
+    assert_select "ol > li:last-child #action_next_time", /Ask for more time early/
   end
 
   test "form saves drafts per user and per entry" do
@@ -290,23 +311,25 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#feeling_shift", "Down 3 from 7"
   end
 
-  test "the first step asks for the thought and feelings; the short name comes later, with no default" do
+  test "the first step asks for the thought, then a short name with no default, then the feelings" do
     get new_situation_url
     assert_select "form[action=?][method=post]", situations_path do
       assert_select "h1", "What's on your mind"
       assert_select "textarea[name=?][required]", "situation[thought_imagery]"
+      assert_select "input[name=?][required]:not([value])", "situation[title]"
       assert_select "input[type=checkbox][name=?]", "situation[emotions][]", count: Situation::EMOTIONS.size
-      assert_select "input[name=?]", "situation[title]", count: 0
     end
+    fields = css_select("form textarea, form input:not([type=hidden]):not([type=submit])").map { it["name"] }
+    assert_equal [ "situation[thought_imagery]", "situation[title]", "situation[emotions][]" ], fields.first(3)
 
-    post situations_url, params: { situation: { thought_imagery: "Everyone in the room could tell" }, go_to: "what-happened" }
+    post situations_url, params: { situation: { thought_imagery: "Everyone in the room could tell", title: "Meeting" }, go_to: "what-happened" }
     follow_redirect!
-    assert_select "input[name=?][required]:not([value])", "situation[title]"
+    assert_select "input[name=?]", "situation[title]", count: 0
     assert_select "input[type=datetime-local][step='60']" do |field|
       assert_match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}\z/, field.first["value"])
     end
 
-    get situation_step_url(@situation, "weigh-it-up")
+    get situation_step_url(@situation, "move-forward")
     assert_select "input[type=radio][name=?]", "situation[emotion_level_after]", count: 12
   end
 
@@ -323,27 +346,92 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", situation_step_path(@situation, "what-happened") do
       assert_select "button[type=submit].sr-only[name=go_to][value=name-the-pattern]:first-of-type"
       assert_select "nav a[href=?]", situation_step_path(@situation, "whats-on-your-mind")
-      assert_select "nav button[name=go_to]", count: 3
+      assert_select "nav button[name=go_to]", count: 4
       assert_select "nav button[aria-current=step]", /What happened/
       assert_select "a[href=?]", situation_step_path(@situation, "whats-on-your-mind"), /Back/
       assert_select "button[name=go_to][value=name-the-pattern]", "Next"
       assert_select "button:not([name=go_to])", "Save entry"
     end
 
-    get situation_step_url(@situation, "weigh-it-up")
+    get situation_step_url(@situation, "move-forward")
     assert_select "button", text: "Next", count: 0
     assert_select "button.sr-only:not([name=go_to])"
     assert_select "figure blockquote", @situation.thought_imagery if @situation.thought_imagery.present?
   end
 
+  test "Weigh it up puts the evidence side by side and needs no answer; Move forward asks for the balanced thought" do
+    get situation_step_url(@situation, "weigh-it-up")
+    assert_select ".md\\:grid-cols-2 > .md\\:grid-rows-subgrid textarea", count: 2
+    assert_select "textarea[required]", count: 0
+    assert_select "textarea[name=?]", "situation[balanced_thought]", count: 0
+
+    get situation_step_url(@situation, "move-forward")
+    assert_select "figure blockquote", @situation.thought_imagery
+    assert_select "textarea[name=?][required]", "situation[balanced_thought]"
+    assert_select "textarea[name=?]", "situation[evidence_for]", count: 0
+  end
+
+  test "steps ask one question at a time, except on a finished entry, and say how saving early works" do
+    get new_situation_url
+    assert_select "form[data-controller~=conversation][data-conversation-open-value=false]"
+    assert_select "[data-conversation-target=question]", 4
+    assert_select "[data-conversation-target=continue][hidden]", 3
+    assert_select "button:not([name=go_to])", "Jot it down for now"
+
+    unfinished = @user.situations.create!(date: Time.current, thought_imagery: "I froze", title: "Stand-up")
+    get situation_step_url(unfinished, "what-happened")
+    assert_select "[data-conversation-target=question]", 3
+    assert_select "input[type=datetime-local][data-conversation-prefilled]"
+    assert_select "button:not([name=go_to])", "Finish later"
+
+    get situation_step_url(@situation, "what-happened")
+    assert_select "form[data-conversation-open-value=true]"
+    assert_select "button:not([name=go_to])", "Save entry"
+  end
+
+  test "questions pick up earlier answers" do
+    @situation.update!(emotions: %w[ Anxious Ashamed ], emotion_level: 8)
+
+    get situation_step_url(@situation, "what-happened")
+    assert_select "header p, p", /Back to “Missed deadline”/
+    assert_select "#action_in_moment_hint", /You felt anxious and ashamed, 8 out of 10\./
+
+    get situation_step_url(@situation, "name-the-pattern")
+    assert_select "figure blockquote", @situation.thought_imagery
+
+    get situation_step_url(@situation, "weigh-it-up")
+    assert_select "#evidence_against_hint", /You spotted catastrophizing and mind reading\. Try asking: What's the most likely outcome, not the worst one\?/
+    assert_select "[data-controller=prompts][data-prompts-questions-value=?]",
+      [ "What's the most likely outcome, not the worst one?", "Will this matter a year from now?" ].to_json
+
+    get situation_step_url(@situation, "move-forward")
+    assert_select "#emotion_level_after_hint", "It was 8 out of 10 before. Optional."
+  end
+
+  test "Weigh it up falls back to general questions when no picked trap has its own" do
+    @situation.update!(distortion_ids: [ distortions(:mind_reading).id ])
+    get situation_step_url(@situation, "weigh-it-up")
+    assert_select "#evidence_against_hint", /You spotted mind reading\. Try asking: #{Regexp.escape(SituationsHelper::GENERAL_QUESTIONS.first)}/
+  end
+
+  test "ratings keep their radios under the slider" do
+    @situation.update!(emotion_level: 8)
+    get situation_step_url(@situation, "whats-on-your-mind")
+    assert_select "fieldset[data-controller=rating]" do
+      assert_select "[data-rating-target=slider][hidden] input[type=range]:not([name])"
+      assert_select "input[type=radio][name=?][value='8'][checked]", "situation[emotion_level]"
+      assert_select "svg[data-rating-target=weather]", 5
+    end
+  end
+
   test "steps open in order, up to the first one still waiting for its answer" do
     get new_situation_url
     assert_select "nav button[name=go_to][value=what-happened]"
-    assert_select "nav span[aria-disabled=true]", count: 2
+    assert_select "nav span[aria-disabled=true]", count: 3
 
-    unfinished = @user.situations.create!(date: Time.current, thought_imagery: "I froze")
+    unfinished = @user.situations.create!(date: Time.current, thought_imagery: "I froze", title: "Stand-up")
     get situation_step_url(unfinished, "weigh-it-up")
-    assert_redirected_to situation_step_url(unfinished, "what-happened")
+    assert_redirected_to situation_step_url(unfinished, "name-the-pattern")
 
     get situation_step_url(unfinished, "what-happened")
     assert_response :success
@@ -375,11 +463,10 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input#situation_date[aria-invalid=true]"
   end
 
-  test "creates an entry with feelings, a re-rating and no short name yet" do
-    post situations_url, params: { situation: { date: "2026-10-05T08:30", thought_imagery: "They are all judging me", emotions: [ "", "Anxious", "Ashamed" ], emotion_level: 8, emotion_level_after: 5 } }
+  test "creates an entry with a short name, feelings and a re-rating" do
+    post situations_url, params: { situation: { date: "2026-10-05T08:30", thought_imagery: "They are all judging me", title: "Team lunch", emotions: [ "", "Anxious", "Ashamed" ], emotion_level: 8, emotion_level_after: 5 } }
     situation = @user.situations.find_by!(thought_imagery: "They are all judging me")
-    assert_nil situation.title
-    assert_equal [ "They are all judging me", %w[ Anxious Ashamed ], 5 ], [ situation.display_title, situation.emotions, situation.emotion_level_after ]
+    assert_equal [ "Team lunch", %w[ Anxious Ashamed ], 5 ], [ situation.display_title, situation.emotions, situation.emotion_level_after ]
 
     follow_redirect!
     assert_select "#notice", "Entry saved."
@@ -472,7 +559,7 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "invalid feelings link to the feelings group, not an inline message" do
-    post situations_url, params: { situation: { date: "2026-10-05T08:30", thought_imagery: "Nothing to do", emotions: [ "Bored" ] } }
+    post situations_url, params: { situation: { date: "2026-10-05T08:30", thought_imagery: "Nothing to do", title: "Weekend", emotions: [ "Bored" ] } }
     assert_response :unprocessable_content
     assert_select "#error_explanation a[href='#situation_emotions']"
     assert_select "fieldset#situation_emotions"

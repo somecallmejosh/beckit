@@ -61,6 +61,6 @@ class DistortionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def distortion_params
-      params.expect(distortion: [ :title, :description, :details, :image ])
+      params.expect(distortion: [ :title, :description, :questions, :details, :image ])
     end
 end

@@ -1,35 +1,33 @@
 <%# locals: (form:, situation:) %>
-<%# The thought from the first step, repeated so it doesn't have to be remembered while weighing it up. %>
-<% if situation.thought_imagery.present? %>
-  <figure class="rounded-2xl panel-teal px-4 py-3">
-    <figcaption class="text-base/6 font-medium text-teal-800 sm:text-sm/6 dark:text-teal-300">Your thought</figcaption>
-    <blockquote class="mt-1 line-clamp-4 font-display text-lg/7 text-pretty text-stone-800 italic dark:text-stone-100"><%= situation.thought_imagery %></blockquote>
-  </figure>
-<% end %>
+<%= render "situations/your_thought", situation: %>
 
-<div class="flex flex-col gap-2">
-  <div>
-    <%= form.label :evidence_for, "Evidence that validates the thought", class: "field-label" %>
-    <p id="evidence_for_hint" class="field-hint">What makes you think the thought is true?</p>
+<%# Side by side from md, so for and against read as one question with two sides, as they do on the entry. Each column is a
+    subgrid of the same two rows, so the writing lines up even when one side's prompt runs longer. %>
+<% traps = situation.distortions.sort_by(&:title).map { it.title.downcase }.to_sentence %>
+<% questions = trap_questions(situation) %>
+<div class="grid gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+  <div class="grid gap-4 md:row-span-2 md:grid-rows-subgrid">
+    <div>
+      <%= form.label :evidence_for, "What's backing this thought up?", class: "question" %>
+      <p id="evidence_for_hint" class="mt-1 field-hint">Facts, not feelings. What would a camera have seen?</p>
+    </div>
+    <%= form.textarea :evidence_for, rows: 2, class: "writing", placeholder: "My voice shook on the first slide…",
+          aria: { describedby: "evidence_for_hint" } %>
   </div>
-  <%= form.textarea :evidence_for, rows: 4, class: "field", aria: { describedby: "evidence_for_hint" } %>
-</div>
 
-<div class="flex flex-col gap-2">
-  <div>
-    <%= form.label :evidence_against, "Evidence that doesn't validate it", class: "field-label" %>
-    <p id="evidence_against_hint" class="field-hint">What are some signs that the thought might not be true?</p>
+  <div class="grid gap-4 md:row-span-2 md:grid-rows-subgrid">
+    <div data-controller="prompts" data-prompts-questions-value="<%= questions.to_json %>">
+      <%= form.label :evidence_against, "What doesn't quite fit the story?", class: "question" %>
+      <p id="evidence_against_hint" class="mt-1 field-hint">
+        <%= traps.present? ? "You spotted #{traps}. Try asking:" : "Try asking:" %>
+        <span data-prompts-target="text" aria-live="polite" class="font-display text-stone-800 italic dark:text-stone-200"><%= questions.first %></span>
+      </p>
+      <button type="button" hidden data-prompts-target="another" data-action="prompts#another"
+              class="mt-2 inline-flex cursor-pointer items-center gap-1 text-base/6 font-medium text-teal-700 underline decoration-teal-700/30 underline-offset-4 hover:text-teal-600 hover:decoration-teal-600 sm:text-sm/6 dark:text-teal-400 dark:decoration-teal-400/40 dark:hover:text-teal-300">
+        Another question
+      </button>
+    </div>
+    <%= form.textarea :evidence_against, rows: 2, class: "writing", placeholder: "Two people asked follow-up questions…",
+          aria: { describedby: "evidence_against_hint" } %>
   </div>
-  <%= form.textarea :evidence_against, rows: 4, class: "field", aria: { describedby: "evidence_against_hint" } %>
 </div>
-
-<div class="flex flex-col gap-2">
-  <div>
-    <%= form.label :balanced_thought, "A more balanced thought", class: "field-label" %>
-    <p id="balanced_thought_hint" class="field-hint">What might you say to a friend who was in the same situation?</p>
-  </div>
-  <%= form.textarea :balanced_thought, rows: 4, required: true, class: "field", aria: { describedby: "balanced_thought_hint" } %>
-</div>
-
-<%= render "situations/intensity", form:, attribute: :emotion_level_after, legend: "How strong is the feeling now?",
-      hint: "Optional. Rate it again after writing the balanced thought, on the same 0 to 10 scale." %>

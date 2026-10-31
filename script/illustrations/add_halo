@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Give an existing traced beckit SVG the rough-edge halo, in place. The halo goes in as the bottom
+# layer with class "light", so drawings that recolor for dark mode pick it up.
+#
+#   script/illustrations/add_halo app/assets/images/steps/*.svg
+set -euo pipefail
+source "$(dirname "$0")/halo.sh"
+# Older drawings have heavier lines, so the halo must reach further to clear them.
+export HALO_REACH=${HALO_REACH:-16}
+
+for SVG in "$@"; do
+  if grep -q '<g class="light"' "$SVG"; then echo "$SVG: already has a light layer, skipped"; continue; fi
+  T=$(mktemp -d)
+  # Render in the raster coordinates the paths were traced in.
+  H=$(grep -o 'translate(0.000000,[0-9]*' "$SVG" | head -1 | cut -d, -f2)
+  read -r VX VY VW VH < <(grep -o 'viewBox="[^"]*"' "$SVG" | head -1 | tr -d 'viewBox="')
+  W=$(( VX + VW > H ? VX + VW : H ))
+  sed -E "s/viewBox=\"[^\"]*\" width=\"[0-9]+\" height=\"[0-9]+\"/viewBox=\"0 0 $W $H\" width=\"$W\" height=\"$H\"/" "$SVG" > "$T/full.svg"
+  rsvg-convert -b white "$T/full.svg" -o "$T/full.png"
+
+  magick "$T/full.png" -colorspace Gray -fx "u < 85/255 ? 1 : 0" "$T/ink.png"
+  magick "$T/full.png" -colorspace Gray -fx "u < 238/255 ? 1 : 0" "$T/filled.png"
+  magick "$T/full.png" -colorspace HCL -channel G -separate +channel -threshold 12% \
+    -morphology Dilate Disk:9 "$T/zone.png"
+  # Only real gray fills: not the anti-aliased fringe of the ink lines, and not the teal accent.
+  magick "$T/filled.png" \( "$T/ink.png" -morphology Dilate Disk:2 \) -compose MinusSrc -composite \
+    "$T/zone.png" -compose MinusSrc -composite -morphology Open Disk:2 "$T/fills.png"
+  make_halo "$T/fills.png" "$T/filled.png" "$T/zone.png" "$T/halo.png"
+
+  LAYER="<g class=\"light\" fill=\"#B6B6B3\"><g transform=\"translate(0.000000,$H.000000) scale(0.250000,-0.250000)\">$(potrace_paths "$T/halo.png")</g></g>"
+  # Bottom layer: straight after the <style> (and the transparent <rect>, if there is one).
+  ruby -e 'svg = File.read(ARGV[0]); at = svg.index("<g "); File.write(ARGV[0], svg.insert(at, ARGV[1]))' "$SVG" "$LAYER"
+  rm -rf "$T"
+  echo "$SVG"
+done

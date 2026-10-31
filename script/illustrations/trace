@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Trace a generated PNG into a layered beckit SVG: light, mid and ink grays, the rough-edge halo,
+# and one floating teal accent. See .claude/skills/image-illustration/SKILL.md.
+#
+#   script/illustrations/trace raw.png app/assets/images/be-kind/new.svg [WxH]
+#
+# WxH frames a viewBox of that size on the drawing's center (e.g. 1200x1000 for be-kind);
+# without it the viewBox is the whole PNG.
+# Tuning (env): MID_MAX=150 (grays darker than this become mid), MEDIAN=5 (denoise),
+# INK_GROW=1 (thicken lines), SEED, HALO_SPARSITY, HALO_REACH.
+set -euo pipefail
+source "$(dirname "$0")/halo.sh"
+
+IN0=$1; OUT=$2; CANVAS=${3:-}
+T=$(mktemp -d); trap 'rm -rf "$T"' EXIT
+IN=$T/in.png
+magick "$IN0" -statistic Median "${MEDIAN:-5}" "$IN"
+W=$(magick identify -format %w "$IN"); H=$(magick identify -format %h "$IN")
+
+# Chroma picks out the teal; the zone around it keeps gray (and the halo) out from under it.
+magick "$IN" -colorspace HCL -channel G -separate +channel -threshold 12% -morphology Open Disk:1.5 "$T/teal.png"
+magick "$T/teal.png" -morphology Dilate Disk:9 "$T/zone.png"
+magick "$IN" -colorspace Gray "$T/gray.png"
+
+mask () { # name max -> white where gray < max
+  magick "$T/gray.png" -fx "u < $2/255 ? 1 : 0" "$T/$1.png"
+}
+mask ink 85
+mask mid "${MID_MAX:-150}"  # each fill also covers the darker layers above it, so no seams show
+mask light 238
+
+for n in light mid; do
+  magick "$T/$n.png" "$T/zone.png" -compose MinusSrc -composite "$T/$n.png"
+done
+magick "$T/ink.png" "$T/teal.png" -compose MinusSrc -composite "$T/ink.png"
+# The accent's outline stays put; only the teal and the ink it encloses (a face, a swirl) float inside it.
+magick "$T/teal.png" -negate -fill black -draw "color 0,0 floodfill" "$T/holes.png"
+magick "$T/teal.png" "$T/holes.png" -compose Lighten -composite -morphology Erode Disk:2 "$T/inside.png"
+magick "$T/ink.png" "$T/inside.png" -compose Multiply -composite "$T/aink.png"
+magick "$T/ink.png" "$T/aink.png" -compose MinusSrc -composite \
+  -morphology Dilate "Disk:${INK_GROW:-1}" "$T/ink.png"
+magick "$T/aink.png" -morphology Dilate "Disk:${INK_GROW:-1}" "$T/aink.png"
+
+magick "$T/light.png" "$T/ink.png" -compose MinusSrc -composite "$T/fills.png"
+make_halo "$T/fills.png" "$T/light.png" "$T/zone.png" "$T/halo.png"
+magick "$T/light.png" "$T/halo.png" -compose Lighten -composite "$T/light.png"
+
+if [[ -n $CANVAS ]]; then
+  CW=${CANVAS%x*}; CH=${CANVAS#*x}
+  magick "$T/light.png" "$T/teal.png" -compose Lighten -composite "$T/all.png"
+  read -r BW BH BX BY < <(magick "$T/all.png" -format "%@\n" info: | sed 's/[x+]/ /g')
+  VX=$((BX + BW / 2 - CW / 2)); VY=$((BY + BH / 2 - CH / 2))
+else
+  CW=$W; CH=$H; VX=0; VY=0
+fi
+
+group () { # fill mask
+  echo -n "<g fill=\"$1\"><g transform=\"translate(0.000000,$H.000000) scale(0.250000,-0.250000)\">$(potrace_paths "$T/$2.png")</g></g>"
+}
+{
+  echo -n "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"$VX $VY $CW $CH\" width=\"$CW\" height=\"$CH\">"
+  echo -n '<style>.accent{transform-box:fill-box;transform-origin:50% 60%;animation:float 6s ease-in-out infinite}@keyframes float{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(0,-22px) rotate(-3deg)}}@media (prefers-reduced-motion:reduce){.accent{animation:none}}</style>'
+  echo -n "<rect x=\"$VX\" y=\"$VY\" width=\"$CW\" height=\"$CH\" fill=\"transparent\"/>"
+  group "#B6B6B3" light
+  group "#8E8E8B" mid
+  group "#262626" ink
+  echo -n '<g class="accent">'
+  group "#0F9488" teal
+  group "#262626" aink
+  echo -n '</g></svg>'
+} > "$OUT"
+echo "$OUT"

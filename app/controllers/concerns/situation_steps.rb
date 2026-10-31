@@ -49,6 +49,6 @@ module SituationSteps
     # Each step only sends its own fields, so the rest are left as they are. user_id is set from Current.user.
     def situation_params
       params.expect(situation: [ :title, :date, :location, :distortion_id, :who_was_involved, :thought_imagery, :emotion_level, :emotion_level_after,
-        :evidence_for, :evidence_against, :balanced_thought, distortion_ids: [], emotions: [] ])
+        :action_in_moment, :evidence_for, :evidence_against, :balanced_thought, :action_next_time, distortion_ids: [], emotions: [] ])
     end
 end

@@ -20,6 +20,14 @@
         </div>
         <%= form.textarea :description, rows: 4, required: true, class: "field", aria: { describedby: "description_hint" } %>
       </div>
+
+      <div class="flex flex-col gap-2">
+        <div>
+          <%= form.label :questions, "Questions to ask", class: "field-label" %>
+          <p id="questions_hint" class="field-hint">One per line. Offered on the Weigh it up step to people who picked this trap.</p>
+        </div>
+        <%= form.textarea :questions, rows: 3, class: "field", aria: { describedby: "questions_hint" } %>
+      </div>
     </div>
   </div>
 
