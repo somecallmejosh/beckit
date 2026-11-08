@@ -1,5 +1,5 @@
 class Settings::PasswordsController < ApplicationController
-  rate_limit to: 10, within: 3.minutes, only: :update, with: -> { redirect_to edit_settings_path, alert: "Try again later." }
+  rate_limit to: 10, within: 3.minutes, only: :update, with: -> { redirect_to edit_settings_path, alert: RATE_LIMITED }
 
   # PATCH /settings/password
   # Validated on a separate copy of the user so the profile form on the same page stays clean.

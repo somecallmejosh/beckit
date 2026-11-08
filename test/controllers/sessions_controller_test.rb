@@ -26,9 +26,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   test "create with invalid credentials" do
     post session_path, params: { email_address: @user.email_address, password: "wrong" }
 
-    assert_redirected_to new_session_path
+    assert_response :unprocessable_content
     assert_nil cookies[:session_id]
+    assert_select "#alert", /don't match/
+    # The email stays filled in, and the cursor moves on to the password.
+    assert_select "#email_address[value=?]:not([autofocus])", @user.email_address
+    assert_select "#password[autofocus]"
   end
+
 
   test "destroy" do
     sign_in_as(User.take)

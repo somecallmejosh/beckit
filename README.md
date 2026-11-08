@@ -1,3 +1,3 @@
 # README
 
-Name inspired by Alan Beck
+Name inspired by Aaron Beck

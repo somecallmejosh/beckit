@@ -1,5 +1,5 @@
 class Settings::AccountsController < ApplicationController
-  rate_limit to: 10, within: 3.minutes, only: :destroy, with: -> { redirect_to edit_settings_path, alert: "Try again later." }
+  rate_limit to: 10, within: 3.minutes, only: :destroy, with: -> { redirect_to edit_settings_path, alert: RATE_LIMITED }
 
   # DELETE /settings/account
   # Removes the user with their sessions, entries and photo.

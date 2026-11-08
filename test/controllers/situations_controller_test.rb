@@ -567,9 +567,43 @@ class SituationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "on small screens the 30-day summary follows the entries" do
+    travel_to Time.zone.local(2026, 10, 7, 12) # within 30 days of the fixtures' dates
     get situations_url
     assert_select "aside section.max-lg\\:hidden #summary_heading"
     assert_select "#situations ~ section.lg\\:hidden #summary_mobile_heading", "Last 30 days"
     assert_select "a", "See 30-day insights"
+  end
+
+  test "index filters by time with When, and keeps it through the filter heading" do
+    travel_to Time.zone.local(2026, 10, 7, 12)
+    @user.situations.create!(title: "Long ago", thought_imagery: "An old worry", date: 200.days.ago)
+
+    get situations_url(range: "30")
+    assert_select "#filter_heading", "Last 30 days"
+    assert_select "#situations", text: /Long ago/, count: 0
+    assert_select "select#range option[selected][value='30']"
+
+    get situations_url(range: "365")
+    assert_select "#situations", /Long ago/
+
+    get situations_url(range: "bogus")
+    assert_select "#filter_heading", count: 0
+  end
+
+  test "each part of a finished entry links to the step it was written on" do
+    situation = @situation
+    assert situation.complete?
+    get situation_url(situation)
+
+    %w[ what-happened whats-on-your-mind name-the-pattern weigh-it-up move-forward ].each do |step|
+      assert_select "a[href=?]", situation_step_path(situation, step), text: /Edit/
+    end
+  end
+
+  test "an entry in progress only links to steps it can reach" do
+    situation = @user.situations.create!(title: "Half done", thought_imagery: "Still thinking", date: Time.current)
+    get situation_url(situation)
+    assert_select "a[href=?]", situation_step_path(situation, "whats-on-your-mind"), text: /Edit/
+    assert_select "a[href=?]", situation_step_path(situation, "weigh-it-up"), count: 0
   end
 end

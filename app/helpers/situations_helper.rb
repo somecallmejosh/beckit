@@ -1,4 +1,7 @@
 module SituationsHelper
+  # The journal search's "When" choices. Keys match DistortionInsights::RANGES, so the durations come from there.
+  JOURNAL_RANGES = { "30" => "Last 30 days", "90" => "Last 90 days", "365" => "Last year" }.freeze
+
   STEP_TITLES = { "whats-on-your-mind" => "What's on your mind", "what-happened" => "What happened",
     "name-the-pattern" => "Name the pattern", "weigh-it-up" => "Weigh it up", "move-forward" => "Move forward" }.freeze
 
@@ -50,11 +53,31 @@ module SituationsHelper
   end
 
   # The sentence under a filtered journal's heading, e.g. "7 entries with this thinking trap, across your whole journal."
-  def filter_summary(count, distortion:, query:)
+  def filter_summary(count, distortion:, query:, range: nil)
     entries = pluralize(count, "entry")
-    if distortion && query.present? then "#{entries} with #{distortion.title.downcase} #{count == 1 ? "matches" : "match"} “#{query}”."
-    elsif distortion then "#{entries} with this thinking trap, across your whole journal."
-    else "#{entries} #{count == 1 ? "matches" : "match"} “#{query}”."
+    period = range ? " #{JOURNAL_RANGES.fetch(range).downcase.sub("last", "in the last")}" : ""
+    if distortion && query.present? then "#{entries} with #{distortion.title.downcase} #{count == 1 ? "matches" : "match"} “#{query}”#{period}."
+    elsif distortion then "#{entries} with this thinking trap#{range ? period : ", across your whole journal"}."
+    elsif query.present? then "#{entries} #{count == 1 ? "matches" : "match"} “#{query}”#{period}."
+    else "#{entries}#{period}."
+    end
+  end
+
+  # Heading over a filtered journal: the thinking trap, else the search, else the time range on its own.
+  def filter_heading(distortion:, query:, range:)
+    if distortion then distortion.title
+    elsif query.present? then "Search results"
+    else JOURNAL_RANGES.fetch(range)
+    end
+  end
+
+  # A quiet Edit beside one part of an entry, opening the step where that part was written, so fixing one answer
+  # doesn't mean starting from the first step. Left out for steps the entry can't reach yet (Situation#reachable?).
+  def section_edit_link(situation, step, name)
+    return unless situation.reachable?(step)
+
+    link_to situation_step_path(situation, step), class: "btn-sm btn-ghost -my-1 -mr-3 shrink-0" do
+      safe_join([ "Edit", tag.span(" #{name}", class: "sr-only") ])
     end
   end
 

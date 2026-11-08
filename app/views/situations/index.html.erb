@@ -23,7 +23,7 @@
       <%= render "shared/flash" %>
 
       <% if @any_entries %>
-        <% filters = { q: @query.presence, distortion_id: @distortion&.id, insights_range: @insights_range }.compact %>
+        <% filters = { q: @query.presence, distortion_id: @distortion&.id, range: @range, insights_range: @insights_range }.compact %>
         <%# A filtered journal says so up top, and links back to Insights when that's where the filter came from. %>
         <% if @match_count %>
           <section aria-labelledby="filter_heading" class="flex flex-col gap-4 rounded-3xl panel-teal p-6">
@@ -34,8 +34,8 @@
             <% end %>
             <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div class="min-w-0">
-                <h2 id="filter_heading" class="font-display text-2xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= @distortion ? @distortion.title : "Search results" %></h2>
-                <p role="status" class="mt-1 text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-300"><%= filter_summary @match_count, distortion: @distortion, query: @query %></p>
+                <h2 id="filter_heading" class="font-display text-2xl font-medium tracking-tight text-balance text-stone-900 dark:text-white"><%= filter_heading distortion: @distortion, query: @query, range: @range %></h2>
+                <p role="status" class="mt-1 text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-300"><%= filter_summary @match_count, distortion: @distortion, query: @query, range: @range %></p>
               </div>
               <%= link_to "Show all entries", situations_path, class: "btn-sm btn-secondary self-start sm:self-auto" %>
             </div>
@@ -53,7 +53,7 @@
               <span class="group-open/search:hidden contents"><%= icon :magnifying_glass %> Search entries</span>
               <span class="group-not-open/search:hidden contents"><%= icon :x_mark %> Hide search</span>
             </summary>
-            <%= form_with url: situations_path, method: :get, html: { role: "search" }, class: "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 panel p-4 motion-safe:animate-reveal sm:grid-cols-[minmax(0,1fr)_14rem_auto] sm:p-5" do |form| %>
+            <%= form_with url: situations_path, method: :get, html: { role: "search" }, class: "mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3 panel p-4 motion-safe:animate-reveal sm:grid-cols-[minmax(0,1fr)_13rem_10rem_auto] sm:p-5" do |form| %>
               <div class="col-span-2 flex flex-col gap-2 sm:col-span-1">
                 <%= form.label :q, "Words to find", class: "field-label" %>
                 <div class="relative">
@@ -61,10 +61,14 @@
                   <%= form.search_field :q, value: @query, class: "field pl-9" %>
                 </div>
               </div>
-              <div class="flex min-w-0 flex-col gap-2">
+              <div class="col-span-2 flex min-w-0 flex-col gap-2 sm:col-span-1">
                 <%= form.label :distortion_id, "Thinking trap", class: "field-label" %>
                 <%= form.select :distortion_id, options_from_collection_for_select(Distortion.order(:title), :id, :title, @distortion&.id),
                       { include_blank: "Any" }, class: "field" %>
+              </div>
+              <div class="flex min-w-0 flex-col gap-2">
+                <%= form.label :range, "When", class: "field-label" %>
+                <%= form.select :range, options_for_select(SituationsHelper::JOURNAL_RANGES.invert, @range), { include_blank: "Any time" }, class: "field" %>
               </div>
               <%= form.submit "Search", name: nil, class: "btn btn-secondary py-3 sm:py-2.5" %>
             <% end %>
@@ -94,7 +98,7 @@
         </div>
 
         <% if @situations.empty? %>
-          <p class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">No entries match. Try other words, or a different thinking trap.</p>
+          <p class="rounded-3xl border border-dashed border-stone-950/10 px-6 py-14 text-center text-base/7 text-pretty text-stone-600 sm:text-sm/6 dark:border-white/10 dark:text-stone-400">No entries match. Try other words, a different thinking trap or a longer time.</p>
         <% end %>
 
         <% if @page > 1 || @older_page %>

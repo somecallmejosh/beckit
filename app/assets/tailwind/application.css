@@ -141,6 +141,16 @@
   }
 }
 
+/* While Turbo submits a form it disables the button pressed and marks the form aria-busy. Every button in a busy form
+   dims and shows the wait cursor, so a slow save never looks frozen, even when Enter submitted through the hidden
+   default button. Unlayered, so it wins over the btn utilities' cursor and hover. */
+form[aria-busy='true'] :is(button, input[type='submit']),
+:is(.btn, .btn-lg, .btn-sm):disabled {
+  cursor: wait;
+  opacity: 0.6;
+  translate: none;
+}
+
 /* Page container shared by every signed-in page; header and footer use the same edges. */
 @utility page {
   @apply mx-auto w-full max-w-7xl px-4 pt-8 pb-16 sm:px-6 sm:pt-14 lg:px-8;

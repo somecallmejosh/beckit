@@ -120,7 +120,7 @@
 
       <div class="form-section border-t border-stone-950/5 pt-8 dark:border-white/10">
         <div class="flex max-w-xl flex-col-reverse gap-3 sm:flex-row sm:justify-end lg:col-start-2">
-          <%= form.submit "Save settings", class: "btn btn-primary" %>
+          <%= form.submit "Save settings", class: "btn btn-primary", data: { turbo_submits_with: "Saving…" } %>
         </div>
       </div>
     <% end %>
@@ -142,10 +142,10 @@
             <%= form.password_field :password_challenge, required: true, autofocus: @password_user.present?, autocomplete: "current-password", maxlength: 72, class: "field" %>
           </div>
 
-          <%= render "shared/new_password_fields", form:, label: "New password", confirm_label: "Confirm new password" %>
+          <%= render "shared/new_password_fields", form:, label: "New password", confirm_label: "Confirm new password", record: @password_user %>
 
           <div>
-            <%= form.submit "Change password", class: "btn btn-secondary" %>
+            <%= form.submit "Change password", class: "btn btn-secondary", data: { turbo_submits_with: "Changing…" } %>
           </div>
         <% end %>
 

@@ -7,7 +7,7 @@ class SituationsController < ApplicationController
   before_action :set_distortions, :set_suggestions, only: %i[ new create ]
 
   # GET /situations
-  # GET /situations?q=&distortion_id=&insights_range=&page= ; GET /situations.csv exports every entry (linked from Settings).
+  # GET /situations?q=&distortion_id=&range=&insights_range=&page= ; GET /situations.csv exports every entry (linked from Settings).
   def index
     situations = Current.user.situations.includes(:distortions).order(date: :desc)
 
@@ -56,9 +56,12 @@ class SituationsController < ApplicationController
       @distortion = Distortion.find_by(id: params[:distortion_id]) if params[:distortion_id].present?
       # Set when a thinking trap's Insights page linked here, so the journal can link back to the same view.
       @insights_range = params[:insights_range] if @distortion && DistortionInsights::RANGES.key?(params[:insights_range])
+      # "When" in search: the last 30 or 90 days or year, with the same keys as Insights' ranges. Blank is any time.
+      @range = params[:range] if params[:range].in?(SituationsHelper::JOURNAL_RANGES.keys)
       situations = situations.search(@query) if @query.present?
       situations = situations.tagged_with(@distortion) if @distortion
-      @match_count = situations.count if @query.present? || @distortion
+      situations = situations.where(date: DistortionInsights::RANGES.fetch(@range).ago..) if @range
+      @match_count = situations.count if @query.present? || @distortion || @range
 
       @page = [ params[:page].to_i, 1 ].max
       @page_count = [ ((@match_count || situations.count) / PER_PAGE.to_f).ceil, 1 ].max

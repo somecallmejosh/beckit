@@ -17,7 +17,7 @@
 
     <%= render "shared/new_password_fields", form: %>
 
-    <%= form.submit "Create account", class: "btn btn-primary w-full" %>
+    <%= form.submit "Create account", class: "btn btn-primary w-full", data: { turbo_submits_with: "Creating your account…" } %>
   <% end %>
 
   <p class="text-base/6 text-pretty text-stone-600 sm:text-sm/6 dark:text-stone-400">

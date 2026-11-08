@@ -27,16 +27,18 @@
       <%= button_tag "", name: (following && "go_to"), value: following, tabindex: -1, aria: { hidden: true }, class: "sr-only" %>
 
       <%# Steps open in order: earlier ones are links, this one and later ones are buttons that save first, up to the first step still
-          waiting for its answer (or the next one, which saving this step reaches). Past that they wait. The bars fill up to the step showing. %>
+          waiting for its answer (or the next one, which saving this step reaches). Past that they wait. The bars fill up to the step showing.
+          Phones have no room for five labels, so there they're read out but not shown: the bars (24px tall to tap) say
+          "Step 2 of 5" underneath, and the heading below names the step. %>
       <nav aria-label="Entry steps">
         <ol role="list" class="grid grid-cols-5 gap-2 sm:gap-3">
           <% steps.each_with_index do |other, i| %>
             <li>
-              <% item_class = "group flex w-full flex-col gap-2 rounded-xs pb-1 text-left text-sm/5" %>
+              <% item_class = "group flex w-full flex-col gap-2 rounded-xs pb-1 text-left text-sm/5 max-sm:min-h-6 max-sm:justify-center max-sm:pb-0" %>
               <% open_class = "cursor-pointer text-stone-500 hover:text-stone-800 aria-[current=step]:font-medium aria-[current=step]:text-teal-800 dark:text-stone-400 dark:hover:text-stone-200 dark:aria-[current=step]:text-teal-300" %>
               <% label = capture do %>
                 <span aria-hidden="true" class="h-1 w-full rounded-full <%= i <= index ? "bg-teal-600 dark:bg-teal-400" : "bg-stone-950/10 dark:bg-white/10" %>"></span>
-                <span class="text-pretty"><%= step_title(other) %></span>
+                <span class="text-pretty max-sm:sr-only"><%= step_title(other) %></span>
               <% end %>
               <% if i < index %>
                 <%= link_to label, situation_step_path(situation, other), class: [ item_class, open_class ] %>
@@ -48,6 +50,7 @@
             </li>
           <% end %>
         </ol>
+        <p aria-hidden="true" class="mt-1 text-sm/5 text-stone-500 sm:hidden dark:text-stone-400">Step <%= index + 1 %> of <%= steps.size %></p>
       </nav>
 
       <div data-draft-target="notice" hidden role="status" class="flex flex-wrap items-center justify-between gap-3 rounded-2xl panel-teal px-4 py-3 text-base/6 text-teal-900 sm:text-sm/6 dark:text-teal-200">
@@ -84,10 +87,10 @@
         <% end %>
         <div class="ml-auto flex items-center gap-2">
           <% if following %>
-            <%= button_tag save_label, class: "btn-lg btn-ghost" %>
-            <%= button_tag "Next", name: "go_to", value: following, class: "btn-lg btn-primary min-w-24" %>
+            <%= button_tag save_label, class: "btn-lg btn-ghost", data: { turbo_submits_with: "Saving…" } %>
+            <%= button_tag "Next", name: "go_to", value: following, class: "btn-lg btn-primary min-w-24", data: { turbo_submits_with: "Saving…" } %>
           <% else %>
-            <%= button_tag "Save entry", class: "btn-lg btn-primary" %>
+            <%= button_tag "Save entry", class: "btn-lg btn-primary", data: { turbo_submits_with: "Saving…" } %>
           <% end %>
         </div>
       </div>

@@ -2,8 +2,9 @@
 
 <%= render layout: "shared/auth", locals: { title: "Choose a new password" } do %>
   <%= form_with url: password_path(params[:token]), method: :put, class: "flex flex-col gap-6" do |form| %>
-    <%= render "shared/new_password_fields", form:, label: "New password", confirm_label: "Confirm new password", autofocus: true %>
+    <%= render "shared/form_errors", record: @user, prefix: "" %>
+    <%= render "shared/new_password_fields", form:, label: "New password", confirm_label: "Confirm new password", autofocus: true, record: @user %>
 
-    <%= form.submit "Save password", class: "btn btn-primary w-full" %>
+    <%= form.submit "Save password", class: "btn btn-primary w-full", data: { turbo_submits_with: "Saving…" } %>
   <% end %>
 <% end %>
